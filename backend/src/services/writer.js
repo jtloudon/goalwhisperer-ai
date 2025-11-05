@@ -36,8 +36,10 @@ export async function addObjective(filePath, objective) {
     // Add key results
     objective.keyResults.forEach((kr, index) => {
       const krNum = index + 1;
+      // Normalize status to valid values
+      const status = kr.status === 'complete' ? 'complete' : 'in-progress';
       newContent += `#### KR ${newObjId}.${krNum}: ${kr.title}\n`;
-      newContent += `- **Status**: ${kr.status || 'in-progress'}\n`;
+      newContent += `- **Status**: ${status}\n`;
       newContent += `- **Target**: ${kr.target || 'N/A'}\n`;
       newContent += `- **Current**: ${kr.current || 0}\n`;
       newContent += `- **Progress**: ${kr.progress || 0}%\n`;
