@@ -14,9 +14,10 @@
   border-bottom: 1px solid #d0d0e8;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  min-height: 88px;
+  height: 100px;
   display: flex;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .sidebar-header h2 {
