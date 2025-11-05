@@ -56,8 +56,7 @@ function Plans() {
           return (
             <div key={plan.file} className="plan-card">
               <div className="plan-header">
-                <h3>Week {plan.week}, Q{plan.quarter} {plan.year}</h3>
-                <span className="date-range">{plan.dateRange}</span>
+                <h3>{plan.dateRange}</h3>
               </div>
 
               {Object.keys(grouped).length > 0 && (

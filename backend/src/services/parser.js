@@ -264,7 +264,7 @@ export async function parseCompletedItems(filePath) {
 
 /**
  * Parse all weekly plans
- * Standard format: plan-YYYY-MM-DD.md
+ * Standard format: plan-YYYY-MM-DD.md with date-based identification
  */
 export async function parseWeeklyPlans(plansDir) {
   const files = await fs.readdir(plansDir);
@@ -278,9 +278,6 @@ export async function parseWeeklyPlans(plansDir) {
 
     const plan = {
       file,
-      week: 0,
-      quarter: 0,
-      year: 2025,
       dateRange: '',
       actions: [],
     };
