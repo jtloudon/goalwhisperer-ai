@@ -1,5 +1,5 @@
 .claude-panel {
-  width: 400px;
+  width: 440px;
   background: white;
   border-left: 1px solid #e0e0e0;
   display: flex;
@@ -167,7 +167,7 @@
 /* Responsive */
 @media (max-width: 1200px) {
   .claude-panel {
-    width: 350px;
+    width: 385px;
   }
 }
 
