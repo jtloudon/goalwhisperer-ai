@@ -9,6 +9,12 @@ import {
   generateDashboardData,
 } from '../services/parser.js';
 import { chatWithClaude } from '../services/claude.js';
+import {
+  addObjective,
+  addWeeklyPlan,
+  addCompletion,
+  updateKeyResultProgress,
+} from '../services/writer.js';
 
 const router = express.Router();
 
@@ -164,6 +170,123 @@ router.post('/claude/chat', async (req, res) => {
       success: false,
       error: error.message,
     });
+  }
+});
+
+/**
+ * POST /api/objectives/add
+ * Add a new objective with key results
+ * Body: { title, description, keyResults: [{title, status, target, current, progress, targetDate}] }
+ */
+router.post('/objectives/add', async (req, res) => {
+  try {
+    const { title, description, keyResults } = req.body;
+
+    if (!title || !description || !keyResults || !Array.isArray(keyResults)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: title, description, keyResults',
+      });
+    }
+
+    const result = await addObjective(PATHS.objectives.annual, {
+      title,
+      description,
+      keyResults,
+    });
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Error adding objective:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * POST /api/plans/add
+ * Add a weekly plan
+ * Body: { weekStart, weekEnd, actions: [{title, mapsTo, description}] }
+ */
+router.post('/plans/add', async (req, res) => {
+  try {
+    const { weekStart, weekEnd, actions } = req.body;
+
+    if (!weekStart || !weekEnd || !actions || !Array.isArray(actions)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: weekStart, weekEnd, actions',
+      });
+    }
+
+    const result = await addWeeklyPlan(PATHS.plans, {
+      weekStart,
+      weekEnd,
+      actions,
+    });
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Error adding weekly plan:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * POST /api/tracking/complete
+ * Add a completion
+ * Body: { objectiveId, krId, date, description }
+ */
+router.post('/tracking/complete', async (req, res) => {
+  try {
+    const { objectiveId, krId, date, description } = req.body;
+
+    if (!objectiveId || !krId || !date || !description) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: objectiveId, krId, date, description',
+      });
+    }
+
+    const result = await addCompletion(PATHS.tracking.completed, {
+      objectiveId,
+      krId,
+      date,
+      description,
+    });
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Error adding completion:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * POST /api/objectives/update-progress
+ * Update progress on a key result
+ * Body: { krId, current, progress }
+ */
+router.post('/objectives/update-progress', async (req, res) => {
+  try {
+    const { krId, current, progress } = req.body;
+
+    if (!krId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required field: krId',
+      });
+    }
+
+    const result = await updateKeyResultProgress(
+      PATHS.objectives.annual,
+      krId,
+      { current, progress }
+    );
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Error updating progress:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
