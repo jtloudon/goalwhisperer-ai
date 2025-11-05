@@ -4,6 +4,7 @@ import { marked } from 'marked';
 
 /**
  * Parse annual objectives file
+ * Standard format: ## Objective N: Title with #### KR N.M: Title
  */
 export async function parseAnnualObjectives(filePath) {
   const content = await fs.readFile(filePath, 'utf-8');
@@ -20,7 +21,7 @@ export async function parseAnnualObjectives(filePath) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // New objective
+    // Objective: ## Objective N: Title
     if (line.startsWith('## Objective ')) {
       if (currentObj) objectives.push(currentObj);
 
@@ -35,14 +36,14 @@ export async function parseAnnualObjectives(filePath) {
       currentKR = null;
     }
 
-    // Description (support both old and new formats)
-    else if (line.startsWith('**Why this matters**:') || line.startsWith('**Description**:')) {
+    // Description: **Description**: text
+    else if (line.startsWith('**Description**:')) {
       if (currentObj) {
-        currentObj.description = line.replace('**Why this matters**:', '').replace('**Description**:', '').trim();
+        currentObj.description = line.replace('**Description**:', '').trim();
       }
     }
 
-    // Objective Progress
+    // Objective Progress: **Progress**: X%
     else if (line.startsWith('**Progress**:') && currentObj && !currentKR) {
       const progressMatch = line.match(/Progress\*\*: (\d+)%/);
       if (progressMatch) {
@@ -50,34 +51,16 @@ export async function parseAnnualObjectives(filePath) {
       }
     }
 
-    // Key Result (support both old and new formats)
-    else if (line.match(/^- \*\*KR \d+\.\d+\*\*/) || line.match(/^#### KR \d+\.\d+:/)) {
-      // Old format: - **KR 1.1**: Title - Target: date ✅
-      let krMatch = line.match(/\*\*KR (\d+)\.(\d+)\*\*: (.+?) - Target: (.+?)( ✅ COMPLETE)?$/);
-
-      // New format: #### KR 1.1: Title
-      if (!krMatch) {
-        krMatch = line.match(/#### KR (\d+)\.(\d+): (.+)/);
-        if (krMatch && currentObj) {
-          currentKR = {
-            id: `kr-${krMatch[1]}.${krMatch[2]}`,
-            number: `${krMatch[1]}.${krMatch[2]}`,
-            title: krMatch[3],
-            targetDate: null,
-            status: 'in-progress',
-            progress: 0,
-            current: 0,
-            target: 0,
-          };
-          currentObj.keyResults.push(currentKR);
-        }
-      } else if (currentObj) {
+    // Key Result: #### KR N.M: Title
+    else if (line.match(/^#### KR \d+\.\d+:/)) {
+      const krMatch = line.match(/#### KR (\d+)\.(\d+): (.+)/);
+      if (krMatch && currentObj) {
         currentKR = {
           id: `kr-${krMatch[1]}.${krMatch[2]}`,
           number: `${krMatch[1]}.${krMatch[2]}`,
           title: krMatch[3],
-          targetDate: krMatch[4],
-          status: krMatch[5] ? 'complete' : 'in-progress',
+          targetDate: null,
+          status: 'in-progress',
           progress: 0,
           current: 0,
           target: 0,
@@ -86,13 +69,15 @@ export async function parseAnnualObjectives(filePath) {
       }
     }
 
-    // Parse KR attributes (new format)
+    // KR Status: - **Status**: in-progress | complete
     else if (line.startsWith('- **Status**:') && currentKR) {
       const statusMatch = line.match(/Status\*\*: (.+)/);
       if (statusMatch) {
         currentKR.status = statusMatch[1].trim();
       }
     }
+
+    // KR Target: - **Target**: numeric or text
     else if (line.startsWith('- **Target**:') && currentKR) {
       const targetMatch = line.match(/Target\*\*: (.+)/);
       if (targetMatch) {
@@ -100,56 +85,28 @@ export async function parseAnnualObjectives(filePath) {
         currentKR.target = isNaN(val) ? 0 : parseInt(val);
       }
     }
+
+    // KR Current: - **Current**: numeric value
     else if (line.startsWith('- **Current**:') && currentKR) {
       const currentMatch = line.match(/Current\*\*: (.+)/);
       if (currentMatch) {
         currentKR.current = parseInt(currentMatch[1].trim()) || 0;
       }
     }
+
+    // KR Progress: - **Progress**: X%
     else if (line.startsWith('- **Progress**:') && currentKR) {
       const progressMatch = line.match(/Progress\*\*: (\d+)%/);
       if (progressMatch) {
         currentKR.progress = parseInt(progressMatch[1]);
       }
     }
+
+    // KR Target Date: - **Target Date**: YYYY-MM-DD
     else if (line.startsWith('- **Target Date**:') && currentKR) {
       const dateMatch = line.match(/Target Date\*\*: (.+)/);
       if (dateMatch) {
         currentKR.targetDate = dateMatch[1].trim();
-      }
-    }
-
-    // Measurement type
-    else if (line.includes('- Measurement:') && currentKR) {
-      const measureMatch = line.match(/Measurement: (\w+)/);
-      if (measureMatch) {
-        currentKR.measurement = measureMatch[1].toLowerCase();
-      }
-    }
-
-    // Weight
-    else if (line.includes('- Weight:') && currentKR) {
-      const weightMatch = line.match(/Weight: (\d+)%/);
-      if (weightMatch) {
-        currentKR.weight = parseInt(weightMatch[1]);
-      }
-    }
-
-    // Current Progress
-    else if (line.includes('- Current Progress:') && currentKR) {
-      const progressMatch = line.match(/Current Progress: (\d+)\/(\d+).*\((\d+)%\)/);
-      if (progressMatch) {
-        currentKR.current = parseInt(progressMatch[1]);
-        currentKR.target = parseInt(progressMatch[2]);
-        currentKR.progress = parseInt(progressMatch[3]);
-      }
-    }
-
-    // Overall progress
-    else if (line.includes('**Overall Objective Progress**:') && currentObj) {
-      const progressMatch = line.match(/(\d+)%/);
-      if (progressMatch) {
-        currentObj.progress = parseInt(progressMatch[1]);
       }
     }
   }
@@ -307,10 +264,11 @@ export async function parseCompletedItems(filePath) {
 
 /**
  * Parse all weekly plans
+ * Standard format: plan-YYYY-MM-DD.md
  */
 export async function parseWeeklyPlans(plansDir) {
   const files = await fs.readdir(plansDir);
-  const planFiles = files.filter(f => f.match(/2025-week-\d+-q\d+\.md/));
+  const planFiles = files.filter(f => f.match(/plan-\d{4}-\d{2}-\d{2}\.md/));
 
   const plans = [];
 
@@ -327,61 +285,60 @@ export async function parseWeeklyPlans(plansDir) {
       actions: [],
     };
 
-    // Extract week/quarter from filename
-    const filenameMatch = file.match(/2025-week-(\d+)-q(\d+)\.md/);
-    if (filenameMatch) {
-      plan.week = parseInt(filenameMatch[1]);
-      plan.quarter = parseInt(filenameMatch[2]);
-    }
-
-    // Extract date range from title
-    const titleMatch = content.match(/# Week \d+, Q\d+ \d+ - Weekly Plan\n\*(.+?)\*/);
+    // Extract date range from title: # Weekly Plan: YYYY-MM-DD to YYYY-MM-DD
+    const titleMatch = content.match(/# Weekly Plan: (.+?) to (.+)/);
     if (titleMatch) {
-      plan.dateRange = titleMatch[1];
+      plan.dateRange = `${titleMatch[1]} to ${titleMatch[2]}`;
     }
 
-    // Extract actions with "Maps to" field
-    const actionsSection = content.match(/## Key Actions This Week\n\n([\s\S]+?)(?=\n## |$)/);
-    if (actionsSection) {
-      // Split into individual action blocks
-      const actionBlocks = actionsSection[1].split(/(?=### \d+\.)/);
+    // Parse actions: ## Title format
+    let i = 0;
+    // Skip header line
+    while (i < lines.length && !lines[i].startsWith('## ')) i++;
 
-      for (const block of actionBlocks) {
-        if (!block.trim()) continue;
+    while (i < lines.length) {
+      const line = lines[i];
 
-        // Extract action title
-        const titleMatch = block.match(/### \d+\. (.+)/);
-        if (!titleMatch) continue;
-
+      if (line.startsWith('## ')) {
+        const title = line.replace('## ', '').trim();
         const action = {
-          title: titleMatch[1],
+          title,
           mapsTo: null,
           objectiveId: null,
           krId: null,
         };
 
-        // Extract "Maps to" field
-        const mapsToMatch = block.match(/\*\*Maps to\*\*:\s*(.+)/);
-        if (mapsToMatch) {
-          action.mapsTo = mapsToMatch[1].trim();
+        // Look ahead for Maps to field
+        i++;
+        while (i < lines.length && !lines[i].startsWith('## ')) {
+          const contentLine = lines[i];
 
-          // Try to extract KR reference (e.g., "KR 1.2")
-          const krMatch = action.mapsTo.match(/KR (\d+)\.(\d+)/);
-          if (krMatch) {
-            action.objectiveId = `obj-${krMatch[1]}`;
-            action.krId = `kr-${krMatch[1]}.${krMatch[2]}`;
+          const mapsToMatch = contentLine.match(/\*\*Maps to\*\*:\s*(.+)/);
+          if (mapsToMatch) {
+            action.mapsTo = mapsToMatch[1].trim();
+
+            // Extract KR reference (e.g., "KR 1.2")
+            const krMatch = action.mapsTo.match(/KR (\d+)\.(\d+)/);
+            if (krMatch) {
+              action.objectiveId = `obj-${krMatch[1]}`;
+              action.krId = `kr-${krMatch[1]}.${krMatch[2]}`;
+            }
           }
+
+          i++;
         }
 
         plan.actions.push(action);
+      } else {
+        i++;
       }
     }
 
     plans.push(plan);
   }
 
-  // Sort by week descending (newest first)
-  plans.sort((a, b) => b.week - a.week);
+  // Sort by date descending (newest first)
+  plans.sort((a, b) => b.dateRange.localeCompare(a.dateRange));
 
   return plans;
 }
