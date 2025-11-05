@@ -81,7 +81,7 @@ function Dashboard() {
             <div key={obj.id} className="objective-card">
               <div className="objective-header">
                 <div>
-                  <h3>{obj.title}</h3>
+                  <h3>Objective {obj.number}: {obj.title}</h3>
                   <div className="kr-summary">
                     {completeKRs > 0 && <span className="kr-stat status-complete">{completeKRs} Complete</span>}
                     {inProgressKRs > 0 && <span className="kr-stat status-in-progress">{inProgressKRs} In Progress</span>}
@@ -97,7 +97,7 @@ function Dashboard() {
               {obj.keyResults.map(kr => (
                 <div key={kr.id} className="key-result">
                   <div className="kr-header">
-                    <span className="kr-title">{kr.title}</span>
+                    <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
                     <span className={`kr-status-indicator status-${kr.status}`}></span>
                   </div>
                   <div className="progress-bar">
