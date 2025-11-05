@@ -40,7 +40,7 @@ function Objectives() {
           <h2>Active Objectives ({objectivesData.current.year})</h2>
           {currentObjectives.map(obj => (
         <div key={obj.id} className="objective-card">
-          <h2>{obj.title}</h2>
+          <h2>Objective {obj.number}: {obj.title}</h2>
           <p>{obj.description}</p>
           <div className="progress-info">
             <strong>Overall Progress: {obj.progress}%</strong>
@@ -49,7 +49,7 @@ function Objectives() {
           {obj.keyResults.map(kr => (
             <div key={kr.id} className="kr-item">
               <div className="kr-title-row">
-                <span>{kr.title}</span>
+                <span><strong>KR {kr.number}:</strong> {kr.title}</span>
                 <span className={`status-badge ${kr.status}`}>{kr.status}</span>
               </div>
               <div className="progress-bar">
@@ -75,7 +75,7 @@ function Objectives() {
               <h3>{yearData.year}</h3>
               {yearData.objectives.map(obj => (
                 <div key={obj.id} className="objective-card completed">
-                  <h4>{obj.title}</h4>
+                  <h4>Objective {obj.number}: {obj.title}</h4>
                   <p>{obj.description}</p>
                   <div className="progress-info">
                     <strong>Final Progress: {obj.progress}%</strong>
@@ -85,7 +85,7 @@ function Objectives() {
                     {obj.keyResults.map(kr => (
                       <div key={kr.id} className="kr-item">
                         <div className="kr-title-row">
-                          <span>{kr.title}</span>
+                          <span><strong>KR {kr.number}:</strong> {kr.title}</span>
                           <span className={`status-badge ${kr.status}`}>{kr.status}</span>
                         </div>
                         <div className="progress-bar">
