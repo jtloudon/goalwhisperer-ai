@@ -12,8 +12,7 @@
 .claude-header {
   padding: 1.5rem;
   border-bottom: 1px solid #e0e0e0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: white;
   height: 100px;
   display: flex;
   flex-direction: column;
@@ -24,12 +23,17 @@
 .claude-header h3 {
   margin: 0 0 0.25rem 0;
   font-size: 1.25rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
 }
 
 .claude-subtitle {
   margin: 0;
   font-size: 0.85rem;
-  opacity: 0.9;
+  color: #666;
 }
 
 .claude-messages {
