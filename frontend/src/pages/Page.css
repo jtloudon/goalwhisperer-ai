@@ -1,0 +1,520 @@
+.page-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: #333;
+}
+
+.page-content h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #333 !important;
+}
+
+.page-content h2 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #333 !important;
+}
+
+.page-content h3 {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #444 !important;
+}
+
+.page-content p {
+  color: #333 !important;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Objectives Page */
+.objective-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.progress-info {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f0f7ff;
+  border-radius: 8px;
+}
+
+.kr-item {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.kr-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.kr-title-row > span {
+  color: #333;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-badge.complete {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.in-progress {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+}
+
+.kr-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+/* Plans Page */
+.plans-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.plan-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.plan-header {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.plan-header h3 {
+  margin: 0 0 0.5rem 0;
+  color: #667eea;
+}
+
+.date-range {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.actions-list h4 {
+  margin-bottom: 0.75rem;
+  color: #444;
+  font-size: 1rem;
+}
+
+.actions-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.actions-list li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+
+.actions-list li:last-child {
+  border-bottom: none;
+}
+
+.actions-by-objective {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.objective-group {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #667eea;
+}
+
+.objective-title {
+  margin: 0 0 1.25rem 0;
+  color: #667eea;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.objective-group .actions-list {
+  margin-top: 0;
+}
+
+.objective-group .actions-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.objective-group .actions-list li {
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 3px solid #e0e0e0;
+}
+
+.objective-group .actions-list li:last-child {
+  margin-bottom: 0;
+}
+
+.action-title {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+  font-size: 1rem;
+}
+
+.kr-reference {
+  display: block;
+  font-size: 0.875rem;
+  color: #667eea;
+  padding-left: 1rem;
+  border-left: 2px solid #e0e0e0;
+  margin-top: 0.5rem;
+}
+
+.actions-ungrouped {
+  margin-top: 2rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #999;
+}
+
+.actions-ungrouped h4 {
+  margin: 0 0 1.25rem 0;
+  color: #666;
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.actions-ungrouped .actions-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.actions-ungrouped .actions-list li {
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 3px solid #e0e0e0;
+}
+
+.actions-ungrouped .actions-list li:last-child {
+  margin-bottom: 0;
+}
+
+.maps-to-note {
+  display: block;
+  font-size: 0.875rem;
+  color: #888;
+  padding-left: 1rem;
+  border-left: 2px solid #e0e0e0;
+  margin-top: 0.5rem;
+}
+
+/* Completed Page */
+.objective-section {
+  margin-bottom: 3rem;
+}
+
+.objective-section h2 {
+  color: #667eea;
+  margin-bottom: 1.5rem;
+}
+
+.kr-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.kr-section h3 {
+  margin-top: 0;
+  color: #444 !important;
+}
+
+.completions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.completion-row {
+  display: grid;
+  grid-template-columns: 100px 40px 1fr;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 6px;
+  align-items: center;
+}
+
+.completion-row .date {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.completion-row .status {
+  font-size: 1.2rem;
+}
+
+.completion-row .description {
+  color: #333;
+}
+
+/* Progress Page */
+.summary-header {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.summary-header h2 {
+  margin: 0 0 0.5rem 0;
+  color: #667eea !important;
+}
+
+.generated-date {
+  color: #666 !important;
+  font-size: 0.9rem;
+}
+
+.overview-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.wins-section {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.wins-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.wins-section li {
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  background: #f0f7ff;
+  border-left: 4px solid #667eea;
+  border-radius: 4px;
+  color: #333 !important;
+}
+
+/* Objectives Page */
+.current-objectives {
+  margin-bottom: 3rem;
+}
+
+.current-objectives h2 {
+  color: #667eea;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.completed-objectives {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 3px solid #f0f0f0;
+}
+
+.completed-objectives h2 {
+  color: #888;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.year-section {
+  margin-bottom: 2rem;
+}
+
+.year-section h3 {
+  color: #666;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.objective-card.completed {
+  opacity: 0.85;
+  border-left: 4px solid #ccc;
+}
+
+.objective-card.completed h4 {
+  color: #666;
+  font-size: 1.1rem;
+  margin-top: 0;
+}
+
+.objective-card details {
+  margin-top: 1rem;
+}
+
+.objective-card summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: #667eea;
+  padding: 0.5rem;
+  user-select: none;
+}
+
+.objective-card summary:hover {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.objective-card details[open] summary {
+  margin-bottom: 1rem;
+}
+
+/* About Page */
+.page-content section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.page-content ul,
+.page-content ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+  color: #333;
+}
+
+.page-content li {
+  margin: 0.5rem 0;
+  color: #333 !important;
+}
+
+.page-content strong {
+  color: #333 !important;
+}
+
+.page-content a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.page-content a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-content {
+    padding: 1rem;
+  }
+
+  .completion-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

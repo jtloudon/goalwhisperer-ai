@@ -1,0 +1,18 @@
+{
+  "name": "okr-web-app",
+  "version": "0.1.0",
+  "description": "AI-powered OKR management system with conversational interface",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "build": "cd frontend && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "Jesse Loudon",
+  "license": "MIT"
+}

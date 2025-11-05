@@ -1,0 +1,24 @@
+{
+  "name": "okr-backend",
+  "version": "0.1.0",
+  "description": "Backend API for OKR web app",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "gray-matter": "^4.0.3",
+    "marked": "^15.0.4",
+    "chokidar": "^4.0.3",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
