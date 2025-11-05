@@ -21,10 +21,10 @@ export async function parseAnnualObjectives(filePath) {
     const line = lines[i];
 
     // New objective
-    if (line.startsWith('### Objective ')) {
+    if (line.startsWith('## Objective ')) {
       if (currentObj) objectives.push(currentObj);
 
-      const match = line.match(/### Objective (\d+): (.+)/);
+      const match = line.match(/## Objective (\d+): (.+)/);
       currentObj = {
         id: `obj-${match[1]}`,
         number: parseInt(match[1]),
@@ -35,17 +35,43 @@ export async function parseAnnualObjectives(filePath) {
       currentKR = null;
     }
 
-    // Why this matters
-    else if (line.startsWith('**Why this matters**:')) {
+    // Description (support both old and new formats)
+    else if (line.startsWith('**Why this matters**:') || line.startsWith('**Description**:')) {
       if (currentObj) {
-        currentObj.description = line.replace('**Why this matters**:', '').trim();
+        currentObj.description = line.replace('**Why this matters**:', '').replace('**Description**:', '').trim();
       }
     }
 
-    // Key Result
-    else if (line.match(/^- \*\*KR \d+\.\d+\*\*/)) {
-      const krMatch = line.match(/\*\*KR (\d+)\.(\d+)\*\*: (.+?) - Target: (.+?)( ✅ COMPLETE)?$/);
-      if (krMatch && currentObj) {
+    // Objective Progress
+    else if (line.startsWith('**Progress**:') && currentObj && !currentKR) {
+      const progressMatch = line.match(/Progress\*\*: (\d+)%/);
+      if (progressMatch) {
+        currentObj.progress = parseInt(progressMatch[1]);
+      }
+    }
+
+    // Key Result (support both old and new formats)
+    else if (line.match(/^- \*\*KR \d+\.\d+\*\*/) || line.match(/^#### KR \d+\.\d+:/)) {
+      // Old format: - **KR 1.1**: Title - Target: date ✅
+      let krMatch = line.match(/\*\*KR (\d+)\.(\d+)\*\*: (.+?) - Target: (.+?)( ✅ COMPLETE)?$/);
+
+      // New format: #### KR 1.1: Title
+      if (!krMatch) {
+        krMatch = line.match(/#### KR (\d+)\.(\d+): (.+)/);
+        if (krMatch && currentObj) {
+          currentKR = {
+            id: `kr-${krMatch[1]}.${krMatch[2]}`,
+            number: `${krMatch[1]}.${krMatch[2]}`,
+            title: krMatch[3],
+            targetDate: null,
+            status: 'in-progress',
+            progress: 0,
+            current: 0,
+            target: 0,
+          };
+          currentObj.keyResults.push(currentKR);
+        }
+      } else if (currentObj) {
         currentKR = {
           id: `kr-${krMatch[1]}.${krMatch[2]}`,
           number: `${krMatch[1]}.${krMatch[2]}`,
@@ -57,6 +83,39 @@ export async function parseAnnualObjectives(filePath) {
           target: 0,
         };
         currentObj.keyResults.push(currentKR);
+      }
+    }
+
+    // Parse KR attributes (new format)
+    else if (line.startsWith('- **Status**:') && currentKR) {
+      const statusMatch = line.match(/Status\*\*: (.+)/);
+      if (statusMatch) {
+        currentKR.status = statusMatch[1].trim();
+      }
+    }
+    else if (line.startsWith('- **Target**:') && currentKR) {
+      const targetMatch = line.match(/Target\*\*: (.+)/);
+      if (targetMatch) {
+        const val = targetMatch[1].trim();
+        currentKR.target = isNaN(val) ? 0 : parseInt(val);
+      }
+    }
+    else if (line.startsWith('- **Current**:') && currentKR) {
+      const currentMatch = line.match(/Current\*\*: (.+)/);
+      if (currentMatch) {
+        currentKR.current = parseInt(currentMatch[1].trim()) || 0;
+      }
+    }
+    else if (line.startsWith('- **Progress**:') && currentKR) {
+      const progressMatch = line.match(/Progress\*\*: (\d+)%/);
+      if (progressMatch) {
+        currentKR.progress = parseInt(progressMatch[1]);
+      }
+    }
+    else if (line.startsWith('- **Target Date**:') && currentKR) {
+      const dateMatch = line.match(/Target Date\*\*: (.+)/);
+      if (dateMatch) {
+        currentKR.targetDate = dateMatch[1].trim();
       }
     }
 
