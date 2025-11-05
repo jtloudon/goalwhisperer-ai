@@ -14,6 +14,10 @@
   border-bottom: 1px solid #e0e0e0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .claude-header h3 {
