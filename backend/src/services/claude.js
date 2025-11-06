@@ -4,6 +4,10 @@ import {
   addWeeklyPlan,
   addCompletion,
   updateKeyResultProgress,
+  updateKeyResult,
+  deleteObjective,
+  deleteKeyResult,
+  deleteWeeklyPlan,
 } from './writer.js';
 import PATHS from '../config/paths.js';
 
@@ -77,7 +81,7 @@ const tools = [
   },
   {
     name: 'update_progress',
-    description: 'Update progress on a key result. Use this when the user reports progress or completion of work.',
+    description: 'Update ONLY the current value and progress percentage on a key result. Use this when the user reports measurable progress (e.g., "I completed 3 more items" or "I\'m now at 50%"). DO NOT use this for changing titles, dates, or status.',
     input_schema: {
       type: 'object',
       properties: {
@@ -86,6 +90,54 @@ const tools = [
         progress: { type: 'number', description: 'New progress percentage (0-100)' },
       },
       required: ['krId'],
+    },
+  },
+  {
+    name: 'update_key_result',
+    description: 'Update key result details including title, status, target value, or target date. Use this when the user wants to CHANGE or MODIFY or UPDATE the title, description, wording, status, target value, or due date of a key result. Examples: "change the title", "update KR 1.2 to say...", "rename KR 1.3", "change the target date".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        krId: { type: 'string', description: 'Key result ID (e.g., "kr-1.2")' },
+        title: { type: 'string', description: 'New title for the key result' },
+        status: { type: 'string', enum: ['in-progress', 'complete'], description: 'New status' },
+        target: { type: 'string', description: 'New target value or description' },
+        targetDate: { type: 'string', description: 'New target date (YYYY-MM-DD)' },
+      },
+      required: ['krId'],
+    },
+  },
+  {
+    name: 'delete_objective',
+    description: 'Delete an entire objective and all its key results. Use this when the user wants to remove or delete an objective. IMPORTANT: Use the objective NUMBER displayed in the UI (e.g., "3" for "Objective 3"), NOT the obj-X ID. Examples: user says "delete objective 2" → use objectiveNumber: "2".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        objectiveNumber: { type: 'string', description: 'The objective number displayed in the markdown (e.g., "1", "2", "3") - this is what the user sees as "Objective N:"' },
+      },
+      required: ['objectiveNumber'],
+    },
+  },
+  {
+    name: 'delete_key_result',
+    description: 'Delete a single key result from an objective. Use this when the user wants to remove or delete a specific key result. Accept flexible formats from user. Examples: user says "delete KR 1.2" → use krId: "1.2" or "kr-1.2".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        krId: { type: 'string', description: 'Key result identifier in any format: "1.2", "kr-1.2", or "KR 1.2" - all work' },
+      },
+      required: ['krId'],
+    },
+  },
+  {
+    name: 'delete_weekly_plan',
+    description: 'Delete a weekly plan. Use this when the user wants to remove or delete a weekly plan. Examples: "delete the plan for week of Nov 7", "remove weekly plan 2025-11-07".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        weekStart: { type: 'string', description: 'Week start date (YYYY-MM-DD) of the plan to delete' },
+      },
+      required: ['weekStart'],
     },
   },
 ];
@@ -106,6 +158,28 @@ async function executeTool(toolName, toolInput) {
           toolInput.krId,
           { current: toolInput.current, progress: toolInput.progress }
         );
+
+      case 'update_key_result':
+        return await updateKeyResult(
+          PATHS.objectives.annual,
+          toolInput.krId,
+          {
+            title: toolInput.title,
+            status: toolInput.status,
+            target: toolInput.target,
+            targetDate: toolInput.targetDate,
+          }
+        );
+
+      case 'delete_objective':
+        // Pass the display number directly - the function will handle parsing
+        return await deleteObjective(PATHS.objectives.annual, toolInput.objectiveNumber);
+
+      case 'delete_key_result':
+        return await deleteKeyResult(PATHS.objectives.annual, toolInput.krId);
+
+      case 'delete_weekly_plan':
+        return await deleteWeeklyPlan(PATHS.plans, toolInput.weekStart);
 
       default:
         throw new Error(`Unknown tool: ${toolName}`);

@@ -157,15 +157,22 @@ export async function updateKeyResultProgress(filePath, krId, updates) {
   try {
     let content = await fs.readFile(filePath, 'utf-8');
 
+    // Convert krId format (kr-1.2) to markdown format (KR 1.2)
+    const idMatch = krId.match(/kr-(\d+)\.(\d+)/);
+    if (!idMatch) {
+      throw new Error(`Invalid KR ID format: ${krId}`);
+    }
+    const markdownKrId = `KR ${idMatch[1]}.${idMatch[2]}`;
+
     // Update current value
     if (updates.current !== undefined) {
-      const currentRegex = new RegExp(`(#### ${krId}:.*?- \\*\\*Current\\*\\*: )(\\d+)`, 's');
+      const currentRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Current\\*\\*: )(\\d+)`, 's');
       content = content.replace(currentRegex, `$1${updates.current}`);
     }
 
     // Update progress
     if (updates.progress !== undefined) {
-      const progressRegex = new RegExp(`(#### ${krId}:.*?- \\*\\*Progress\\*\\*: )(\\d+)%`, 's');
+      const progressRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Progress\\*\\*: )(\\d+)%`, 's');
       content = content.replace(progressRegex, `$1${updates.progress}%`);
     }
 
@@ -178,5 +185,213 @@ export async function updateKeyResultProgress(filePath, krId, updates) {
   } catch (error) {
     console.error('Error updating KR progress:', error);
     throw new Error(`Failed to update KR progress: ${error.message}`);
+  }
+}
+
+/**
+ * Update key result details (title, target date, status, etc.)
+ * @param {string} filePath - Path to the annual objectives markdown file
+ * @param {string} krId - Key result ID (e.g., "kr-1.1")
+ * @param {Object} updates - Updates to apply
+ * @param {string} updates.title - New KR title
+ * @param {string} updates.targetDate - New target date
+ * @param {string} updates.status - New status (in-progress, complete)
+ * @param {number} updates.target - New target value
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function updateKeyResult(filePath, krId, updates) {
+  try {
+    let content = await fs.readFile(filePath, 'utf-8');
+
+    // Convert krId format (kr-1.2) to markdown format (KR 1.2)
+    // Extract numbers from kr-X.Y format
+    const idMatch = krId.match(/kr-(\d+)\.(\d+)/);
+    if (!idMatch) {
+      throw new Error(`Invalid KR ID format: ${krId}`);
+    }
+    const markdownKrId = `KR ${idMatch[1]}.${idMatch[2]}`;
+
+    // Update title
+    if (updates.title !== undefined) {
+      const titleRegex = new RegExp(`(#### ${markdownKrId}: )([^\n]+)`);
+      content = content.replace(titleRegex, `$1${updates.title}`);
+    }
+
+    // Update status
+    if (updates.status !== undefined) {
+      const status = updates.status === 'complete' ? 'complete' : 'in-progress';
+      const statusRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Status\\*\\*: )(.+?)\\n`, 's');
+      content = content.replace(statusRegex, `$1${status}\n`);
+    }
+
+    // Update target
+    if (updates.target !== undefined) {
+      const targetRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Target\\*\\*: )(.+?)\\n`, 's');
+      content = content.replace(targetRegex, `$1${updates.target}\n`);
+    }
+
+    // Update target date
+    if (updates.targetDate !== undefined) {
+      const dateRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Target Date\\*\\*: )(.+?)\\n`, 's');
+      content = content.replace(dateRegex, `$1${updates.targetDate}\n`);
+    }
+
+    await fs.writeFile(filePath, content);
+
+    return {
+      success: true,
+      message: `Successfully updated ${krId}`,
+    };
+  } catch (error) {
+    console.error('Error updating KR:', error);
+    throw new Error(`Failed to update KR: ${error.message}`);
+  }
+}
+
+/**
+ * Delete an entire objective and all its key results
+ * @param {string} filePath - Path to the annual objectives markdown file
+ * @param {string} objectiveNumber - Objective display number (e.g., "1", "2", "3") - this is the number shown in the markdown "Objective N:"
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function deleteObjective(filePath, objectiveNumber) {
+  try {
+    let content = await fs.readFile(filePath, 'utf-8');
+
+    // Extract just the number - accept "1", "obj-1", or "Objective 1"
+    let objNumber;
+    if (objectiveNumber.match(/^\d+$/)) {
+      // Already just a number like "1"
+      objNumber = objectiveNumber;
+    } else if (objectiveNumber.match(/^obj-(\d+)$/)) {
+      // Format like "obj-1"
+      objNumber = objectiveNumber.match(/^obj-(\d+)$/)[1];
+    } else if (objectiveNumber.match(/^objective\s+(\d+)$/i)) {
+      // Format like "Objective 1"
+      objNumber = objectiveNumber.match(/^objective\s+(\d+)$/i)[1];
+    } else {
+      throw new Error(`Invalid objective format: ${objectiveNumber}. Use format like "1", "obj-1", or "Objective 1"`);
+    }
+
+    // Find the objective section to delete by its DISPLAY number
+    // Pattern: ## Objective N: ... up to next ## Objective or end of file
+    const objectiveRegex = new RegExp(
+      `## Objective ${objNumber}:.*?(?=\\n## Objective \\d+:|$)`,
+      's'
+    );
+
+    const match = content.match(objectiveRegex);
+    if (!match) {
+      throw new Error(`Objective ${objNumber} not found in the markdown`);
+    }
+
+    // Remove the objective section
+    content = content.replace(objectiveRegex, '');
+
+    // Clean up any extra blank lines
+    content = content.replace(/\n{3,}/g, '\n\n');
+
+    await fs.writeFile(filePath, content);
+
+    return {
+      success: true,
+      message: `Successfully deleted Objective ${objNumber}`,
+    };
+  } catch (error) {
+    console.error('Error deleting objective:', error);
+    throw new Error(`Failed to delete objective: ${error.message}`);
+  }
+}
+
+/**
+ * Delete a single key result from an objective
+ * @param {string} filePath - Path to the annual objectives markdown file
+ * @param {string} krId - Key result identifier (e.g., "1.2", "kr-1.2", or "KR 1.2")
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function deleteKeyResult(filePath, krId) {
+  try {
+    let content = await fs.readFile(filePath, 'utf-8');
+
+    // Normalize KR ID format - accept "1.2", "kr-1.2", or "KR 1.2"
+    let objNum, krNum;
+
+    if (krId.match(/^(\d+)\.(\d+)$/)) {
+      // Format like "1.2"
+      const match = krId.match(/^(\d+)\.(\d+)$/);
+      objNum = match[1];
+      krNum = match[2];
+    } else if (krId.match(/^kr-(\d+)\.(\d+)$/i)) {
+      // Format like "kr-1.2" or "KR-1.2"
+      const match = krId.match(/^kr-(\d+)\.(\d+)$/i);
+      objNum = match[1];
+      krNum = match[2];
+    } else if (krId.match(/^kr\s+(\d+)\.(\d+)$/i)) {
+      // Format like "KR 1.2"
+      const match = krId.match(/^kr\s+(\d+)\.(\d+)$/i);
+      objNum = match[1];
+      krNum = match[2];
+    } else {
+      throw new Error(`Invalid KR format: ${krId}. Use format like "1.2", "kr-1.2", or "KR 1.2"`);
+    }
+
+    const markdownKrId = `KR ${objNum}.${krNum}`;
+
+    // Find the KR section to delete
+    // Pattern: #### KR X.Y: ... up to next #### or ## or end
+    const krRegex = new RegExp(
+      `#### ${markdownKrId}:.*?(?=\\n####|\\n##|$)`,
+      's'
+    );
+
+    const match = content.match(krRegex);
+    if (!match) {
+      throw new Error(`${markdownKrId} not found in the markdown`);
+    }
+
+    // Remove the KR section
+    content = content.replace(krRegex, '');
+
+    // Clean up any extra blank lines
+    content = content.replace(/\n{3,}/g, '\n\n');
+
+    await fs.writeFile(filePath, content);
+
+    return {
+      success: true,
+      message: `Successfully deleted ${markdownKrId}`,
+    };
+  } catch (error) {
+    console.error('Error deleting KR:', error);
+    throw new Error(`Failed to delete KR: ${error.message}`);
+  }
+}
+
+/**
+ * Delete a weekly plan file
+ * @param {string} plansDir - Path to the plans directory
+ * @param {string} weekStart - Week start date (YYYY-MM-DD) of the plan to delete
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function deleteWeeklyPlan(plansDir, weekStart) {
+  try {
+    const fileName = `${plansDir}/plan-${weekStart}.md`;
+
+    // Check if file exists
+    try {
+      await fs.access(fileName);
+    } catch {
+      throw new Error(`Weekly plan for ${weekStart} not found`);
+    }
+
+    await fs.unlink(fileName);
+
+    return {
+      success: true,
+      message: `Successfully deleted weekly plan for ${weekStart}`,
+    };
+  } catch (error) {
+    console.error('Error deleting weekly plan:', error);
+    throw new Error(`Failed to delete weekly plan: ${error.message}`);
   }
 }
