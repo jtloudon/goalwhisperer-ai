@@ -40,8 +40,8 @@ function About() {
           <li>Your OKR data is stored in markdown files</li>
           <li>The backend API parses these files into structured data</li>
           <li>The frontend displays your data with beautiful visualizations</li>
-          <li>Chat with Claude to update your progress (coming soon)</li>
-          <li>Dashboard auto-refreshes when files change (coming soon)</li>
+          <li>Chat with Claude AI to create objectives, update progress, and manage weekly plans</li>
+          <li>All pages auto-refresh every 5 seconds to reflect changes</li>
         </ol>
       </section>
 
