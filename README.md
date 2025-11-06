@@ -94,12 +94,19 @@ When you want to mark a weekly action as complete, reference it by number:
 3. The page will auto-refresh and show the completed action with a checkmark and strikethrough
 
 **CRITICAL for the agent:**
-- Always use the Edit tool to modify the markdown file. Simply saying "I've marked it complete" without actually editing the file won't work.
+- **YOU MUST USE THE EDIT TOOL.** Simply saying "I've marked it complete" or "I've updated the file" is NOT enough. You must actually invoke the Edit tool with the file path and the exact old_string/new_string parameters.
 - **ONLY modify the action title line (the `##` heading).** Do NOT touch the `**Maps to**:` line or any other content below the action title.
-- Example of correct edit:
+- **Verify your work:** After using the Edit tool, the system will confirm the edit was successful. If you don't see this confirmation, the file was NOT modified.
+- Example of correct workflow:
   ```
-  OLD: ## Design OKR tracking web app architecture
-  NEW: ## ✅ Design OKR tracking web app architecture
+  1. User says: "Mark action 1 complete from week 10/7"
+  2. You read: personal/plans/plan-2025-10-07.md
+  3. You identify action 1: "## Create career/current-profile.md"
+  4. You use Edit tool:
+     - old_string: "## Create career/current-profile.md"
+     - new_string: "## ✅ Create career/current-profile.md"
+  5. System confirms: "File has been updated"
+  6. You tell user: "I've marked action 1 complete"
 
   (Keep everything else unchanged, including the **Maps to**: line)
   ```
