@@ -73,6 +73,19 @@ export async function addWeeklyPlan(plansDir, plan) {
   try {
     const fileName = `${plansDir}/plan-${plan.weekStart}.md`;
 
+    // Check if file already exists
+    try {
+      await fs.access(fileName);
+      // File exists - return error telling AI to use update instead
+      throw new Error(`A weekly plan for ${plan.weekStart} already exists. Use update_weekly_plan instead of add_weekly_plan to modify it.`);
+    } catch (err) {
+      // File doesn't exist, continue with creation
+      if (err.message.includes('already exists')) {
+        throw err; // Re-throw our custom error
+      }
+      // ENOENT is expected when file doesn't exist
+    }
+
     // Build plan markdown
     let content = `# Weekly Plan: ${plan.weekStart} to ${plan.weekEnd}\n\n`;
 
