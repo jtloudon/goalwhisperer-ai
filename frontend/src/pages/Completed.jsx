@@ -32,10 +32,10 @@ function Completed() {
       <h1>Completed Items</h1>
       {completed && completed.map(obj => (
         <div key={obj.id} className="objective-section">
-          <h2>{obj.title}</h2>
+          <h2>Objective {obj.number}: {obj.title}</h2>
           {obj.keyResults.map(kr => (
             <div key={kr.id} className="kr-section">
-              <h3>{kr.title}</h3>
+              <h3>KR {kr.number}: {kr.title}</h3>
               <div className="completions-list">
                 {kr.completions.map((completion, idx) => (
                   <div key={idx} className="completion-row">

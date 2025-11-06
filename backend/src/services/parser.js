@@ -233,6 +233,7 @@ export async function parseCompletedItems(filePath) {
       const match = line.match(/## Objective (\d+): (.+)/);
       currentObj = {
         id: `obj-${match[1]}`,
+        number: parseInt(match[1]),
         title: match[2],
         keyResults: [],
       };
@@ -244,6 +245,7 @@ export async function parseCompletedItems(filePath) {
       if (krMatch && currentObj) {
         currentKR = {
           id: `kr-${krMatch[1]}`,
+          number: krMatch[1],
           title: krMatch[2],
           completions: [],
         };
