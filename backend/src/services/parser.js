@@ -114,6 +114,17 @@ export async function parseAnnualObjectives(filePath) {
   // Push last objective
   if (currentObj) objectives.push(currentObj);
 
+  // Recalculate KR progress from current/target (overrides manual Progress field)
+  for (const obj of objectives) {
+    for (const kr of obj.keyResults) {
+      if (kr.target > 0) {
+        kr.progress = Math.round((kr.current / kr.target) * 100);
+        // Cap at 100%
+        if (kr.progress > 100) kr.progress = 100;
+      }
+    }
+  }
+
   // Recalculate objective progress from KR averages
   for (const obj of objectives) {
     if (obj.keyResults.length > 0) {
@@ -307,9 +318,18 @@ export async function parseWeeklyPlans(plansDir) {
       const line = lines[i];
 
       if (line.startsWith('## ')) {
-        const title = line.replace('## ', '').trim();
+        let title = line.replace('## ', '').trim();
+
+        // Check for completion status (✅ or ☑ at start of title)
+        let status = 'pending';
+        if (title.startsWith('✅') || title.startsWith('☑')) {
+          status = 'completed';
+          title = title.replace(/^[✅☑]\s*/, '').trim();
+        }
+
         const action = {
           title,
+          status,
           mapsTo: null,
           objectiveId: null,
           krId: null,

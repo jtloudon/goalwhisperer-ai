@@ -7,7 +7,7 @@ function Sidebar() {
   const navItems = [
     { path: '/', label: 'Dashboard' },
     { path: '/objectives', label: 'Objectives' },
-    { path: '/plans', label: 'Weekly Goals' },
+    { path: '/plans', label: 'Weekly Actions' },
     { path: '/completed', label: 'Completed' },
     { path: '/about', label: 'About' },
   ];

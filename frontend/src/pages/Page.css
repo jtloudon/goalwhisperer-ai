@@ -128,15 +128,66 @@
   color: #333;
 }
 
+.plan-card.current-week {
+  border-left: 4px solid #667eea;
+}
+
+.plan-card.past-week {
+  border: none;
+}
+
+.plan-card.past-week summary {
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.plan-card.past-week summary::-webkit-details-marker {
+  display: none;
+}
+
+.plan-card.past-week summary::before {
+  content: '▶';
+  display: inline-block;
+  margin-right: 0.5rem;
+  transition: transform 0.2s;
+  color: #667eea;
+}
+
+.plan-card.past-week[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.plan-card.past-week summary:hover {
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
 .plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #f0f0f0;
 }
 
 .plan-header h3 {
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   color: #667eea;
+}
+
+.completion-badge {
+  font-size: 0.9rem;
+  padding: 0.25rem 0.75rem;
+  background: #f0f7ff;
+  border-radius: 12px;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.plan-content {
+  margin-top: 1rem;
 }
 
 .date-range {
@@ -156,6 +207,9 @@
 }
 
 .actions-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid #f0f0f0;
   color: #333;
@@ -163,6 +217,31 @@
 
 .actions-list li:last-child {
   border-bottom: none;
+}
+
+.actions-list li.completed .action-title {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.action-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #667eea;
+  background: #f0f7ff;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.action-checkbox {
+  font-size: 1.2rem;
+  color: #667eea;
+  flex-shrink: 0;
 }
 
 .actions-by-objective {
@@ -205,15 +284,21 @@
   background: #f9f9f9;
   border-radius: 8px;
   border-left: 3px solid #e0e0e0;
+  flex-direction: column;
 }
 
 .objective-group .actions-list li:last-child {
   margin-bottom: 0;
 }
 
+.objective-group .actions-list li > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
 .action-title {
-  display: block;
-  margin-bottom: 0.5rem;
+  flex: 1;
   font-weight: 500;
   color: #333;
   font-size: 1rem;
