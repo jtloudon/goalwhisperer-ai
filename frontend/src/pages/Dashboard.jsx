@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Dashboard.css';
 
 const API_URL = 'http://localhost:3001/api';
@@ -7,7 +7,29 @@ function Dashboard() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const scrollPositionRef = useRef(0);
 
+  async function fetchDashboard() {
+    try {
+      // Save scroll position before fetch
+      scrollPositionRef.current = window.scrollY;
+
+      const response = await fetch(`${API_URL}/dashboard`);
+      const result = await response.json();
+
+      if (result.success) {
+        setDashboard(result.data);
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Initial load and auto-refresh
   useEffect(() => {
     fetchDashboard();
 
@@ -19,34 +41,14 @@ function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  async function fetchDashboard() {
-    try {
-      // Only show loading spinner on initial load
-      if (!dashboard) {
-        setLoading(true);
-      }
-
-      // Save scroll position before fetch
-      const scrollPosition = window.scrollY;
-
-      const response = await fetch(`${API_URL}/dashboard`);
-      const result = await response.json();
-
-      if (result.success) {
-        setDashboard(result.data);
-        // Restore scroll position after state update
-        requestAnimationFrame(() => {
-          window.scrollTo(0, scrollPosition);
-        });
-      } else {
-        setError(result.error);
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  // Restore scroll position after data changes
+  useEffect(() => {
+    if (dashboard) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
     }
-  }
+  }, [dashboard]);
 
   if (loading) {
     return <div className="loading">Loading your OKR data...</div>;

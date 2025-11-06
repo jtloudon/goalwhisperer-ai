@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Page.css';
 
 const API_URL = 'http://localhost:3001/api';
@@ -6,8 +6,33 @@ const API_URL = 'http://localhost:3001/api';
 function Plans() {
   const [plans, setPlans] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [openWeeks, setOpenWeeks] = useState(new Set());
+  const scrollPositionRef = useRef(0);
+  const openWeeksRef = useRef(new Set());
 
+  async function fetchPlans() {
+    try {
+      // Save scroll position and open states before fetch
+      scrollPositionRef.current = window.scrollY;
+      const openElements = document.querySelectorAll('details[open]');
+      openWeeksRef.current = new Set(
+        Array.from(openElements).map(el => el.getAttribute('data-week-id'))
+      );
+
+      const response = await fetch(`${API_URL}/plans`);
+      const result = await response.json();
+      if (result.success) {
+        console.log('Plans fetched:', result.data.length, 'plans');
+        // Force a new object reference to trigger React update
+        setPlans([...result.data]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Initial load and auto-refresh
   useEffect(() => {
     fetchPlans();
 
@@ -19,39 +44,22 @@ function Plans() {
     return () => clearInterval(interval);
   }, []);
 
-  async function fetchPlans() {
-    try {
-      // Only show loading spinner on initial load
-      if (!plans) {
-        setLoading(true);
-      }
+  // Restore scroll position and open states after data changes
+  useEffect(() => {
+    if (plans) {
+      // Use requestAnimationFrame to ensure DOM is updated
+      requestAnimationFrame(() => {
+        // Restore scroll position
+        window.scrollTo(0, scrollPositionRef.current);
 
-      // Save scroll position and open states before fetch
-      const scrollPosition = window.scrollY;
-      const openElements = document.querySelectorAll('details[open]');
-      const openIds = Array.from(openElements).map(el => el.getAttribute('data-week-id'));
-      setOpenWeeks(new Set(openIds));
-
-      const response = await fetch(`${API_URL}/plans`);
-      const result = await response.json();
-      if (result.success) {
-        setPlans(result.data);
-        // Restore scroll position and open states after state update
-        requestAnimationFrame(() => {
-          window.scrollTo(0, scrollPosition);
-          // Restore open state
-          openIds.forEach(id => {
-            const element = document.querySelector(`details[data-week-id="${id}"]`);
-            if (element) element.open = true;
-          });
+        // Restore open state for details elements
+        openWeeksRef.current.forEach(id => {
+          const element = document.querySelector(`details[data-week-id="${id}"]`);
+          if (element) element.open = true;
         });
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+      });
     }
-  }
+  }, [plans]);
 
   if (loading) return <div className="loading">Loading weekly actions...</div>;
 

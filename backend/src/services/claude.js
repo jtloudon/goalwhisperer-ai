@@ -11,6 +11,7 @@ import {
   addActionToWeeklyPlan,
   updateWeeklyPlan,
   deleteWeeklyPlan,
+  removeActionsFromWeeklyPlan,
 } from './writer.js';
 import PATHS from '../config/paths.js';
 
@@ -201,6 +202,22 @@ const tools = [
       required: ['weekStart'],
     },
   },
+  {
+    name: 'remove_actions_from_weekly_plan',
+    description: 'Remove specific actions from a weekly plan by their action numbers. Use this when the user wants to delete or remove specific actions from a week. Examples: "remove action 3 from this week", "delete actions 2 and 5 from week of Oct 31". IMPORTANT: Action numbers are 1-indexed (first action is 1, not 0) and correspond to the order shown in the UI.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        weekStart: { type: 'string', description: 'Week start date (YYYY-MM-DD) of the plan' },
+        actionNumbers: {
+          type: 'array',
+          items: { type: 'number' },
+          description: 'Array of action numbers to remove (1-indexed). Example: [2, 5] removes actions 2 and 5',
+        },
+      },
+      required: ['weekStart', 'actionNumbers'],
+    },
+  },
 ];
 
 // Execute tool calls
@@ -258,6 +275,13 @@ async function executeTool(toolName, toolInput) {
       case 'delete_weekly_plan':
         return await deleteWeeklyPlan(PATHS.plans, toolInput.weekStart);
 
+      case 'remove_actions_from_weekly_plan':
+        return await removeActionsFromWeeklyPlan(
+          PATHS.plans,
+          toolInput.weekStart,
+          toolInput.actionNumbers
+        );
+
       default:
         throw new Error(`Unknown tool: ${toolName}`);
     }
@@ -286,7 +310,30 @@ You help users:
 - Analyze progress and provide insights
 - Coach them on effective goal-setting strategies
 
-You have the ability to update the user's goal files directly using tools. When the user asks you to create objectives, add plans, or update progress, use the appropriate tool.
+AVAILABLE TOOLS - You have these tools to modify the user's goal files:
+
+OBJECTIVES & KEY RESULTS:
+- add_objective: Create new objective with key results
+- update_key_result: Change KR title, status, target, or date
+- update_progress: Update KR current value and progress percentage
+- complete_key_result: Mark a KR as complete
+- delete_objective: Remove entire objective by number (e.g., "Objective 3")
+- delete_key_result: Remove specific KR by ID (e.g., "KR 1.2")
+
+WEEKLY PLANS:
+- add_weekly_plan: Create NEW weekly plan (only if week doesn't exist)
+- add_action_to_weekly_plan: Add ONE action to existing plan
+- remove_actions_from_weekly_plan: Remove specific actions by numbers (e.g., [6, 7])
+- update_weekly_plan: Replace ALL actions (destructive - use cautiously)
+- delete_weekly_plan: Delete entire weekly plan
+
+CRITICAL RULES FOR TOOL USAGE:
+1. You MUST actually invoke tools when the user requests changes - simply saying "I've done it" is NEVER acceptable
+2. ALWAYS wait for tool result confirmation before responding to the user
+3. Action numbers are 1-indexed (first action = 1) matching what the user sees in the UI
+4. When user says "remove action 6 and 7" → call remove_actions_from_weekly_plan with actionNumbers: [6, 7]
+5. To add a single action to existing plan → use add_action_to_weekly_plan (NOT update_weekly_plan)
+6. Only use update_weekly_plan when user wants to completely rewrite all actions for a week
 
 Be concise, actionable, and supportive. Ask clarifying questions when needed.`;
 

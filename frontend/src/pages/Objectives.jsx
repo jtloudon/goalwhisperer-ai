@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Page.css';
 import './Dashboard.css';
 
@@ -7,7 +7,26 @@ const API_URL = 'http://localhost:3001/api';
 function Objectives() {
   const [objectivesData, setObjectivesData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const scrollPositionRef = useRef(0);
 
+  async function fetchObjectives() {
+    try {
+      // Save scroll position before fetch
+      scrollPositionRef.current = window.scrollY;
+
+      const response = await fetch(`${API_URL}/objectives/annual`);
+      const result = await response.json();
+      if (result.success) {
+        setObjectivesData(result.data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Initial load and auto-refresh
   useEffect(() => {
     fetchObjectives();
 
@@ -19,31 +38,14 @@ function Objectives() {
     return () => clearInterval(interval);
   }, []);
 
-  async function fetchObjectives() {
-    try {
-      // Only show loading spinner on initial load
-      if (!objectivesData) {
-        setLoading(true);
-      }
-
-      // Save scroll position before fetch
-      const scrollPosition = window.scrollY;
-
-      const response = await fetch(`${API_URL}/objectives/annual`);
-      const result = await response.json();
-      if (result.success) {
-        setObjectivesData(result.data);
-        // Restore scroll position after state update
-        requestAnimationFrame(() => {
-          window.scrollTo(0, scrollPosition);
-        });
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+  // Restore scroll position after data changes
+  useEffect(() => {
+    if (objectivesData) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
     }
-  }
+  }, [objectivesData]);
 
   if (loading) return <div className="loading">Loading objectives...</div>;
 

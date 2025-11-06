@@ -556,3 +556,88 @@ export async function deleteWeeklyPlan(plansDir, weekStart) {
     throw new Error(`Failed to delete weekly plan: ${error.message}`);
   }
 }
+
+/**
+ * Remove specific actions from a weekly plan by action numbers
+ * @param {string} plansDir - Path to the plans directory
+ * @param {string} weekStart - Week start date (YYYY-MM-DD)
+ * @param {Array<number>} actionNumbers - Array of action numbers to remove (1-indexed)
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function removeActionsFromWeeklyPlan(plansDir, weekStart, actionNumbers) {
+  try {
+    const fileName = `${plansDir}/plan-${weekStart}.md`;
+
+    // Check if file exists
+    try {
+      await fs.access(fileName);
+    } catch {
+      throw new Error(`Weekly plan for ${weekStart} not found`);
+    }
+
+    // Read existing file
+    const content = await fs.readFile(fileName, 'utf-8');
+    const lines = content.split('\n');
+
+    // Parse actions (sections starting with ##)
+    const actions = [];
+    let currentAction = null;
+
+    for (const line of lines) {
+      if (line.startsWith('## ')) {
+        // New action starts
+        if (currentAction) {
+          actions.push(currentAction);
+        }
+        currentAction = { lines: [line] };
+      } else if (currentAction) {
+        // Part of current action
+        currentAction.lines.push(line);
+      }
+    }
+
+    // Push last action
+    if (currentAction) {
+      actions.push(currentAction);
+    }
+
+    // Remove specified actions (convert to 0-indexed)
+    const actionsToKeep = actions.filter((_, index) =>
+      !actionNumbers.includes(index + 1)
+    );
+
+    if (actionsToKeep.length === actions.length) {
+      return {
+        success: false,
+        message: `No actions were removed. Action numbers may be invalid: ${actionNumbers.join(', ')}`,
+      };
+    }
+
+    // Extract header (first line before any ## actions)
+    const headerLines = [];
+    for (const line of lines) {
+      if (line.startsWith('## ')) break;
+      headerLines.push(line);
+    }
+
+    // Rebuild content
+    let newContent = headerLines.join('\n') + '\n';
+    actionsToKeep.forEach(action => {
+      newContent += action.lines.join('\n') + '\n';
+    });
+
+    // Write updated file
+    await fs.writeFile(fileName, newContent.trim() + '\n');
+
+    const removedCount = actions.length - actionsToKeep.length;
+    return {
+      success: true,
+      fileName,
+      removedCount,
+      message: `Successfully removed ${removedCount} action(s) from weekly plan for ${weekStart}`,
+    };
+  } catch (error) {
+    console.error('Error removing actions from weekly plan:', error);
+    throw new Error(`Failed to remove actions from weekly plan: ${error.message}`);
+  }
+}
