@@ -8,7 +8,7 @@ function Sidebar() {
     { path: '/', label: 'Dashboard' },
     { path: '/objectives', label: 'Objectives' },
     { path: '/plans', label: 'Weekly Actions' },
-    { path: '/completed', label: 'Completed' },
+    { path: '/completed', label: 'Completed Actions' },
     { path: '/about', label: 'About' },
   ];
 

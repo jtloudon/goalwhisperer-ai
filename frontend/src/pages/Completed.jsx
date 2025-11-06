@@ -44,11 +44,11 @@ function Completed() {
     }
   }
 
-  if (loading) return <div className="loading">Loading completed items...</div>;
+  if (loading) return <div className="loading">Loading completed actions...</div>;
 
   return (
     <div className="page-content">
-      <h1>Completed Items</h1>
+      <h1>Completed Actions</h1>
       {completed && completed.map(obj => (
         <div key={obj.id} className="objective-section">
           <h2>Objective {obj.number}: {obj.title}</h2>

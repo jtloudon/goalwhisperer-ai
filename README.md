@@ -65,21 +65,48 @@ npm run dev
 
 ## Usage
 
-**Current functionality (Phase 2):**
+**Current functionality:**
 
-1. **View Dashboard** - See overview stats, objectives summary, recent completions, and wins
+1. **View Dashboard** - See overview stats, recent wins
 2. **Browse Pages** - Use sidebar navigation to explore:
    - **Objectives** - Annual goals with detailed KR breakdowns
-   - **Plans** - Weekly action plans timeline
+   - **Weekly Actions** - Current and past weekly action plans with status tracking
    - **Completed** - Historical completion log
-   - **Progress** - Current week progress summary
    - **About** - System information
-3. **Refresh Data** - Click refresh button on dashboard to reload from markdown files
+3. **Auto-Refresh** - Pages auto-refresh every 5 seconds to reflect markdown file changes
+
+### Working with the Chat Agent
+
+The AI Goal Coach panel (powered by Claude) can help you manage your weekly actions. Here's how to use it:
+
+**Marking Actions Complete:**
+
+When you want to mark a weekly action as complete, reference it by number:
+- "Close action 3" or "Mark action 2 as done"
+- The agent will add ✅ to the beginning of that action's title in the markdown file
+
+**How it works:**
+1. Actions are numbered sequentially (1, 2, 3...) on the Weekly Actions page
+2. The agent needs to:
+   - Identify the weekly plan file (e.g., `personal/plans/plan-2025-10-31.md`)
+   - Count actions in the order they appear in the file
+   - Use the Edit tool to add `✅ ` at the start of the action title (e.g., `## Design app` → `## ✅ Design app`)
+3. The page will auto-refresh and show the completed action with a checkmark and strikethrough
+
+**CRITICAL for the agent:**
+- Always use the Edit tool to modify the markdown file. Simply saying "I've marked it complete" without actually editing the file won't work.
+- **ONLY modify the action title line (the `##` heading).** Do NOT touch the `**Maps to**:` line or any other content below the action title.
+- Example of correct edit:
+  ```
+  OLD: ## Design OKR tracking web app architecture
+  NEW: ## ✅ Design OKR tracking web app architecture
+
+  (Keep everything else unchanged, including the **Maps to**: line)
+  ```
 
 **Coming soon:**
-- **Chat with Claude** (Phase 3) - Conversational check-ins and file updates
-- **Auto-Refresh** (Phase 4) - Watch markdown files and update dashboard automatically
-- **Enhanced UI** (Phase 5) - Better charts, animations, and visual polish
+- **Enhanced Chat Features** - More conversational OKR management
+- **Enhanced Visualizations** - Better charts, animations, and visual polish
 
 ## Project Structure
 
