@@ -24,10 +24,18 @@ function Plans() {
       if (!plans) {
         setLoading(true);
       }
+
+      // Save scroll position before fetch
+      const scrollPosition = window.scrollY;
+
       const response = await fetch(`${API_URL}/plans`);
       const result = await response.json();
       if (result.success) {
         setPlans(result.data);
+        // Restore scroll position after state update
+        requestAnimationFrame(() => {
+          window.scrollTo(0, scrollPosition);
+        });
       }
     } catch (err) {
       console.error(err);

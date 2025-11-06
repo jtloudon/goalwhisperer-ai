@@ -25,11 +25,19 @@ function Dashboard() {
       if (!dashboard) {
         setLoading(true);
       }
+
+      // Save scroll position before fetch
+      const scrollPosition = window.scrollY;
+
       const response = await fetch(`${API_URL}/dashboard`);
       const result = await response.json();
 
       if (result.success) {
         setDashboard(result.data);
+        // Restore scroll position after state update
+        requestAnimationFrame(() => {
+          window.scrollTo(0, scrollPosition);
+        });
       } else {
         setError(result.error);
       }

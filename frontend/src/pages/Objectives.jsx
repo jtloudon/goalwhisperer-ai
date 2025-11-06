@@ -24,10 +24,18 @@ function Objectives() {
       if (!objectivesData) {
         setLoading(true);
       }
+
+      // Save scroll position before fetch
+      const scrollPosition = window.scrollY;
+
       const response = await fetch(`${API_URL}/objectives/annual`);
       const result = await response.json();
       if (result.success) {
         setObjectivesData(result.data);
+        // Restore scroll position after state update
+        requestAnimationFrame(() => {
+          window.scrollTo(0, scrollPosition);
+        });
       }
     } catch (err) {
       console.error(err);
