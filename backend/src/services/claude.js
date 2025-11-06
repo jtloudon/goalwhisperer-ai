@@ -48,12 +48,12 @@ const tools = [
             properties: {
               title: { type: 'string', description: 'Key result title' },
               status: { type: 'string', enum: ['in-progress', 'complete'], description: 'Current status' },
-              target: { type: 'string', description: 'Target value or description' },
+              target: { type: 'number', description: 'Target value as a NUMBER (required for UI display). Examples: 10 for "10 items", 5 for "5 lbs", 3 for "3%". Never use strings like "N/A" or "3%".' },
               current: { type: 'number', description: 'Current progress value' },
               progress: { type: 'number', description: 'Progress percentage (0-100)' },
               targetDate: { type: 'string', description: 'Target completion date (YYYY-MM-DD)' },
             },
-            required: ['title', 'targetDate'],
+            required: ['title', 'target', 'targetDate'],
           },
         },
       },
@@ -146,14 +146,14 @@ const tools = [
   },
   {
     name: 'update_key_result',
-    description: 'Update key result details including title, status, target value, or target date. Use this when the user wants to CHANGE or MODIFY or UPDATE the title, description, wording, status, target value, or due date of a key result. Examples: "change the title", "update KR 1.2 to say...", "rename KR 1.3", "change the target date".',
+    description: 'Update key result details including title, status, target value, or target date. Use this when the user wants to CHANGE or MODIFY or UPDATE the title, description, wording, status, target value, or due date of a key result. IMPORTANT: If the user changes a numeric value that appears in BOTH the title and target (e.g., "by 2%" → "by 3%"), you MUST update BOTH fields. Examples: "change the title", "update KR 1.2 to say...", "rename KR 1.3", "change the target date", "update kr 3.2 to target 3%" (must update both title and target).',
     input_schema: {
       type: 'object',
       properties: {
         krId: { type: 'string', description: 'Key result ID (e.g., "kr-1.2")' },
         title: { type: 'string', description: 'New title for the key result' },
         status: { type: 'string', enum: ['in-progress', 'complete'], description: 'New status' },
-        target: { type: 'string', description: 'New target value or description' },
+        target: { type: 'number', description: 'New target value as a NUMBER (required for UI display). Examples: 10 for "10 items", 5 for "5 lbs", 3 for "3%".' },
         targetDate: { type: 'string', description: 'New target date (YYYY-MM-DD)' },
       },
       required: ['krId'],
@@ -204,12 +204,12 @@ const tools = [
           type: 'object',
           properties: {
             title: { type: 'string', description: 'Key result title' },
-            target: { type: 'string', description: 'Target value or description' },
+            target: { type: 'number', description: 'Target value as a NUMBER (required for UI display). Examples: 10 for "10 items", 5 for "5 lbs", 3 for "3%". Never use strings like "N/A" or "3%".' },
             current: { type: 'number', description: 'Current progress value (default: 0)' },
             targetDate: { type: 'string', description: 'Target completion date (YYYY-MM-DD)' },
             status: { type: 'string', enum: ['in-progress', 'complete'], description: 'Status (default: in-progress)' },
           },
-          required: ['title', 'targetDate'],
+          required: ['title', 'target', 'targetDate'],
         },
       },
       required: ['objectiveNumber', 'keyResult'],
@@ -391,10 +391,13 @@ WEEKLY PLANS:
 CRITICAL RULES FOR TOOL USAGE:
 1. You MUST actually invoke tools when the user requests changes - simply saying "I've done it" is NEVER acceptable
 2. ALWAYS wait for tool result confirmation before responding to the user
-3. Action numbers are 1-indexed (first action = 1) matching what the user sees in the UI
-4. When user says "remove action 6 and 7" → call remove_actions_from_weekly_plan with actionNumbers: [6, 7]
-5. To add a single action to existing plan → use add_action_to_weekly_plan (NOT update_weekly_plan)
-6. Only use update_weekly_plan when user wants to completely rewrite all actions for a week
+3. NEVER tell the user you've made a change unless you actually called a tool and received a success response
+4. Action numbers are 1-indexed (first action = 1) matching what the user sees in the UI
+5. When user says "remove action 6 and 7" → call remove_actions_from_weekly_plan with actionNumbers: [6, 7]
+6. To add a single action to existing plan → use add_action_to_weekly_plan (NOT update_weekly_plan)
+7. Only use update_weekly_plan when user wants to completely rewrite all actions for a week
+8. ALL KEY RESULTS MUST have numeric 'target' values (not "N/A" or strings like "3%") - the UI requires this to display progress
+9. When user wants to change a target value that's embedded in the KR title (e.g., "by 2%" → "by 3%"), you MUST update BOTH the title AND the target field
 
 Be concise, actionable, and supportive. Ask clarifying questions when needed.`;
 
@@ -415,7 +418,7 @@ Be concise, actionable, and supportive. Ask clarifying questions when needed.`;
     // Tool use loop - keep calling Claude until we get a text response
     while (true) {
       const response = await anthropic.messages.create({
-        model: 'claude-3-haiku-20240307',
+        model: 'claude-sonnet-4-5-20250929',
         max_tokens: 2048,
         system: systemPrompt,
         tools: tools,
@@ -444,6 +447,14 @@ Be concise, actionable, and supportive. Ask clarifying questions when needed.`;
         for (const toolUse of toolUses) {
           console.log(`Executing tool: ${toolUse.name}`, toolUse.input);
           const result = await executeTool(toolUse.name, toolUse.input);
+
+          // Log the result for debugging
+          if (result.error) {
+            console.log(`Tool ${toolUse.name} returned error:`, result.error);
+          } else {
+            console.log(`Tool ${toolUse.name} succeeded:`, result.message || result.success);
+          }
+
           toolResults.push({
             type: 'tool_result',
             tool_use_id: toolUse.id,

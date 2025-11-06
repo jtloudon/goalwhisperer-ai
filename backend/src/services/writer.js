@@ -27,6 +27,13 @@ export async function addObjective(filePath, objective) {
     const newObjId = maxId + 1;
     const newObjIdStr = `obj-${newObjId}`;
 
+    // Validate that all key results have numeric targets
+    for (const kr of objective.keyResults) {
+      if (typeof kr.target !== 'number' || kr.target <= 0) {
+        throw new Error(`Key result "${kr.title}" must have a numeric target value greater than 0 (got: ${kr.target}). The UI requires numeric targets to display progress.`);
+      }
+    }
+
     // Build new objective markdown
     let newContent = `\n## Objective ${newObjId}: ${objective.title}\n\n`;
     newContent += `**Description**: ${objective.description}\n\n`;
@@ -40,7 +47,7 @@ export async function addObjective(filePath, objective) {
       const status = kr.status === 'complete' ? 'complete' : 'in-progress';
       newContent += `#### KR ${newObjId}.${krNum}: ${kr.title}\n`;
       newContent += `- **Status**: ${status}\n`;
-      newContent += `- **Target**: ${kr.target || 'N/A'}\n`;
+      newContent += `- **Target**: ${kr.target}\n`;
       newContent += `- **Current**: ${kr.current || 0}\n`;
       newContent += `- **Progress**: ${kr.progress || 0}%\n`;
       newContent += `- **Target Date**: ${kr.targetDate}\n\n`;
@@ -214,6 +221,13 @@ export async function updateKeyResultProgress(filePath, krId, updates) {
  */
 export async function updateKeyResult(filePath, krId, updates) {
   try {
+    // Validate target if provided
+    if (updates.target !== undefined) {
+      if (typeof updates.target !== 'number' || updates.target <= 0) {
+        throw new Error(`Target must be a numeric value greater than 0 (got: ${updates.target}). The UI requires numeric targets to display progress. Please provide a number like 5 for "5 lbs" or 3 for "3%".`);
+      }
+    }
+
     let content = await fs.readFile(filePath, 'utf-8');
 
     // Convert krId format (kr-1.2) to markdown format (KR 1.2)
@@ -467,6 +481,11 @@ export async function addKeyResultToObjective(filePath, objectiveNumber, keyResu
     const newKrNum = maxKrNum + 1;
     const newKrId = `${objectiveNumber}.${newKrNum}`;
 
+    // Validate that target is numeric
+    if (typeof keyResult.target !== 'number' || keyResult.target <= 0) {
+      throw new Error(`Key result "${keyResult.title}" must have a numeric target value greater than 0 (got: ${keyResult.target}). The UI requires numeric targets to display progress.`);
+    }
+
     // Find insertion point (after last KR or after "### Key Results" header)
     let insertIndex = nextObjectiveIndex;
     for (let i = nextObjectiveIndex - 1; i > objectiveIndex; i--) {
@@ -483,10 +502,8 @@ export async function addKeyResultToObjective(filePath, objectiveNumber, keyResu
     // Build new KR markdown
     const status = keyResult.status === 'complete' ? 'complete' : 'in-progress';
     const current = keyResult.current || 0;
-    const target = keyResult.target || 'N/A';
-    const progress = target !== 'N/A' && !isNaN(target) && target > 0
-      ? Math.min(100, Math.round((current / parseFloat(target)) * 100))
-      : 0;
+    const target = keyResult.target;
+    const progress = Math.min(100, Math.round((current / target) * 100));
 
     const newKrLines = [
       '',

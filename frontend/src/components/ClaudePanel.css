@@ -36,6 +36,13 @@
   color: #666;
 }
 
+.claude-model {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.7rem;
+  color: #999;
+  font-family: monospace;
+}
+
 .claude-messages {
   flex: 1;
   overflow-y: auto;

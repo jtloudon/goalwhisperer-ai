@@ -2,28 +2,48 @@
 
 A local-first OKR tracking web application with markdown-based data storage. Visualize your objectives, key results, weekly plans, and progress in a clean dashboard interface.
 
-## Current Features (Phase 2 - Complete)
+## Current Features (Phase 6 - Complete)
 
 - 📊 **Dashboard** - Overview stats, objectives, recent completions, and wins
 - 🎯 **Objectives Page** - Detailed annual objectives with KR progress tracking
 - 📅 **Plans Page** - Weekly plans timeline with action items
 - ✅ **Completed Page** - Completion history organized by objective and KR
 - 📈 **Progress Page** - Current week progress summary
+- 💬 **AI Goal Coach** - Conversational OKR management powered by Claude Sonnet 4.5
+- 🛡️ **Robust Validation** - Input validation with error feedback loop for data integrity
 - 📁 **Markdown-Based** - All data stored in human-readable markdown files
 - 🏠 **Local-First** - Runs on your machine, complete privacy
 
-## Planned Features (Phase 3-5)
+## Recent Updates (Nov 6, 2024)
 
-- 💬 **Conversational Check-ins** - Natural language OKR management via Claude AI (Phase 3)
-- 🔄 **Auto-Updates** - Dashboard refreshes automatically when markdown files change (Phase 4)
-- 📊 **Enhanced Visualizations** - Better charts, animations, loading states (Phase 5)
+**Phase 6: Agent Reliability & Data Validation**
+- Fixed critical issue where chat agent claimed to make changes without actually calling tools
+- Implemented three-layer validation system for numeric targets:
+  1. Tool schema enforcement (type-level validation)
+  2. Runtime validation with helpful error messages
+  3. Error logging and feedback to agent
+- Upgraded from Claude Haiku to Claude Sonnet 4.5 for more reliable tool calling
+- Enhanced system prompts with explicit rules about tool invocation and data requirements
+- Added model version display in chat interface for transparency
+- Fixed issues where KR progress wasn't displaying due to non-numeric target values
+
+**Key Technical Improvements:**
+- All key results now require numeric `target` values for proper UI display
+- Agent validates and rejects invalid inputs (e.g., "X lbs", "N/A") with clear error messages
+- Agent now reliably updates both title AND target fields when values are embedded in both
+- Comprehensive error feedback loop ensures data integrity
+
+## Planned Features (Future Phases)
+
+- 📊 **Enhanced Visualizations** - Better charts, animations, loading states
+- 🔄 **Progress Tracking** - Historical trend analysis and insights
 
 ## Tech Stack
 
 - **Frontend**: React + Vite + vanilla CSS
 - **Backend**: Node.js + Express
 - **Data**: Markdown files (parsed to JSON)
-- **AI**: Claude API (planned for Phase 3)
+- **AI**: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929)
 
 ## Setup
 
