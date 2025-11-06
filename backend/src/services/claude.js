@@ -5,6 +5,7 @@ import {
   addCompletion,
   updateKeyResultProgress,
   updateKeyResult,
+  completeKeyResult,
   deleteObjective,
   deleteKeyResult,
   deleteWeeklyPlan,
@@ -108,6 +109,18 @@ const tools = [
     },
   },
   {
+    name: 'complete_key_result',
+    description: 'Mark a key result as complete. Use this when the user says to complete, finish, or mark a KR as done. This sets the status to "complete" regardless of the current progress percentage. Examples: "complete KR 3.1", "mark KR 2.2 as done", "finish all KRs for objective 3".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        krId: { type: 'string', description: 'Key result ID (e.g., "kr-1.2")' },
+        setProgressTo100: { type: 'boolean', description: 'Whether to also set progress to 100% (default: false)' },
+      },
+      required: ['krId'],
+    },
+  },
+  {
     name: 'delete_objective',
     description: 'Delete an entire objective and all its key results. Use this when the user wants to remove or delete an objective. IMPORTANT: Use the objective NUMBER displayed in the UI (e.g., "3" for "Objective 3"), NOT the obj-X ID. Examples: user says "delete objective 2" → use objectiveNumber: "2".',
     input_schema: {
@@ -169,6 +182,13 @@ async function executeTool(toolName, toolInput) {
             target: toolInput.target,
             targetDate: toolInput.targetDate,
           }
+        );
+
+      case 'complete_key_result':
+        return await completeKeyResult(
+          PATHS.objectives.annual,
+          toolInput.krId,
+          toolInput.setProgressTo100 || false
         );
 
       case 'delete_objective':

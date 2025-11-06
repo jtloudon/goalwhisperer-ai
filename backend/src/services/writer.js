@@ -249,6 +249,46 @@ export async function updateKeyResult(filePath, krId, updates) {
 }
 
 /**
+ * Complete a key result (mark as complete regardless of progress %)
+ * @param {string} filePath - Path to the annual objectives markdown file
+ * @param {string} krId - Key result ID (e.g., "kr-1.2")
+ * @param {boolean} setProgressTo100 - Optional: set progress to 100% when completing (default: false)
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function completeKeyResult(filePath, krId, setProgressTo100 = false) {
+  try {
+    let content = await fs.readFile(filePath, 'utf-8');
+
+    // Convert krId format (kr-1.2) to markdown format (KR 1.2)
+    const idMatch = krId.match(/kr-(\d+)\.(\d+)/);
+    if (!idMatch) {
+      throw new Error(`Invalid KR ID format: ${krId}`);
+    }
+    const markdownKrId = `KR ${idMatch[1]}.${idMatch[2]}`;
+
+    // Update status to complete
+    const statusRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Status\\*\\*: )(.+?)\\n`, 's');
+    content = content.replace(statusRegex, `$1complete\n`);
+
+    // Optionally set progress to 100%
+    if (setProgressTo100) {
+      const progressRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Progress\\*\\*: )(\\d+)%`, 's');
+      content = content.replace(progressRegex, `$1100%`);
+    }
+
+    await fs.writeFile(filePath, content);
+
+    return {
+      success: true,
+      message: `Successfully completed ${markdownKrId}`,
+    };
+  } catch (error) {
+    console.error('Error completing KR:', error);
+    throw new Error(`Failed to complete KR: ${error.message}`);
+  }
+}
+
+/**
  * Delete an entire objective and all its key results
  * @param {string} filePath - Path to the annual objectives markdown file
  * @param {string} objectiveNumber - Objective display number (e.g., "1", "2", "3") - this is the number shown in the markdown "Objective N:"

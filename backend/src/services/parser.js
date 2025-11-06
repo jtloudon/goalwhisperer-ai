@@ -114,6 +114,14 @@ export async function parseAnnualObjectives(filePath) {
   // Push last objective
   if (currentObj) objectives.push(currentObj);
 
+  // Recalculate objective progress from KR averages
+  for (const obj of objectives) {
+    if (obj.keyResults.length > 0) {
+      const totalProgress = obj.keyResults.reduce((sum, kr) => sum + kr.progress, 0);
+      obj.progress = Math.round(totalProgress / obj.keyResults.length);
+    }
+  }
+
   return { objectives, year };
 }
 
@@ -355,6 +363,7 @@ export async function generateDashboardData(objectives, progressSummary, complet
     },
     objectives: objectives.map(obj => ({
       id: obj.id,
+      number: obj.number,
       title: obj.title,
       progress: obj.progress,
       status: obj.progress >= 90 ? 'ahead' : obj.progress >= 70 ? 'on-track' : obj.progress >= 40 ? 'at-risk' : 'blocked',
