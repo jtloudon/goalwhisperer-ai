@@ -27,7 +27,7 @@ function About() {
       <section>
         <h2>Tech Stack</h2>
         <ul>
-          <li><strong>Frontend:</strong> React + Vite + Tailwind CSS</li>
+          <li><strong>Frontend:</strong> React + Vite + React Router</li>
           <li><strong>Backend:</strong> Node.js + Express</li>
           <li><strong>AI:</strong> Claude API (Anthropic)</li>
           <li><strong>Data:</strong> Markdown files</li>
