@@ -10,11 +10,21 @@ function Dashboard() {
 
   useEffect(() => {
     fetchDashboard();
+
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(() => {
+      fetchDashboard();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   async function fetchDashboard() {
     try {
-      setLoading(true);
+      // Only show loading spinner on initial load
+      if (!dashboard) {
+        setLoading(true);
+      }
       const response = await fetch(`${API_URL}/dashboard`);
       const result = await response.json();
 

@@ -9,10 +9,21 @@ function Plans() {
 
   useEffect(() => {
     fetchPlans();
+
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(() => {
+      fetchPlans();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   async function fetchPlans() {
     try {
+      // Only show loading spinner on initial load
+      if (!plans) {
+        setLoading(true);
+      }
       const response = await fetch(`${API_URL}/plans`);
       const result = await response.json();
       if (result.success) {

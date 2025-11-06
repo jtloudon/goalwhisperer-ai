@@ -9,10 +9,21 @@ function Objectives() {
 
   useEffect(() => {
     fetchObjectives();
+
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(() => {
+      fetchObjectives();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   async function fetchObjectives() {
     try {
+      // Only show loading spinner on initial load
+      if (!objectivesData) {
+        setLoading(true);
+      }
       const response = await fetch(`${API_URL}/objectives/annual`);
       const result = await response.json();
       if (result.success) {

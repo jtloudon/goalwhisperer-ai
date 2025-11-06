@@ -9,10 +9,21 @@ function Completed() {
 
   useEffect(() => {
     fetchCompleted();
+
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(() => {
+      fetchCompleted();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   async function fetchCompleted() {
     try {
+      // Only show loading spinner on initial load
+      if (!completed) {
+        setLoading(true);
+      }
       const response = await fetch(`${API_URL}/tracking/completed`);
       const result = await response.json();
       if (result.success) {
