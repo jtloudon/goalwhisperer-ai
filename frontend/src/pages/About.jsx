@@ -16,11 +16,11 @@ function About() {
       <section>
         <h2>Features</h2>
         <ul>
-          <li>📊 Real-time dashboard with progress tracking</li>
-          <li>💬 Conversational check-ins with Claude AI</li>
-          <li>📁 Markdown-based data storage (human-readable)</li>
-          <li>🔄 Auto-updates when data changes</li>
-          <li>🏠 Local-first (runs on your machine)</li>
+          <li>Real-time dashboard with progress tracking</li>
+          <li>Conversational check-ins with Claude AI</li>
+          <li>Markdown-based data storage (human-readable)</li>
+          <li>Auto-updates when data changes</li>
+          <li>Local-first (runs on your machine)</li>
         </ul>
       </section>
 
@@ -49,11 +49,11 @@ function About() {
         <h2>Development Status</h2>
         <p><strong>Current Phase:</strong> Phase 2 - Navigation & Pages</p>
         <ul>
-          <li>✅ Phase 1: Basic dashboard</li>
-          <li>🔄 Phase 2: Multi-page navigation</li>
-          <li>⏳ Phase 3: Chat integration</li>
-          <li>⏳ Phase 4: Real-time updates</li>
-          <li>⏳ Phase 5: Polish & enhancement</li>
+          <li>Phase 1: Basic dashboard (Complete)</li>
+          <li>Phase 2: Multi-page navigation (In Progress)</li>
+          <li>Phase 3: Chat integration (Planned)</li>
+          <li>Phase 4: Real-time updates (Planned)</li>
+          <li>Phase 5: Polish & enhancement (Planned)</li>
         </ul>
       </section>
 
