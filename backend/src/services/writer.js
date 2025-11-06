@@ -421,7 +421,57 @@ export async function deleteKeyResult(filePath, krId) {
 }
 
 /**
- * Update an existing weekly plan
+ * Add a single action to an existing weekly plan
+ * @param {string} plansDir - Path to the plans directory
+ * @param {string} weekStart - Week start date (YYYY-MM-DD) to identify the plan
+ * @param {Object} action - Action to add
+ * @param {string} action.title - Action title
+ * @param {string} action.mapsTo - Optional: Which KR this maps to
+ * @param {string} action.description - Optional: Detailed description
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function addActionToWeeklyPlan(plansDir, weekStart, action) {
+  try {
+    const fileName = `${plansDir}/plan-${weekStart}.md`;
+
+    // Check if file exists
+    try {
+      await fs.access(fileName);
+    } catch {
+      throw new Error(`Weekly plan for ${weekStart} not found`);
+    }
+
+    // Read existing file
+    const content = await fs.readFile(fileName, 'utf-8');
+
+    // Build new action markdown
+    let newAction = `\n## ${action.title}\n\n`;
+    if (action.mapsTo) {
+      newAction += `**Maps to**: ${action.mapsTo}\n\n`;
+    }
+    if (action.description) {
+      newAction += `${action.description}\n\n`;
+    }
+
+    // Append new action to existing content
+    const updatedContent = content + newAction;
+
+    // Write updated file
+    await fs.writeFile(fileName, updatedContent);
+
+    return {
+      success: true,
+      fileName,
+      message: `Successfully added action to weekly plan for ${weekStart}`,
+    };
+  } catch (error) {
+    console.error('Error adding action to weekly plan:', error);
+    throw new Error(`Failed to add action to weekly plan: ${error.message}`);
+  }
+}
+
+/**
+ * Update an existing weekly plan (replaces all actions)
  * @param {string} plansDir - Path to the plans directory
  * @param {string} weekStart - Week start date (YYYY-MM-DD) to identify the plan
  * @param {Object} updates - Updated plan data

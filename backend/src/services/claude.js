@@ -8,6 +8,7 @@ import {
   completeKeyResult,
   deleteObjective,
   deleteKeyResult,
+  addActionToWeeklyPlan,
   updateWeeklyPlan,
   deleteWeeklyPlan,
 } from './writer.js';
@@ -82,8 +83,29 @@ const tools = [
     },
   },
   {
+    name: 'add_action_to_weekly_plan',
+    description: 'Add a SINGLE action to an existing weekly plan without removing existing actions. Use this when the user wants to ADD a new action/goal to an existing week. Examples: "add X to the plan for week of Oct 31", "also add Y to this week\'s goals".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        weekStart: { type: 'string', description: 'Week start date (YYYY-MM-DD) of the plan to add to' },
+        action: {
+          type: 'object',
+          description: 'Single action to add to the plan',
+          properties: {
+            title: { type: 'string', description: 'Action title' },
+            mapsTo: { type: 'string', description: 'Which KR this maps to (e.g., "KR 1.2")' },
+            description: { type: 'string', description: 'Optional detailed description' },
+          },
+          required: ['title'],
+        },
+      },
+      required: ['weekStart', 'action'],
+    },
+  },
+  {
     name: 'update_weekly_plan',
-    description: 'Update an EXISTING weekly plan by replacing all its actions. Use this when the user wants to modify, change, or update an existing week\'s plan. Examples: "update the plan for week of Oct 31", "change my weekly goals for Nov 7".',
+    description: 'REPLACE ALL actions in an existing weekly plan. WARNING: This deletes all existing actions and replaces them with the new list. ONLY use this when the user wants to completely rewrite or restructure the entire week\'s plan. For adding a single action, use add_action_to_weekly_plan instead.',
     input_schema: {
       type: 'object',
       properties: {
@@ -190,6 +212,9 @@ async function executeTool(toolName, toolInput) {
 
       case 'add_weekly_plan':
         return await addWeeklyPlan(PATHS.plans, toolInput);
+
+      case 'add_action_to_weekly_plan':
+        return await addActionToWeeklyPlan(PATHS.plans, toolInput.weekStart, toolInput.action);
 
       case 'update_weekly_plan':
         return await updateWeeklyPlan(PATHS.plans, toolInput.weekStart, {
