@@ -421,6 +421,101 @@ export async function deleteKeyResult(filePath, krId) {
 }
 
 /**
+ * Add a new key result to an existing objective
+ * @param {string} filePath - Path to the annual objectives markdown file
+ * @param {string} objectiveNumber - The objective number (e.g., "1", "2", "3")
+ * @param {Object} keyResult - Key result data
+ * @param {string} keyResult.title - KR title
+ * @param {string} keyResult.target - Target value or description
+ * @param {number} keyResult.current - Current progress value (default: 0)
+ * @param {string} keyResult.targetDate - Target completion date (YYYY-MM-DD)
+ * @param {string} keyResult.status - Status: "in-progress" or "complete" (default: "in-progress")
+ * @returns {Promise<Object>} Result with success status and new KR ID
+ */
+export async function addKeyResultToObjective(filePath, objectiveNumber, keyResult) {
+  try {
+    let content = await fs.readFile(filePath, 'utf-8');
+    const lines = content.split('\n');
+
+    // Find the objective section
+    const objectivePattern = new RegExp(`^## Objective ${objectiveNumber}:`);
+    let objectiveIndex = -1;
+    let nextObjectiveIndex = lines.length;
+
+    for (let i = 0; i < lines.length; i++) {
+      if (objectivePattern.test(lines[i])) {
+        objectiveIndex = i;
+      } else if (objectiveIndex !== -1 && /^## Objective \d+:/.test(lines[i])) {
+        nextObjectiveIndex = i;
+        break;
+      }
+    }
+
+    if (objectiveIndex === -1) {
+      throw new Error(`Objective ${objectiveNumber} not found`);
+    }
+
+    // Count existing KRs to determine next KR number
+    let maxKrNum = 0;
+    for (let i = objectiveIndex; i < nextObjectiveIndex; i++) {
+      const match = lines[i].match(new RegExp(`^#### KR ${objectiveNumber}\\.(\\d+):`));
+      if (match) {
+        maxKrNum = Math.max(maxKrNum, parseInt(match[1]));
+      }
+    }
+
+    const newKrNum = maxKrNum + 1;
+    const newKrId = `${objectiveNumber}.${newKrNum}`;
+
+    // Find insertion point (after last KR or after "### Key Results" header)
+    let insertIndex = nextObjectiveIndex;
+    for (let i = nextObjectiveIndex - 1; i > objectiveIndex; i--) {
+      if (lines[i].trim().startsWith('####') || lines[i].trim() === '### Key Results') {
+        insertIndex = i + 1;
+        // Skip past the KR content to find the blank line after it
+        while (insertIndex < nextObjectiveIndex && lines[insertIndex].trim() !== '') {
+          insertIndex++;
+        }
+        break;
+      }
+    }
+
+    // Build new KR markdown
+    const status = keyResult.status === 'complete' ? 'complete' : 'in-progress';
+    const current = keyResult.current || 0;
+    const target = keyResult.target || 'N/A';
+    const progress = target !== 'N/A' && !isNaN(target) && target > 0
+      ? Math.min(100, Math.round((current / parseFloat(target)) * 100))
+      : 0;
+
+    const newKrLines = [
+      '',
+      `#### KR ${newKrId}: ${keyResult.title}`,
+      `- **Status**: ${status}`,
+      `- **Target**: ${target}`,
+      `- **Current**: ${current}`,
+      `- **Progress**: ${progress}%`,
+      `- **Target Date**: ${keyResult.targetDate}`,
+      ''
+    ];
+
+    // Insert the new KR
+    lines.splice(insertIndex, 0, ...newKrLines);
+
+    await fs.writeFile(filePath, lines.join('\n'));
+
+    return {
+      success: true,
+      krId: `kr-${newKrId}`,
+      message: `Successfully added KR ${newKrId} to Objective ${objectiveNumber}`,
+    };
+  } catch (error) {
+    console.error('Error adding KR to objective:', error);
+    throw new Error(`Failed to add KR to objective: ${error.message}`);
+  }
+}
+
+/**
  * Add a single action to an existing weekly plan
  * @param {string} plansDir - Path to the plans directory
  * @param {string} weekStart - Week start date (YYYY-MM-DD) to identify the plan
@@ -639,5 +734,130 @@ export async function removeActionsFromWeeklyPlan(plansDir, weekStart, actionNum
   } catch (error) {
     console.error('Error removing actions from weekly plan:', error);
     throw new Error(`Failed to remove actions from weekly plan: ${error.message}`);
+  }
+}
+
+/**
+ * Update a specific action in a weekly plan
+ * @param {string} plansDir - Path to the plans directory
+ * @param {string} weekStart - Week start date (YYYY-MM-DD)
+ * @param {number} actionNumber - Action number to update (1-indexed)
+ * @param {Object} updates - Fields to update
+ * @param {string} updates.title - Optional: New title
+ * @param {string} updates.mapsTo - Optional: New mapsTo value
+ * @param {string} updates.description - Optional: New description
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber, updates) {
+  try {
+    const fileName = `${plansDir}/plan-${weekStart}.md`;
+
+    // Check if file exists
+    try {
+      await fs.access(fileName);
+    } catch {
+      throw new Error(`Weekly plan for ${weekStart} not found`);
+    }
+
+    // Read existing file
+    const content = await fs.readFile(fileName, 'utf-8');
+    const lines = content.split('\n');
+
+    // Parse actions (sections starting with ##)
+    const actions = [];
+    let currentAction = null;
+    let actionStartLine = -1;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.startsWith('## ')) {
+        // New action starts
+        if (currentAction) {
+          actions.push({ ...currentAction, endLine: i - 1 });
+        }
+        currentAction = {
+          startLine: i,
+          titleLine: i,
+          mapsToLine: -1,
+          descriptionStart: -1,
+          descriptionEnd: -1,
+          lines: [line]
+        };
+        actionStartLine = i;
+      } else if (currentAction) {
+        // Part of current action
+        if (line.startsWith('**Maps to**:')) {
+          currentAction.mapsToLine = i;
+        } else if (currentAction.mapsToLine !== -1 && line.trim() !== '' && !line.startsWith('**')) {
+          // Description content
+          if (currentAction.descriptionStart === -1) {
+            currentAction.descriptionStart = i;
+          }
+          currentAction.descriptionEnd = i;
+        }
+        currentAction.lines.push(line);
+      }
+    }
+
+    // Push last action
+    if (currentAction) {
+      actions.push({ ...currentAction, endLine: lines.length - 1 });
+    }
+
+    // Validate action number
+    if (actionNumber < 1 || actionNumber > actions.length) {
+      throw new Error(`Invalid action number: ${actionNumber}. Valid range: 1-${actions.length}`);
+    }
+
+    const action = actions[actionNumber - 1];
+
+    // Apply updates
+    if (updates.title) {
+      const checkmarkMatch = lines[action.titleLine].match(/^##\s+(✅\s+)?/);
+      const checkmark = checkmarkMatch ? checkmarkMatch[1] || '' : '';
+      lines[action.titleLine] = `## ${checkmark}${updates.title}`;
+    }
+
+    if (updates.mapsTo !== undefined) {
+      if (action.mapsToLine !== -1) {
+        // Update existing mapsTo line
+        if (updates.mapsTo === null || updates.mapsTo === '') {
+          // Remove mapsTo line
+          lines.splice(action.mapsToLine, 2); // Remove mapsTo and blank line
+        } else {
+          lines[action.mapsToLine] = `**Maps to**: ${updates.mapsTo}`;
+        }
+      } else if (updates.mapsTo) {
+        // Add new mapsTo line after title
+        lines.splice(action.titleLine + 1, 0, '', `**Maps to**: ${updates.mapsTo}`);
+      }
+    }
+
+    if (updates.description !== undefined) {
+      // Remove old description if exists
+      if (action.descriptionStart !== -1) {
+        const deleteCount = action.descriptionEnd - action.descriptionStart + 1;
+        lines.splice(action.descriptionStart, deleteCount);
+      }
+
+      // Add new description if provided
+      if (updates.description) {
+        const insertPoint = action.mapsToLine !== -1 ? action.mapsToLine + 2 : action.titleLine + 2;
+        lines.splice(insertPoint, 0, '', updates.description);
+      }
+    }
+
+    // Write updated file
+    await fs.writeFile(fileName, lines.join('\n'));
+
+    return {
+      success: true,
+      fileName,
+      actionNumber,
+      message: `Successfully updated action ${actionNumber} in weekly plan for ${weekStart}`,
+    };
+  } catch (error) {
+    console.error('Error updating action in weekly plan:', error);
+    throw new Error(`Failed to update action in weekly plan: ${error.message}`);
   }
 }

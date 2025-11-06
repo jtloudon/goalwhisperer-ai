@@ -8,10 +8,12 @@ import {
   completeKeyResult,
   deleteObjective,
   deleteKeyResult,
+  addKeyResultToObjective,
   addActionToWeeklyPlan,
   updateWeeklyPlan,
   deleteWeeklyPlan,
   removeActionsFromWeeklyPlan,
+  updateActionInWeeklyPlan,
 } from './writer.js';
 import PATHS from '../config/paths.js';
 
@@ -192,6 +194,28 @@ const tools = [
     },
   },
   {
+    name: 'add_key_result_to_objective',
+    description: 'Add a new key result to an existing objective. Use this when the user wants to add a KR to an objective that already exists. Examples: "add a new KR to objective 2: Launch beta by Dec 31", "add KR to objective 1".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        objectiveNumber: { type: 'string', description: 'The objective number (e.g., "1", "2", "3")' },
+        keyResult: {
+          type: 'object',
+          properties: {
+            title: { type: 'string', description: 'Key result title' },
+            target: { type: 'string', description: 'Target value or description' },
+            current: { type: 'number', description: 'Current progress value (default: 0)' },
+            targetDate: { type: 'string', description: 'Target completion date (YYYY-MM-DD)' },
+            status: { type: 'string', enum: ['in-progress', 'complete'], description: 'Status (default: in-progress)' },
+          },
+          required: ['title', 'targetDate'],
+        },
+      },
+      required: ['objectiveNumber', 'keyResult'],
+    },
+  },
+  {
     name: 'delete_weekly_plan',
     description: 'Delete a weekly plan. Use this when the user wants to remove or delete a weekly plan. Examples: "delete the plan for week of Nov 7", "remove weekly plan 2025-11-07".',
     input_schema: {
@@ -216,6 +240,26 @@ const tools = [
         },
       },
       required: ['weekStart', 'actionNumbers'],
+    },
+  },
+  {
+    name: 'update_action_in_weekly_plan',
+    description: 'Update a specific action in a weekly plan (change title, mapsTo, or description). Use this when the user wants to modify an existing action. Examples: "change action 2 in week of Nov 7 to map to KR 1.2", "update action 3 title to...", "change what action 1 maps to".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        weekStart: { type: 'string', description: 'Week start date (YYYY-MM-DD) of the plan' },
+        actionNumber: { type: 'number', description: 'Action number to update (1-indexed)' },
+        updates: {
+          type: 'object',
+          properties: {
+            title: { type: 'string', description: 'Optional: New title for the action' },
+            mapsTo: { type: 'string', description: 'Optional: New mapsTo value (e.g., "KR 1.2")' },
+            description: { type: 'string', description: 'Optional: New description' },
+          },
+        },
+      },
+      required: ['weekStart', 'actionNumber', 'updates'],
     },
   },
 ];
@@ -272,6 +316,13 @@ async function executeTool(toolName, toolInput) {
       case 'delete_key_result':
         return await deleteKeyResult(PATHS.objectives.annual, toolInput.krId);
 
+      case 'add_key_result_to_objective':
+        return await addKeyResultToObjective(
+          PATHS.objectives.annual,
+          toolInput.objectiveNumber,
+          toolInput.keyResult
+        );
+
       case 'delete_weekly_plan':
         return await deleteWeeklyPlan(PATHS.plans, toolInput.weekStart);
 
@@ -280,6 +331,14 @@ async function executeTool(toolName, toolInput) {
           PATHS.plans,
           toolInput.weekStart,
           toolInput.actionNumbers
+        );
+
+      case 'update_action_in_weekly_plan':
+        return await updateActionInWeeklyPlan(
+          PATHS.plans,
+          toolInput.weekStart,
+          toolInput.actionNumber,
+          toolInput.updates
         );
 
       default:
@@ -314,6 +373,7 @@ AVAILABLE TOOLS - You have these tools to modify the user's goal files:
 
 OBJECTIVES & KEY RESULTS:
 - add_objective: Create new objective with key results
+- add_key_result_to_objective: Add new KR to existing objective
 - update_key_result: Change KR title, status, target, or date
 - update_progress: Update KR current value and progress percentage
 - complete_key_result: Mark a KR as complete
@@ -323,6 +383,7 @@ OBJECTIVES & KEY RESULTS:
 WEEKLY PLANS:
 - add_weekly_plan: Create NEW weekly plan (only if week doesn't exist)
 - add_action_to_weekly_plan: Add ONE action to existing plan
+- update_action_in_weekly_plan: Change action title/mapsTo/description
 - remove_actions_from_weekly_plan: Remove specific actions by numbers (e.g., [6, 7])
 - update_weekly_plan: Replace ALL actions (destructive - use cautiously)
 - delete_weekly_plan: Delete entire weekly plan
