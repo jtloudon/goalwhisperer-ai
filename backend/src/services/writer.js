@@ -408,6 +408,64 @@ export async function deleteKeyResult(filePath, krId) {
 }
 
 /**
+ * Update an existing weekly plan
+ * @param {string} plansDir - Path to the plans directory
+ * @param {string} weekStart - Week start date (YYYY-MM-DD) to identify the plan
+ * @param {Object} updates - Updated plan data
+ * @param {string} updates.weekEnd - Optional new week end date
+ * @param {Array} updates.actions - Optional new actions array (replaces all existing actions)
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function updateWeeklyPlan(plansDir, weekStart, updates) {
+  try {
+    const fileName = `${plansDir}/plan-${weekStart}.md`;
+
+    // Check if file exists
+    try {
+      await fs.access(fileName);
+    } catch {
+      throw new Error(`Weekly plan for ${weekStart} not found`);
+    }
+
+    // Read existing file to get current data
+    const content = await fs.readFile(fileName, 'utf-8');
+    const titleMatch = content.match(/# Weekly Plan: (.+?) to (.+)/);
+
+    const currentWeekEnd = titleMatch ? titleMatch[2] : null;
+    const weekEnd = updates.weekEnd || currentWeekEnd;
+
+    // Build updated plan markdown
+    let newContent = `# Weekly Plan: ${weekStart} to ${weekEnd}\n\n`;
+
+    if (updates.actions && Array.isArray(updates.actions)) {
+      updates.actions.forEach((action) => {
+        newContent += `## ${action.title}\n\n`;
+        if (action.mapsTo) {
+          newContent += `**Maps to**: ${action.mapsTo}\n\n`;
+        }
+        if (action.description) {
+          newContent += `${action.description}\n\n`;
+        }
+      });
+    } else {
+      throw new Error('Actions array is required for update');
+    }
+
+    // Write updated file
+    await fs.writeFile(fileName, newContent);
+
+    return {
+      success: true,
+      fileName,
+      message: `Successfully updated weekly plan for ${weekStart}`,
+    };
+  } catch (error) {
+    console.error('Error updating weekly plan:', error);
+    throw new Error(`Failed to update weekly plan: ${error.message}`);
+  }
+}
+
+/**
  * Delete a weekly plan file
  * @param {string} plansDir - Path to the plans directory
  * @param {string} weekStart - Week start date (YYYY-MM-DD) of the plan to delete

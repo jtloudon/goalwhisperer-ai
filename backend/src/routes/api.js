@@ -82,11 +82,13 @@ router.get('/plans', async (req, res) => {
           const objective = objectives.find(obj => obj.id === action.objectiveId);
           if (objective) {
             action.objectiveTitle = objective.title;
+            action.objectiveNumber = objective.number;
 
             // Find the KR
             const kr = objective.keyResults.find(kr => kr.id === action.krId);
             if (kr) {
               action.krTitle = kr.title;
+              action.krNumber = kr.number;
             }
           }
         }

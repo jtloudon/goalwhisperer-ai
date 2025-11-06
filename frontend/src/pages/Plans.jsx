@@ -61,21 +61,30 @@ function Plans() {
 
               {Object.keys(grouped).length > 0 && (
                 <div className="actions-by-objective">
-                  {Object.entries(grouped).map(([objectiveTitle, actions]) => (
-                    <div key={objectiveTitle} className="objective-group">
-                      <h4 className="objective-title">{objectiveTitle}</h4>
-                      <ul className="actions-list">
-                        {actions.map((action, idx) => (
-                          <li key={idx}>
-                            <span className="action-title">{action.title}</span>
-                            {action.krTitle && (
-                              <span className="kr-reference">→ {action.krTitle}</span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                  {Object.entries(grouped).map(([objectiveTitle, actions]) => {
+                    // Get objective number from first action in the group
+                    const objectiveNumber = actions[0]?.objectiveNumber;
+                    return (
+                      <div key={objectiveTitle} className="objective-group">
+                        <h4 className="objective-title">
+                          {objectiveNumber && `Objective ${objectiveNumber}: `}
+                          {objectiveTitle}
+                        </h4>
+                        <ul className="actions-list">
+                          {actions.map((action, idx) => (
+                            <li key={idx}>
+                              <span className="action-title">{action.title}</span>
+                              {action.krTitle && (
+                                <span className="kr-reference">
+                                  → KR {action.krNumber}: {action.krTitle}
+                                </span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 

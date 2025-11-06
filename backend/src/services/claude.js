@@ -8,6 +8,7 @@ import {
   completeKeyResult,
   deleteObjective,
   deleteKeyResult,
+  updateWeeklyPlan,
   deleteWeeklyPlan,
 } from './writer.js';
 import PATHS from '../config/paths.js';
@@ -57,7 +58,7 @@ const tools = [
   },
   {
     name: 'add_weekly_plan',
-    description: 'Create a weekly plan with specific actions. Use this when the user wants to plan their week.',
+    description: 'Create a NEW weekly plan with specific actions. ONLY use this when creating a brand new plan for a week that doesn\'t exist yet. If a plan already exists for that week, use update_weekly_plan instead.',
     input_schema: {
       type: 'object',
       properties: {
@@ -78,6 +79,31 @@ const tools = [
         },
       },
       required: ['weekStart', 'weekEnd', 'actions'],
+    },
+  },
+  {
+    name: 'update_weekly_plan',
+    description: 'Update an EXISTING weekly plan by replacing all its actions. Use this when the user wants to modify, change, or update an existing week\'s plan. Examples: "update the plan for week of Oct 31", "change my weekly goals for Nov 7".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        weekStart: { type: 'string', description: 'Week start date (YYYY-MM-DD) of the plan to update' },
+        weekEnd: { type: 'string', description: 'Optional: New week end date (YYYY-MM-DD)' },
+        actions: {
+          type: 'array',
+          description: 'New list of actions (replaces all existing actions)',
+          items: {
+            type: 'object',
+            properties: {
+              title: { type: 'string', description: 'Action title' },
+              mapsTo: { type: 'string', description: 'Which KR this maps to (e.g., "KR 1.2")' },
+              description: { type: 'string', description: 'Optional detailed description' },
+            },
+            required: ['title'],
+          },
+        },
+      },
+      required: ['weekStart', 'actions'],
     },
   },
   {
@@ -164,6 +190,12 @@ async function executeTool(toolName, toolInput) {
 
       case 'add_weekly_plan':
         return await addWeeklyPlan(PATHS.plans, toolInput);
+
+      case 'update_weekly_plan':
+        return await updateWeeklyPlan(PATHS.plans, toolInput.weekStart, {
+          weekEnd: toolInput.weekEnd,
+          actions: toolInput.actions,
+        });
 
       case 'update_progress':
         return await updateKeyResultProgress(
