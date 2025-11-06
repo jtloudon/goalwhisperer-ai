@@ -354,10 +354,15 @@ export async function parseWeeklyPlans(plansDir) {
  * Generate dashboard data
  */
 export async function generateDashboardData(objectives, progressSummary, completedItems) {
+  // Calculate overall progress from all objectives
+  const overallProgress = objectives.length > 0
+    ? Math.round(objectives.reduce((sum, obj) => sum + obj.progress, 0) / objectives.length)
+    : 0;
+
   const dashboard = {
     overview: {
       totalObjectives: objectives.length,
-      overallProgress: progressSummary.overview.overallProgress || 0,
+      overallProgress: overallProgress,
       onTrack: progressSummary.overview.onTrack || 0,
       atRisk: progressSummary.overview.atRisk || 0,
       currentWeek: progressSummary.week,

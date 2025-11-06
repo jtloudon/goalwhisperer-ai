@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './Page.css';
+import './Dashboard.css';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -58,32 +59,53 @@ function Objectives() {
       {/* Active Objectives */}
       {objectivesData?.current && activeObjectives.length > 0 && (
         <section className="current-objectives">
-          <h2>Active Objectives ({objectivesData.current.year})</h2>
-          {activeObjectives.map(obj => (
-        <div key={obj.id} className="objective-card">
-          <h2>Objective {obj.number}: {obj.title}</h2>
-          <p>{obj.description}</p>
-          <div className="progress-info">
-            <strong>Overall Progress: {obj.progress}%</strong>
-          </div>
-          <h3>Key Results:</h3>
-          {obj.keyResults.map(kr => (
-            <div key={kr.id} className="kr-item">
-              <div className="kr-title-row">
-                <span><strong>KR {kr.number}:</strong> {kr.title}</span>
-                <span className={`status-badge ${kr.status}`}>{kr.status}</span>
+          {activeObjectives.map(obj => {
+            // Calculate KR stats for this objective
+            const totalKRs = obj.keyResults.length;
+            const completeKRs = obj.keyResults.filter(kr => kr.status === 'complete').length;
+            const inProgressKRs = obj.keyResults.filter(kr => kr.status === 'in-progress').length;
+
+            return (
+              <div key={obj.id} className="objective-card">
+                <div className="objective-header">
+                  <div>
+                    <h3>Objective {obj.number}: {obj.title}</h3>
+                    <div className="kr-summary">
+                      {completeKRs > 0 && <span className="kr-stat status-complete">{completeKRs} Complete</span>}
+                      {inProgressKRs > 0 && <span className="kr-stat status-in-progress">{inProgressKRs} In Progress</span>}
+                      <span className="kr-stat total">({completeKRs}/{totalKRs} KRs Done)</span>
+                    </div>
+                  </div>
+                  <div className="progress-circle">
+                    <span>{obj.progress}%</span>
+                  </div>
+                </div>
+
+                <div className="key-results">
+                  {obj.keyResults.map(kr => (
+                    <div key={kr.id} className="key-result">
+                      <div className="kr-header">
+                        <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                        <span className={`kr-status-indicator status-${kr.status}`}></span>
+                      </div>
+                      <div className="progress-bar">
+                        <div
+                          className="progress-fill"
+                          style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                        />
+                      </div>
+                      <div className="kr-details">
+                        {kr.target > 0 && (
+                          <span>{kr.current}/{kr.target}</span>
+                        )}
+                        <span>Target: {kr.targetDate}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="progress-bar">
-                <div className="progress-fill" style={{ width: `${kr.progress}%` }} />
-              </div>
-              <div className="kr-meta">
-                <span>Target: {kr.targetDate}</span>
-                {kr.target > 0 && <span>{kr.current}/{kr.target}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-      ))}
+            );
+          })}
         </section>
       )}
 
@@ -91,31 +113,53 @@ function Objectives() {
       {completedThisYear.length > 0 && (
         <section className="completed-objectives">
           <h2>Completed This Year ({objectivesData.current.year})</h2>
-          {completedThisYear.map(obj => (
-            <div key={obj.id} className="objective-card completed">
-              <h2>Objective {obj.number}: {obj.title}</h2>
-              <p>{obj.description}</p>
-              <div className="progress-info">
-                <strong>Overall Progress: {obj.progress}%</strong>
-              </div>
-              <h3>Key Results:</h3>
-              {obj.keyResults.map(kr => (
-                <div key={kr.id} className="kr-item">
-                  <div className="kr-title-row">
-                    <span><strong>KR {kr.number}:</strong> {kr.title}</span>
-                    <span className={`status-badge ${kr.status}`}>{kr.status}</span>
+          {completedThisYear.map(obj => {
+            // Calculate KR stats for this objective
+            const totalKRs = obj.keyResults.length;
+            const completeKRs = obj.keyResults.filter(kr => kr.status === 'complete').length;
+            const inProgressKRs = obj.keyResults.filter(kr => kr.status === 'in-progress').length;
+
+            return (
+              <div key={obj.id} className="objective-card completed">
+                <div className="objective-header">
+                  <div>
+                    <h3>Objective {obj.number}: {obj.title}</h3>
+                    <div className="kr-summary">
+                      {completeKRs > 0 && <span className="kr-stat status-complete">{completeKRs} Complete</span>}
+                      {inProgressKRs > 0 && <span className="kr-stat status-in-progress">{inProgressKRs} In Progress</span>}
+                      <span className="kr-stat total">({completeKRs}/{totalKRs} KRs Done)</span>
+                    </div>
                   </div>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${kr.progress}%` }} />
-                  </div>
-                  <div className="kr-meta">
-                    <span>Target: {kr.targetDate}</span>
-                    {kr.target > 0 && <span>{kr.current}/{kr.target}</span>}
+                  <div className="progress-circle">
+                    <span>{obj.progress}%</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          ))}
+
+                <div className="key-results">
+                  {obj.keyResults.map(kr => (
+                    <div key={kr.id} className="key-result">
+                      <div className="kr-header">
+                        <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                        <span className={`kr-status-indicator status-${kr.status}`}></span>
+                      </div>
+                      <div className="progress-bar">
+                        <div
+                          className="progress-fill"
+                          style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                        />
+                      </div>
+                      <div className="kr-details">
+                        {kr.target > 0 && (
+                          <span>{kr.current}/{kr.target}</span>
+                        )}
+                        <span>Target: {kr.targetDate}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </section>
       )}
 
@@ -126,33 +170,59 @@ function Objectives() {
           {completedYears.map(yearData => (
             <div key={yearData.year} className="year-section">
               <h3>{yearData.year}</h3>
-              {yearData.objectives.map(obj => (
-                <div key={obj.id} className="objective-card completed">
-                  <h4>Objective {obj.number}: {obj.title}</h4>
-                  <p>{obj.description}</p>
-                  <div className="progress-info">
-                    <strong>Final Progress: {obj.progress}%</strong>
-                  </div>
-                  <details>
-                    <summary>View Key Results</summary>
-                    {obj.keyResults.map(kr => (
-                      <div key={kr.id} className="kr-item">
-                        <div className="kr-title-row">
-                          <span><strong>KR {kr.number}:</strong> {kr.title}</span>
-                          <span className={`status-badge ${kr.status}`}>{kr.status}</span>
-                        </div>
-                        <div className="progress-bar">
-                          <div className="progress-fill" style={{ width: `${kr.progress}%` }} />
-                        </div>
-                        <div className="kr-meta">
-                          <span>Target: {kr.targetDate}</span>
-                          {kr.target > 0 && <span>{kr.current}/{kr.target}</span>}
+              {yearData.objectives.map(obj => {
+                // Calculate KR stats for this objective
+                const totalKRs = obj.keyResults.length;
+                const completeKRs = obj.keyResults.filter(kr => kr.status === 'complete').length;
+                const inProgressKRs = obj.keyResults.filter(kr => kr.status === 'in-progress').length;
+
+                return (
+                  <div key={obj.id} className="objective-card completed">
+                    <div className="objective-header">
+                      <div>
+                        <h3>Objective {obj.number}: {obj.title}</h3>
+                        <div className="kr-summary">
+                          {completeKRs > 0 && <span className="kr-stat status-complete">{completeKRs} Complete</span>}
+                          {inProgressKRs > 0 && <span className="kr-stat status-in-progress">{inProgressKRs} In Progress</span>}
+                          <span className="kr-stat total">({completeKRs}/{totalKRs} KRs Done)</span>
                         </div>
                       </div>
-                    ))}
-                  </details>
-                </div>
-              ))}
+                      <div className="progress-circle">
+                        <span>{obj.progress}%</span>
+                      </div>
+                    </div>
+
+                    <details>
+                      <summary>View Key Results</summary>
+                      <div className="key-results">
+                        {obj.keyResults.map(kr => (
+                          <div key={kr.id} className="key-result">
+                            <div className="kr-header">
+                              <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                              <span className={`kr-status-indicator status-${kr.status}`}></span>
+                            </div>
+                            <div className="progress-bar">
+                              <div
+                                className="progress-fill"
+                                style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                              />
+                            </div>
+                            <div className="kr-details">
+                              {kr.measurement === 'metric' && kr.target > 0 && (
+                                <span>{kr.current}/{kr.target}</span>
+                              )}
+                              {kr.measurement === 'incremental' && kr.target > 0 && (
+                                <span>{kr.current}/{kr.target} completed</span>
+                              )}
+                              <span>Target: {kr.targetDate}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  </div>
+                );
+              })}
             </div>
           ))}
         </section>
