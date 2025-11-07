@@ -262,6 +262,21 @@ section h2 {
   border-left: 4px solid #667eea;
   border-radius: 4px;
   color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.win-text {
+  flex: 1;
+}
+
+.win-date {
+  font-size: 0.75rem;
+  color: #999;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
 .refresh-button {

@@ -14,6 +14,7 @@ import {
   deleteWeeklyPlan,
   removeActionsFromWeeklyPlan,
   updateActionInWeeklyPlan,
+  addWin,
 } from './writer.js';
 import PATHS from '../config/paths.js';
 
@@ -262,6 +263,20 @@ const tools = [
       required: ['weekStart', 'actionNumber', 'updates'],
     },
   },
+  {
+    name: 'add_win',
+    description: 'Add a win to the Recent Wins section of the progress summary. Use this AUTOMATICALLY when: (1) A key result is completed, (2) Significant progress is made on a KR (e.g., 0% → 50% or 50% → 100%), (3) User reports completing a meaningful action or achievement, (4) User expresses celebration or positive sentiment about an accomplishment. Examples: User says "I finished KR 1.2!" → auto-add win; User says "Just shipped my first app" → auto-add win; User completes a major milestone → auto-add win. DO NOT ask for permission - add wins autonomously when detected.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        winDescription: {
+          type: 'string',
+          description: 'Description of the win. Should be concise and celebratory. Can include emojis (✅, 🏆, 🎉) to emphasize significance. Examples: "✅ Completed KR 1.2: Build 3 full-stack projects", "🏆 Shipped first production app", "✅ Received promotion to Director level"',
+        },
+      },
+      required: ['winDescription'],
+    },
+  },
 ];
 
 // Execute tool calls
@@ -341,6 +356,9 @@ async function executeTool(toolName, toolInput) {
           toolInput.updates
         );
 
+      case 'add_win':
+        return await addWin(PATHS.tracking.progress, toolInput.winDescription);
+
       default:
         throw new Error(`Unknown tool: ${toolName}`);
     }
@@ -388,6 +406,9 @@ WEEKLY PLANS:
 - update_weekly_plan: Replace ALL actions (destructive - use cautiously)
 - delete_weekly_plan: Delete entire weekly plan
 
+WINS TRACKING:
+- add_win: Add wins to Recent Wins section (use AUTOMATICALLY - no permission needed)
+
 CRITICAL RULES FOR TOOL USAGE:
 1. You MUST actually invoke tools when the user requests changes - simply saying "I've done it" is NEVER acceptable
 2. ALWAYS wait for tool result confirmation before responding to the user
@@ -398,6 +419,20 @@ CRITICAL RULES FOR TOOL USAGE:
 7. Only use update_weekly_plan when user wants to completely rewrite all actions for a week
 8. ALL KEY RESULTS MUST have numeric 'target' values (not "N/A" or strings like "3%") - the UI requires this to display progress
 9. When user wants to change a target value that's embedded in the KR title (e.g., "by 2%" → "by 3%"), you MUST update BOTH the title AND the target field
+
+WIN DETECTION & AUTONOMOUS TRACKING:
+You should AUTOMATICALLY call add_win (without asking permission) when you detect:
+1. **KR Completion**: Anytime complete_key_result is called → add win celebrating the completion
+2. **Major Progress Jumps**: When progress goes from 0% → 50%+, or 50% → 100%
+3. **Significant Achievements**: User reports completing meaningful actions, shipping features, or reaching milestones
+4. **Celebratory Language**: User uses words like "finished", "completed", "shipped", "achieved", "done", or celebration emojis (🎉, 🏆, ✅)
+5. **External Recognition**: Promotions, awards, positive feedback, new opportunities
+
+Format wins concisely with appropriate emojis:
+- ✅ for completions and checkoffs
+- 🏆 for major achievements and milestones
+- 🎉 for celebrations and successes
+- Keep descriptions brief but specific
 
 Be concise, actionable, and supportive. Ask clarifying questions when needed.`;
 

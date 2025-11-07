@@ -96,11 +96,19 @@ function Dashboard() {
       <section className="wins-section">
         <h2>🎉 Recent Wins</h2>
         <div className="wins-list">
-          {wins.map((win, index) => (
-            <div key={index} className="win-item">
-              {win}
-            </div>
-          ))}
+          {wins.map((win, index) => {
+            // Extract date from end of win string [YYYY-MM-DD]
+            const dateMatch = win.match(/\[(\d{4}-\d{2}-\d{2})\]$/);
+            const winText = dateMatch ? win.replace(/\s*\[(\d{4}-\d{2}-\d{2})\]$/, '') : win;
+            const winDate = dateMatch ? dateMatch[1] : null;
+
+            return (
+              <div key={index} className="win-item">
+                <span className="win-text">{winText}</span>
+                {winDate && <span className="win-date">{winDate}</span>}
+              </div>
+            );
+          })}
         </div>
       </section>
 

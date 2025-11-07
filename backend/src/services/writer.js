@@ -878,3 +878,55 @@ export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber
     throw new Error(`Failed to update action in weekly plan: ${error.message}`);
   }
 }
+
+/**
+ * Add a win to the progress summary file with date stamp
+ * @param {string} filePath - Path to the progress summary markdown file
+ * @param {string} winDescription - Description of the win to add
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function addWin(filePath, winDescription) {
+  try {
+    // Read existing file
+    let content = await fs.readFile(filePath, 'utf-8');
+
+    // Find the "Wins This Week" section
+    const winsHeaderRegex = /## Wins This Week 🎉/;
+    const winsHeaderMatch = content.match(winsHeaderRegex);
+
+    if (!winsHeaderMatch) {
+      throw new Error('Could not find "## Wins This Week 🎉" section in progress summary');
+    }
+
+    // Find the position right after the header and blank line
+    const headerIndex = content.indexOf(winsHeaderMatch[0]);
+    const afterHeaderIndex = headerIndex + winsHeaderMatch[0].length;
+
+    // Find the next line after the header (skip the blank line)
+    let insertIndex = afterHeaderIndex;
+    while (insertIndex < content.length && content[insertIndex] === '\n') {
+      insertIndex++;
+    }
+
+    // Generate date stamp in YYYY-MM-DD format
+    const now = new Date();
+    const dateStamp = now.toISOString().split('T')[0];
+
+    // Build the new win entry with date stamp at the end
+    const winEntry = `- ${winDescription} [${dateStamp}]\n`;
+
+    // Insert the win at the top of the wins list
+    content = content.slice(0, insertIndex) + winEntry + content.slice(insertIndex);
+
+    // Write back to file
+    await fs.writeFile(filePath, content);
+
+    return {
+      success: true,
+      message: `Successfully added win: "${winDescription}" with date ${dateStamp}`,
+    };
+  } catch (error) {
+    console.error('Error adding win:', error);
+    throw new Error(`Failed to add win: ${error.message}`);
+  }
+}

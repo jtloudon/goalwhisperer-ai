@@ -213,13 +213,21 @@ export async function parseProgressSummary(filePath) {
     summary.overview.atRisk = parseInt(atRiskMatch[1]);
   }
 
-  // Extract wins
+  // Extract wins (sort by date descending, limit to 10 most recent)
   const winsSection = content.match(/## Wins This Week 🎉\n\n([\s\S]+?)(\n\n##|\n\n---|\Z)/);
   if (winsSection) {
     const winLines = winsSection[1].split('\n');
     summary.wins = winLines
       .filter(line => line.trim().startsWith('-'))
-      .map(line => line.replace(/^-\s*/, '').trim());
+      .map(line => line.replace(/^-\s*/, '').trim())
+      .sort((a, b) => {
+        // Extract dates from win strings [YYYY-MM-DD]
+        const dateA = a.match(/\[(\d{4}-\d{2}-\d{2})\]$/)?.[1] || '0000-00-00';
+        const dateB = b.match(/\[(\d{4}-\d{2}-\d{2})\]$/)?.[1] || '0000-00-00';
+        // Sort descending (most recent first)
+        return dateB.localeCompare(dateA);
+      })
+      .slice(0, 10); // Limit to 10 most recent wins
   }
 
   return summary;
