@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&display=swap');
+
 /* Standard page width: 1200px max for optimal readability */
 .page-content {
   padding: 2rem;
@@ -17,6 +19,7 @@
   margin-top: 2rem;
   margin-bottom: 1rem;
   color: #333 !important;
+  font-family: 'Orbitron', sans-serif;
 }
 
 .page-content h3 {

@@ -184,7 +184,7 @@ function Plans() {
             return (
               <div key={plan.file} className="plan-card current-week">
                 <div className="plan-header">
-                  <h3>Current Week: {plan.dateRange}</h3>
+                  <h3>Current Week: {plan.dateRange.replace(' to ', '  to  ')}</h3>
                   <span className="completion-badge">{stats.completed}/{stats.total} completed</span>
                 </div>
                 {renderContent()}
@@ -196,7 +196,7 @@ function Plans() {
           return (
             <details key={plan.file} className="plan-card past-week" data-week-id={plan.file}>
               <summary className="plan-header">
-                <h3>{plan.dateRange}</h3>
+                <h3>{plan.dateRange.replace(' to ', '  to  ')}</h3>
                 <span className="completion-badge">{stats.completed}/{stats.total} completed</span>
               </summary>
               <div className="plan-content">
