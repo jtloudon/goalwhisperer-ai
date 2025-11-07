@@ -16,7 +16,14 @@ body {
 
 .app {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
 
 .main-content {
@@ -30,8 +37,8 @@ p, span, div, li {
   color: #333;
 }
 
-@media (max-width: 768px) {
-  .app {
+@media (max-width: 1024px) {
+  .app-body {
     flex-direction: column;
   }
 }

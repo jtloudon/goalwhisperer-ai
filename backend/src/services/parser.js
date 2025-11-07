@@ -213,24 +213,87 @@ export async function parseProgressSummary(filePath) {
     summary.overview.atRisk = parseInt(atRiskMatch[1]);
   }
 
-  // Extract wins (sort by date descending, limit to 10 most recent)
+  // Extract wins (sort by date descending, limit to 10 most recent for display)
   const winsSection = content.match(/## Wins This Week 🎉\n\n([\s\S]+?)(\n\n##|\n\n---|\Z)/);
   if (winsSection) {
     const winLines = winsSection[1].split('\n');
-    summary.wins = winLines
+    const allWins = winLines
       .filter(line => line.trim().startsWith('-'))
-      .map(line => line.replace(/^-\s*/, '').trim())
+      .map(line => {
+        const text = line.replace(/^-\s*/, '').trim();
+        const dateMatch = text.match(/\[(\d{4}-\d{2}-\d{2})\]$/);
+        return {
+          text,
+          date: dateMatch ? dateMatch[1] : null
+        };
+      });
+
+    // Sort and get top 10 for display
+    summary.wins = allWins
+      .map(w => w.text)
       .sort((a, b) => {
-        // Extract dates from win strings [YYYY-MM-DD]
         const dateA = a.match(/\[(\d{4}-\d{2}-\d{2})\]$/)?.[1] || '0000-00-00';
         const dateB = b.match(/\[(\d{4}-\d{2}-\d{2})\]$/)?.[1] || '0000-00-00';
-        // Sort descending (most recent first)
         return dateB.localeCompare(dateA);
       })
-      .slice(0, 10); // Limit to 10 most recent wins
+      .slice(0, 10);
+
+    // Calculate weekly timeline (last 8 weeks)
+    summary.winsTimeline = calculateWeeklyWins(allWins.filter(w => w.date), 8);
   }
 
   return summary;
+}
+
+/**
+ * Calculate weekly win counts for timeline visualization
+ * @param {Array} wins - Array of win objects with date field
+ * @param {number} numWeeks - Number of weeks to include
+ * @returns {Array} Array of {weekStart, weekEnd, count} objects
+ */
+function calculateWeeklyWins(wins, numWeeks) {
+  const weeks = [];
+  const now = new Date();
+
+  // Generate last N weeks (Monday-Sunday)
+  for (let i = numWeeks - 1; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - (i * 7));
+
+    // Get Monday of this week
+    const dayOfWeek = date.getDay();
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - daysToMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    // Get Sunday of this week
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    weeks.push({
+      weekStart: monday.toISOString().split('T')[0],
+      weekEnd: sunday.toISOString().split('T')[0],
+      count: 0
+    });
+  }
+
+  // Count wins per week
+  wins.forEach(win => {
+    const winDate = new Date(win.date + 'T00:00:00');
+
+    weeks.forEach(week => {
+      const weekStart = new Date(week.weekStart + 'T00:00:00');
+      const weekEnd = new Date(week.weekEnd + 'T23:59:59');
+
+      if (winDate >= weekStart && winDate <= weekEnd) {
+        week.count++;
+      }
+    });
+  });
+
+  return weeks;
 }
 
 /**
@@ -406,6 +469,7 @@ export async function generateDashboardData(objectives, progressSummary, complet
     })),
     recentCompletions: [],
     wins: progressSummary.wins || [],
+    winsTimeline: progressSummary.winsTimeline || [],
   };
 
   // Extract last 5 completions across all KRs

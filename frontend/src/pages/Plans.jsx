@@ -102,7 +102,6 @@ function Plans() {
 
   return (
     <div className="page-content">
-      <h1>Weekly Actions</h1>
       <div className="plans-timeline">
         {plans && plans.map((plan, index) => {
           const { grouped, ungrouped } = groupActionsByObjective(plan.actions);

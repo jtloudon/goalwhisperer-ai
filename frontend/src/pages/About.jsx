@@ -3,8 +3,6 @@ import './Page.css';
 function About() {
   return (
     <div className="page-content">
-      <h1>About AI Powered Goal Tracker</h1>
-
       <section>
         <h2>Overview</h2>
         <p>

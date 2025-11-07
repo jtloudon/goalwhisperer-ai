@@ -56,7 +56,6 @@ function Objectives() {
 
   return (
     <div className="page-content">
-      <h1>Objectives</h1>
 
       {/* Active Objectives */}
       {objectivesData?.current && activeObjectives.length > 0 && (

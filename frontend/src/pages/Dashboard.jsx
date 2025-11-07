@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import WinsTrendline from '../components/WinsTrendline';
 import './Dashboard.css';
 
 const API_URL = 'http://localhost:3001/api';
@@ -64,7 +65,7 @@ function Dashboard() {
     );
   }
 
-  const { overview, objectives, recentCompletions, wins } = dashboard;
+  const { overview, objectives, recentCompletions, wins, winsTimeline } = dashboard;
 
   // Calculate completed objectives
   const completedCount = objectives.filter(obj => obj.progress === 100).length;
@@ -95,6 +96,12 @@ function Dashboard() {
       {/* Wins */}
       <section className="wins-section">
         <h2>🎉 Recent Wins</h2>
+
+        {/* Wins Trendline */}
+        {winsTimeline && winsTimeline.length > 0 && (
+          <WinsTrendline data={winsTimeline} />
+        )}
+
         <div className="wins-list">
           {wins.map((win, index) => {
             // Extract date from end of win string [YYYY-MM-DD]
