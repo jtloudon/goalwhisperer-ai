@@ -82,7 +82,7 @@ export async function parseAnnualObjectives(filePath) {
       const targetMatch = line.match(/Target\*\*: (.+)/);
       if (targetMatch) {
         const val = targetMatch[1].trim();
-        currentKR.target = isNaN(val) ? 0 : parseInt(val);
+        currentKR.target = isNaN(val) ? 0 : parseFloat(val);
       }
     }
 
@@ -90,7 +90,7 @@ export async function parseAnnualObjectives(filePath) {
     else if (line.startsWith('- **Current**:') && currentKR) {
       const currentMatch = line.match(/Current\*\*: (.+)/);
       if (currentMatch) {
-        currentKR.current = parseInt(currentMatch[1].trim()) || 0;
+        currentKR.current = parseFloat(currentMatch[1].trim()) || 0;
       }
     }
 

@@ -22,7 +22,7 @@
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #764ba2 0%, #b794d1 100%);
+  background: linear-gradient(90deg, #d946ef 0%, #6366f1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -42,7 +42,7 @@
   text-decoration: none;
   transition: all 0.2s;
   border-radius: 8px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 500;
   position: relative;
   text-transform: uppercase;

@@ -18,7 +18,7 @@
   font-size: 1.5rem;
   margin-top: 2rem;
   margin-bottom: 1rem;
-  color: #333 !important;
+  color: #764ba2 !important;
   font-family: 'Orbitron', sans-serif;
 }
 
@@ -104,7 +104,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #7c3aed 0%, #c4b5fd 100%);
   transition: width 0.3s ease;
 }
 

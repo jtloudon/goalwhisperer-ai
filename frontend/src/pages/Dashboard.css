@@ -49,7 +49,7 @@
 .stat-value {
   font-size: 2.5rem;
   font-weight: bold;
-  background: linear-gradient(135deg, #7c3aed 0%, #c4b5fd 100%);
+  background: linear-gradient(90deg, #d946ef 0%, #d946ef 35%, #6366f1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -134,14 +134,14 @@ section h2 {
   justify-content: center;
   font-weight: 600;
   font-size: 2.75rem;
-  background: linear-gradient(135deg, #5b21b6 0%, #e9d5ff 100%);
+  background: linear-gradient(90deg, #d946ef 0%, #6366f1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .progress-circle span {
-  background: linear-gradient(135deg, #5b21b6 0%, #e9d5ff 100%);
+  background: linear-gradient(90deg, #d946ef 0%, #6366f1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -173,18 +173,20 @@ section h2 {
 }
 
 .kr-status-indicator {
-  min-width: 16px;
-  max-width: 16px;
-  width: 16px;
-  min-height: 16px;
-  max-height: 16px;
-  height: 16px;
-  border-radius: 50%;
-  display: inline-block;
+  width: 10px !important;
+  height: 10px !important;
+  min-width: 10px !important;
+  max-width: 10px !important;
+  min-height: 10px !important;
+  max-height: 10px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: block !important;
   margin-right: 0.75rem;
-  flex-shrink: 0;
-  align-self: center;
-  aspect-ratio: 1 / 1;
+  flex-shrink: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .kr-status-indicator.status-complete {

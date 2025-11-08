@@ -1,6 +1,6 @@
 .claude-panel {
   width: 440px;
-  background: white;
+  background: #f0ebf7;
   border-left: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
@@ -14,7 +14,7 @@
 .claude-header {
   padding: 1.5rem;
   border-bottom: 1px solid #e0e0e0;
-  background: rgba(118, 75, 162, 0.08);
+  background: #f0ebf7;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -167,7 +167,7 @@
 .claude-input-form {
   padding: 1rem;
   border-top: 1px solid #e0e0e0;
-  background: #fafafa;
+  background: #f0ebf7;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
