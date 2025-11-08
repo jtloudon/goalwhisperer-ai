@@ -40,6 +40,12 @@ function WinsTrendline({ data }) {
       <h3>Wins Trend (Last 8 Weeks)</h3>
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={formattedData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+          <defs>
+            <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#7c3aed" />
+              <stop offset="100%" stopColor="#c4b5fd" />
+            </linearGradient>
+          </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis
             dataKey="weekLabel"
@@ -55,9 +61,9 @@ function WinsTrendline({ data }) {
           <Line
             type="monotone"
             dataKey="count"
-            stroke="#667eea"
+            stroke="url(#lineGradient)"
             strokeWidth={3}
-            dot={{ fill: '#667eea', r: 4 }}
+            dot={{ fill: '#8b5cf6', r: 4 }}
             activeDot={{ r: 6 }}
           />
         </LineChart>

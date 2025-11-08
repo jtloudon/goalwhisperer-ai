@@ -4,6 +4,7 @@ import ClaudePanel from './components/ClaudePanel';
 import Dashboard from './pages/Dashboard';
 import Objectives from './pages/Objectives';
 import Plans from './pages/Plans';
+import CheckinHistory from './pages/CheckinHistory';
 import About from './pages/About';
 import './App.css';
 
@@ -18,6 +19,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/objectives" element={<Objectives />} />
               <Route path="/plans" element={<Plans />} />
+              <Route path="/checkin-history" element={<CheckinHistory />} />
               <Route path="/about" element={<About />} />
             </Routes>
           </main>

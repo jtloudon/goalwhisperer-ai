@@ -74,7 +74,6 @@ function Objectives() {
                     <div className="kr-summary">
                       {completeKRs > 0 && <span className="kr-stat status-complete">{completeKRs} Complete</span>}
                       {inProgressKRs > 0 && <span className="kr-stat status-in-progress">{inProgressKRs} In Progress</span>}
-                      <span className="kr-stat total">({completeKRs}/{totalKRs} KRs Done)</span>
                     </div>
                   </div>
                   <div className="progress-circle">
@@ -86,8 +85,8 @@ function Objectives() {
                   {obj.keyResults.map(kr => (
                     <div key={kr.id} className="key-result">
                       <div className="kr-header">
-                        <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
                         <span className={`kr-status-indicator status-${kr.status}`}></span>
+                        <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
                       </div>
                       <div className="progress-bar">
                         <div
@@ -128,7 +127,6 @@ function Objectives() {
                     <div className="kr-summary">
                       {completeKRs > 0 && <span className="kr-stat status-complete">{completeKRs} Complete</span>}
                       {inProgressKRs > 0 && <span className="kr-stat status-in-progress">{inProgressKRs} In Progress</span>}
-                      <span className="kr-stat total">({completeKRs}/{totalKRs} KRs Done)</span>
                     </div>
                   </div>
                   <div className="progress-circle">
@@ -140,8 +138,8 @@ function Objectives() {
                   {obj.keyResults.map(kr => (
                     <div key={kr.id} className="key-result">
                       <div className="kr-header">
-                        <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
                         <span className={`kr-status-indicator status-${kr.status}`}></span>
+                        <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
                       </div>
                       <div className="progress-bar">
                         <div
@@ -199,8 +197,8 @@ function Objectives() {
                         {obj.keyResults.map(kr => (
                           <div key={kr.id} className="key-result">
                             <div className="kr-header">
-                              <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
                               <span className={`kr-status-indicator status-${kr.status}`}></span>
+                              <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
                             </div>
                             <div className="progress-bar">
                               <div

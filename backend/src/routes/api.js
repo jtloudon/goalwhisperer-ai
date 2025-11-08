@@ -7,13 +7,15 @@ import {
   parseCompletedItems,
   parseWeeklyPlans,
   generateDashboardData,
+  parseCheckinHistory,
 } from '../services/parser.js';
-import { chatWithClaude } from '../services/claude.js';
+import { chatWithClaude, generateGreeting } from '../services/claude.js';
 import {
   addObjective,
   addWeeklyPlan,
   addCompletion,
   updateKeyResultProgress,
+  updateActionInWeeklyPlan,
 } from '../services/writer.js';
 
 const router = express.Router();
@@ -38,7 +40,7 @@ router.get('/objectives/annual', async (req, res) => {
  */
 router.get('/tracking/progress', async (req, res) => {
   try {
-    const progress = await parseProgressSummary(PATHS.tracking.progress);
+    const progress = await parseProgressSummary(PATHS.tracking.progress, PATHS.plans);
     res.json({ success: true, data: progress });
   } catch (error) {
     console.error('Error parsing progress summary:', error);
@@ -56,6 +58,20 @@ router.get('/tracking/completed', async (req, res) => {
     res.json({ success: true, data: completed });
   } catch (error) {
     console.error('Error parsing completed items:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * GET /api/tracking/checkin-history
+ * Returns check-in history
+ */
+router.get('/tracking/checkin-history', async (req, res) => {
+  try {
+    const history = await parseCheckinHistory(PATHS.tracking.checkinHistory);
+    res.json({ success: true, data: history });
+  } catch (error) {
+    console.error('Error parsing check-in history:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -110,7 +126,7 @@ router.get('/dashboard', async (req, res) => {
   try {
     const [objectivesData, progressSummary, completedItems] = await Promise.all([
       parseAnnualObjectives(PATHS.objectives.annual),
-      parseProgressSummary(PATHS.tracking.progress),
+      parseProgressSummary(PATHS.tracking.progress, PATHS.plans),
       parseCompletedItems(PATHS.tracking.completed),
     ]);
 
@@ -122,6 +138,33 @@ router.get('/dashboard', async (req, res) => {
   } catch (error) {
     console.error('Error generating dashboard:', error);
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * GET /api/claude/greeting
+ * Get contextual greeting and suggested actions
+ */
+router.get('/claude/greeting', async (req, res) => {
+  try {
+    // Check if user has objectives
+    const objectivesData = await parseAllAnnualObjectives(PATHS.objectives.dir).catch(() => null);
+    const hasObjectives = objectivesData?.current?.objectives?.length > 0;
+
+    const greeting = generateGreeting(hasObjectives, {
+      objectives: objectivesData?.current?.objectives || []
+    });
+
+    res.json({
+      success: true,
+      data: greeting,
+    });
+  } catch (error) {
+    console.error('Error generating greeting:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
   }
 });
 
@@ -152,7 +195,7 @@ router.post('/claude/chat', async (req, res) => {
 
       context = {
         objectives: objectivesData?.current?.objectives || [],
-        weeklyPlans: weeklyPlans.slice(0, 3), // Last 3 weeks
+        weeklyPlans: weeklyPlans.slice(0, 10), // Last 10 weeks
         completed: completed.slice(0, 5), // Recent completions
       };
     }
@@ -288,6 +331,36 @@ router.post('/objectives/update-progress', async (req, res) => {
     res.json({ success: true, data: result });
   } catch (error) {
     console.error('Error updating progress:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * POST /api/plans/update-action
+ * Update a specific action in a weekly plan
+ * Body: { weekStart, actionNumber, updates: {title, mapsTo, description} }
+ */
+router.post('/plans/update-action', async (req, res) => {
+  try {
+    const { weekStart, actionNumber, updates } = req.body;
+
+    if (!weekStart || !actionNumber || !updates) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: weekStart, actionNumber, updates',
+      });
+    }
+
+    const result = await updateActionInWeeklyPlan(
+      PATHS.plans,
+      weekStart,
+      actionNumber,
+      updates
+    );
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Error updating action in weekly plan:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

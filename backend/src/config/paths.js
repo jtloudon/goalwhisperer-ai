@@ -16,6 +16,7 @@ export const PATHS = {
   tracking: {
     completed: path.join(DATA_DIR, 'tracking/completed-items.md'),
     progress: path.join(DATA_DIR, 'tracking/progress-summary.md'),
+    checkinHistory: path.join(DATA_DIR, 'tracking/checkin-history.md'),
   },
   plans: path.join(DATA_DIR, 'plans'),
 };

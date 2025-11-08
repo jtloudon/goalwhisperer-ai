@@ -171,9 +171,10 @@ export async function addCompletion(filePath, completion) {
  * @param {Object} updates - Updates to apply
  * @param {number} updates.current - New current value
  * @param {number} updates.progress - New progress percentage
+ * @param {string} progressFilePath - Optional: Path to progress summary file for auto-adding wins
  * @returns {Promise<Object>} Result with success status
  */
-export async function updateKeyResultProgress(filePath, krId, updates) {
+export async function updateKeyResultProgress(filePath, krId, updates, progressFilePath = null) {
   try {
     let content = await fs.readFile(filePath, 'utf-8');
 
@@ -183,6 +184,18 @@ export async function updateKeyResultProgress(filePath, krId, updates) {
       throw new Error(`Invalid KR ID format: ${krId}`);
     }
     const markdownKrId = `KR ${idMatch[1]}.${idMatch[2]}`;
+
+    // Get current progress to detect major jumps
+    let oldProgress = 0;
+    const progressMatch = content.match(new RegExp(`#### ${markdownKrId}:.*?- \\*\\*Progress\\*\\*: (\\d+)%`, 's'));
+    if (progressMatch) {
+      oldProgress = parseInt(progressMatch[1]);
+    }
+
+    // Extract KR title for win tracking
+    const titleRegex = new RegExp(`#### ${markdownKrId}: (.+?)\\n`);
+    const titleMatch = content.match(titleRegex);
+    const krTitle = titleMatch ? titleMatch[1] : 'Key Result';
 
     // Update current value
     if (updates.current !== undefined) {
@@ -198,9 +211,30 @@ export async function updateKeyResultProgress(filePath, krId, updates) {
 
     await fs.writeFile(filePath, content);
 
+    // Auto-add win for major progress jumps (25% or more increase)
+    let autoWinAdded = false;
+    if (progressFilePath && updates.progress !== undefined) {
+      const progressJump = updates.progress - oldProgress;
+      const hitsMilestone =
+        (oldProgress < 25 && updates.progress >= 25) ||
+        (oldProgress < 50 && updates.progress >= 50) ||
+        (oldProgress < 75 && updates.progress >= 75) ||
+        (oldProgress < 100 && updates.progress >= 100);
+
+      if (progressJump >= 25 || hitsMilestone) {
+        try {
+          await addWin(progressFilePath, `${markdownKrId}: ${krTitle} reached ${updates.progress}%`);
+          autoWinAdded = true;
+        } catch (winError) {
+          console.warn('Failed to auto-add win for progress jump:', winError.message);
+        }
+      }
+    }
+
     return {
       success: true,
       message: `Successfully updated progress for ${krId}`,
+      autoWinAdded,
     };
   } catch (error) {
     console.error('Error updating KR progress:', error);
@@ -280,9 +314,10 @@ export async function updateKeyResult(filePath, krId, updates) {
  * @param {string} filePath - Path to the annual objectives markdown file
  * @param {string} krId - Key result ID (e.g., "kr-1.2")
  * @param {boolean} setProgressTo100 - Optional: set progress to 100% when completing (default: false)
+ * @param {string} progressFilePath - Optional: Path to progress summary file for auto-adding wins
  * @returns {Promise<Object>} Result with success status
  */
-export async function completeKeyResult(filePath, krId, setProgressTo100 = false) {
+export async function completeKeyResult(filePath, krId, setProgressTo100 = false, progressFilePath = null) {
   try {
     let content = await fs.readFile(filePath, 'utf-8');
 
@@ -292,6 +327,11 @@ export async function completeKeyResult(filePath, krId, setProgressTo100 = false
       throw new Error(`Invalid KR ID format: ${krId}`);
     }
     const markdownKrId = `KR ${idMatch[1]}.${idMatch[2]}`;
+
+    // Extract KR title for win tracking
+    const titleRegex = new RegExp(`#### ${markdownKrId}: (.+?)\\n`);
+    const titleMatch = content.match(titleRegex);
+    const krTitle = titleMatch ? titleMatch[1] : 'Key Result';
 
     // Update status to complete
     const statusRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Status\\*\\*: )(.+?)\\n`, 's');
@@ -305,9 +345,20 @@ export async function completeKeyResult(filePath, krId, setProgressTo100 = false
 
     await fs.writeFile(filePath, content);
 
+    // Auto-add win if progress file path provided
+    if (progressFilePath) {
+      try {
+        await addWin(progressFilePath, `Completed ${markdownKrId}: ${krTitle}`);
+      } catch (winError) {
+        console.warn('Failed to auto-add win:', winError.message);
+        // Don't fail the entire operation if win tracking fails
+      }
+    }
+
     return {
       success: true,
       message: `Successfully completed ${markdownKrId}`,
+      autoWinAdded: !!progressFilePath,
     };
   } catch (error) {
     console.error('Error completing KR:', error);
@@ -763,9 +814,10 @@ export async function removeActionsFromWeeklyPlan(plansDir, weekStart, actionNum
  * @param {string} updates.title - Optional: New title
  * @param {string} updates.mapsTo - Optional: New mapsTo value
  * @param {string} updates.description - Optional: New description
+ * @param {string} progressFilePath - Optional: Path to progress summary file for auto-adding wins
  * @returns {Promise<Object>} Result with success status
  */
-export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber, updates) {
+export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber, updates, progressFilePath = null) {
   try {
     const fileName = `${plansDir}/plan-${weekStart}.md`;
 
@@ -828,11 +880,14 @@ export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber
 
     const action = actions[actionNumber - 1];
 
+    // Get original title to check if we're adding [DONE]
+    const originalTitle = lines[action.titleLine].replace(/^## /, '');
+    const wasNotDone = !originalTitle.startsWith('✅ ') && !originalTitle.startsWith('[DONE] ');
+
     // Apply updates
     if (updates.title) {
-      const checkmarkMatch = lines[action.titleLine].match(/^##\s+(✅\s+)?/);
-      const checkmark = checkmarkMatch ? checkmarkMatch[1] || '' : '';
-      lines[action.titleLine] = `## ${checkmark}${updates.title}`;
+      // Simply use the title as provided - if agent wants checkmark, it's in the title
+      lines[action.titleLine] = `## ${updates.title}`;
     }
 
     if (updates.mapsTo !== undefined) {
@@ -867,11 +922,31 @@ export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber
     // Write updated file
     await fs.writeFile(fileName, lines.join('\n'));
 
+    // Auto-add win if marking action as done
+    let autoWinAdded = false;
+    if (progressFilePath && updates.title && wasNotDone) {
+      const newTitle = updates.title;
+      const isNowDone = newTitle.startsWith('✅ ') || newTitle.startsWith('[DONE] ');
+
+      if (isNowDone) {
+        try {
+          // Strip the done marker for the win description
+          const cleanTitle = newTitle.replace(/^(✅ |\[DONE\] )/, '');
+          await addWin(progressFilePath, cleanTitle);
+          autoWinAdded = true;
+        } catch (winError) {
+          console.warn('Failed to auto-add win:', winError.message);
+          // Don't fail the entire operation if win tracking fails
+        }
+      }
+    }
+
     return {
       success: true,
       fileName,
       actionNumber,
       message: `Successfully updated action ${actionNumber} in weekly plan for ${weekStart}`,
+      autoWinAdded,
     };
   } catch (error) {
     console.error('Error updating action in weekly plan:', error);
@@ -928,5 +1003,72 @@ export async function addWin(filePath, winDescription) {
   } catch (error) {
     console.error('Error adding win:', error);
     throw new Error(`Failed to add win: ${error.message}`);
+  }
+}
+
+/**
+ * Save a check-in summary to the check-in history file
+ * @param {string} filePath - Path to the check-in history markdown file
+ * @param {Object} summary - Check-in summary data
+ * @param {string} summary.weekStart - Week start date (YYYY-MM-DD)
+ * @param {string} summary.weekEnd - Week end date (YYYY-MM-DD)
+ * @param {string} summary.completions - What was completed this week
+ * @param {string} summary.updates - What was updated (progress, blockers, adjustments)
+ * @param {string} summary.nextWeekFocus - Focus areas for next week
+ * @param {string} summary.insights - Key insights or flags from the AI
+ * @returns {Promise<Object>} Result with success status
+ */
+export async function saveCheckinSummary(filePath, summary) {
+  try {
+    // Check if file exists, create if not
+    let content = '';
+    try {
+      content = await fs.readFile(filePath, 'utf-8');
+    } catch (err) {
+      // File doesn't exist, create header
+      content = '# Check-in History\n\n';
+    }
+
+    // Generate date stamp
+    const now = new Date();
+    const dateStamp = now.toISOString().split('T')[0];
+    const timeStamp = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    // Build check-in entry
+    let entry = `## Check-in: ${summary.weekStart} to ${summary.weekEnd}\n`;
+    entry += `**Date**: ${dateStamp} at ${timeStamp}\n\n`;
+
+    if (summary.completions) {
+      entry += `### What Was Completed\n${summary.completions}\n\n`;
+    }
+
+    if (summary.updates) {
+      entry += `### Updates Made\n${summary.updates}\n\n`;
+    }
+
+    if (summary.nextWeekFocus) {
+      entry += `### Next Week Focus\n${summary.nextWeekFocus}\n\n`;
+    }
+
+    if (summary.insights) {
+      entry += `### Insights\n${summary.insights}\n\n`;
+    }
+
+    entry += '---\n\n';
+
+    // Prepend new entry (most recent first)
+    const headerEndIndex = content.indexOf('\n\n') + 2;
+    content = content.slice(0, headerEndIndex) + entry + content.slice(headerEndIndex);
+
+    // Write to file
+    await fs.writeFile(filePath, content);
+
+    return {
+      success: true,
+      message: `Successfully saved check-in summary for week ${summary.weekStart}`,
+    };
+  } catch (error) {
+    console.error('Error saving check-in summary:', error);
+    throw new Error(`Failed to save check-in summary: ${error.message}`);
   }
 }

@@ -167,8 +167,10 @@ export async function parseAllAnnualObjectives(objectivesDir) {
 
 /**
  * Parse progress summary file
+ * @param {string} filePath - Path to progress summary file
+ * @param {string} plansDir - Path to plans directory (for aligning week boundaries)
  */
-export async function parseProgressSummary(filePath) {
+export async function parseProgressSummary(filePath, plansDir) {
   const content = await fs.readFile(filePath, 'utf-8');
   const lines = content.split('\n');
 
@@ -238,8 +240,8 @@ export async function parseProgressSummary(filePath) {
       })
       .slice(0, 10);
 
-    // Calculate weekly timeline (last 8 weeks)
-    summary.winsTimeline = calculateWeeklyWins(allWins.filter(w => w.date), 8);
+    // Calculate weekly timeline (last 8 weeks) - uses actual plan file date ranges
+    summary.winsTimeline = await calculateWeeklyWins(allWins.filter(w => w.date), 8, plansDir);
   }
 
   return summary;
@@ -247,37 +249,91 @@ export async function parseProgressSummary(filePath) {
 
 /**
  * Calculate weekly win counts for timeline visualization
+ * Uses actual weekly plan date ranges for perfect alignment
  * @param {Array} wins - Array of win objects with date field
  * @param {number} numWeeks - Number of weeks to include
+ * @param {string} plansDir - Path to plans directory to read actual week boundaries
  * @returns {Array} Array of {weekStart, weekEnd, count} objects
  */
-function calculateWeeklyWins(wins, numWeeks) {
+async function calculateWeeklyWins(wins, numWeeks, plansDir) {
   const weeks = [];
-  const now = new Date();
 
-  // Generate last N weeks (Monday-Sunday)
-  for (let i = numWeeks - 1; i >= 0; i--) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - (i * 7));
+  // Read actual weekly plan files to get real week boundaries
+  try {
+    const files = await fs.readdir(plansDir);
+    const planFiles = files
+      .filter(f => f.match(/plan-\d{4}-\d{2}-\d{2}\.md$/))
+      .sort()
+      .reverse(); // Most recent first
 
-    // Get Monday of this week
-    const dayOfWeek = date.getDay();
-    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    const monday = new Date(date);
-    monday.setDate(date.getDate() - daysToMonday);
-    monday.setHours(0, 0, 0, 0);
+    // Parse date ranges from plan files
+    for (const file of planFiles.slice(0, numWeeks)) {
+      const content = await fs.readFile(`${plansDir}/${file}`, 'utf-8');
+      const titleMatch = content.match(/# Weekly Plan: (.+?) to (.+)/);
 
-    // Get Sunday of this week
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    sunday.setHours(23, 59, 59, 999);
+      if (titleMatch) {
+        weeks.push({
+          weekStart: titleMatch[1],
+          weekEnd: titleMatch[2],
+          count: 0
+        });
+      }
+    }
 
-    weeks.push({
-      weekStart: monday.toISOString().split('T')[0],
-      weekEnd: sunday.toISOString().split('T')[0],
-      count: 0
-    });
+    // If we don't have enough plan files, fill in with calculated weeks
+    if (weeks.length < numWeeks) {
+      const now = new Date();
+      const weeksNeeded = numWeeks - weeks.length;
+
+      for (let i = 0; i < weeksNeeded; i++) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - ((weeks.length + i) * 7));
+
+        // Get Monday of this week
+        const dayOfWeek = date.getDay();
+        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        const monday = new Date(date);
+        monday.setDate(date.getDate() - daysToMonday);
+        monday.setHours(0, 0, 0, 0);
+
+        // Get Sunday of this week
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+
+        weeks.push({
+          weekStart: monday.toISOString().split('T')[0],
+          weekEnd: sunday.toISOString().split('T')[0],
+          count: 0
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Error reading plan files for week boundaries:', err);
+    // Fallback to calculated weeks if we can't read plan files
+    const now = new Date();
+    for (let i = numWeeks - 1; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - (i * 7));
+
+      const dayOfWeek = date.getDay();
+      const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      const monday = new Date(date);
+      monday.setDate(date.getDate() - daysToMonday);
+      monday.setHours(0, 0, 0, 0);
+
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+
+      weeks.push({
+        weekStart: monday.toISOString().split('T')[0],
+        weekEnd: sunday.toISOString().split('T')[0],
+        count: 0
+      });
+    }
   }
+
+  // Reverse to get chronological order (oldest first)
+  weeks.reverse();
 
   // Count wins per week
   wins.forEach(win => {
@@ -391,11 +447,11 @@ export async function parseWeeklyPlans(plansDir) {
       if (line.startsWith('## ')) {
         let title = line.replace('## ', '').trim();
 
-        // Check for completion status (✅ or ☑ at start of title)
+        // Check for completion status (✅, ☑, or [DONE] at start of title)
         let status = 'pending';
-        if (title.startsWith('✅') || title.startsWith('☑')) {
+        if (title.startsWith('✅') || title.startsWith('☑') || title.startsWith('[DONE]')) {
           status = 'completed';
-          title = title.replace(/^[✅☑]\s*/, '').trim();
+          title = title.replace(/^[✅☑]\s*/, '').replace(/^\[DONE\]\s*/, '').trim();
         }
 
         const action = {
@@ -494,6 +550,114 @@ export async function generateDashboardData(objectives, progressSummary, complet
   return dashboard;
 }
 
+/**
+ * Parse check-in history file
+ * Format: ## Check-in: YYYY-MM-DD to YYYY-MM-DD
+ */
+export async function parseCheckinHistory(filePath) {
+  try {
+    const content = await fs.readFile(filePath, 'utf-8');
+    const lines = content.split('\n');
+
+    const checkins = [];
+    let currentCheckin = null;
+    let currentSection = null;
+    let sectionContent = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // New check-in entry
+      if (line.startsWith('## Check-in:')) {
+        // Save previous check-in
+        if (currentCheckin && currentSection) {
+          currentCheckin[currentSection] = sectionContent.join('\n').trim();
+        }
+        if (currentCheckin) {
+          checkins.push(currentCheckin);
+        }
+
+        const match = line.match(/## Check-in: (.+?) to (.+)/);
+        currentCheckin = {
+          weekStart: match ? match[1] : '',
+          weekEnd: match ? match[2] : '',
+          date: '',
+          completions: '',
+          updates: '',
+          nextWeekFocus: '',
+          insights: '',
+        };
+        currentSection = null;
+        sectionContent = [];
+      }
+      // Date line
+      else if (line.startsWith('**Date**:')) {
+        const dateMatch = line.match(/\*\*Date\*\*: (.+)/);
+        if (currentCheckin && dateMatch) {
+          currentCheckin.date = dateMatch[1];
+        }
+      }
+      // Section headers
+      else if (line.startsWith('### What Was Completed')) {
+        if (currentCheckin && currentSection) {
+          currentCheckin[currentSection] = sectionContent.join('\n').trim();
+        }
+        currentSection = 'completions';
+        sectionContent = [];
+      }
+      else if (line.startsWith('### Updates Made')) {
+        if (currentCheckin && currentSection) {
+          currentCheckin[currentSection] = sectionContent.join('\n').trim();
+        }
+        currentSection = 'updates';
+        sectionContent = [];
+      }
+      else if (line.startsWith('### Next Week Focus')) {
+        if (currentCheckin && currentSection) {
+          currentCheckin[currentSection] = sectionContent.join('\n').trim();
+        }
+        currentSection = 'nextWeekFocus';
+        sectionContent = [];
+      }
+      else if (line.startsWith('### Insights')) {
+        if (currentCheckin && currentSection) {
+          currentCheckin[currentSection] = sectionContent.join('\n').trim();
+        }
+        currentSection = 'insights';
+        sectionContent = [];
+      }
+      // Separator
+      else if (line === '---') {
+        if (currentCheckin && currentSection) {
+          currentCheckin[currentSection] = sectionContent.join('\n').trim();
+        }
+        currentSection = null;
+        sectionContent = [];
+      }
+      // Content
+      else if (currentSection && line.trim()) {
+        sectionContent.push(line);
+      }
+    }
+
+    // Save last check-in
+    if (currentCheckin && currentSection) {
+      currentCheckin[currentSection] = sectionContent.join('\n').trim();
+    }
+    if (currentCheckin) {
+      checkins.push(currentCheckin);
+    }
+
+    return checkins;
+  } catch (error) {
+    // File doesn't exist yet
+    if (error.code === 'ENOENT') {
+      return [];
+    }
+    throw error;
+  }
+}
+
 export default {
   parseAnnualObjectives,
   parseAllAnnualObjectives,
@@ -501,4 +665,5 @@ export default {
   parseCompletedItems,
   parseWeeklyPlans,
   generateDashboardData,
+  parseCheckinHistory,
 };

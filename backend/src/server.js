@@ -40,6 +40,7 @@ app.get('/', (req, res) => {
       progress: '/api/tracking/progress',
       completed: '/api/tracking/completed',
       plans: '/api/plans',
+      updatePlanAction: '/api/plans/update-action',
     },
   });
 });

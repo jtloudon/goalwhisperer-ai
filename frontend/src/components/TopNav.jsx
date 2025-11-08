@@ -8,6 +8,7 @@ function TopNav() {
     { path: '/', label: 'Dashboard' },
     { path: '/objectives', label: 'Objectives' },
     { path: '/plans', label: 'Weekly Actions' },
+    { path: '/checkin-history', label: 'Check-in History' },
     { path: '/about', label: 'About' },
   ];
 

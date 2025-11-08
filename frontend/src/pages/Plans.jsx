@@ -100,6 +100,24 @@ function Plans() {
     return { completed, total };
   }
 
+  // Helper to format date range without year
+  function formatDateRange(dateRange) {
+    const match = dateRange.match(/(\d{4})-(\d{2})-(\d{2}) to (\d{4})-(\d{2})-(\d{2})/);
+    if (!match) return dateRange;
+
+    const [_, year1, month1, day1, year2, month2, day2] = match;
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const startMonth = monthNames[parseInt(month1) - 1];
+    const endMonth = monthNames[parseInt(month2) - 1];
+    const startDay = parseInt(day1);
+    const endDay = parseInt(day2);
+
+    return `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
+  }
+
   return (
     <div className="page-content">
       <div className="plans-timeline">
@@ -184,7 +202,7 @@ function Plans() {
             return (
               <div key={plan.file} className="plan-card current-week">
                 <div className="plan-header">
-                  <h3>Current Week: {plan.dateRange.replace(' to ', '  to  ')}</h3>
+                  <h3>Current Week: {formatDateRange(plan.dateRange)}</h3>
                   <span className="completion-badge">{stats.completed}/{stats.total} completed</span>
                 </div>
                 {renderContent()}
@@ -196,7 +214,7 @@ function Plans() {
           return (
             <details key={plan.file} className="plan-card past-week" data-week-id={plan.file}>
               <summary className="plan-header">
-                <h3>{plan.dateRange.replace(' to ', '  to  ')}</h3>
+                <h3>{formatDateRange(plan.dateRange)}</h3>
                 <span className="completion-badge">{stats.completed}/{stats.total} completed</span>
               </summary>
               <div className="plan-content">

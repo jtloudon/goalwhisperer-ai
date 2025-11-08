@@ -15,6 +15,7 @@ import {
   removeActionsFromWeeklyPlan,
   updateActionInWeeklyPlan,
   addWin,
+  saveCheckinSummary,
 } from './writer.js';
 import PATHS from '../config/paths.js';
 
@@ -245,7 +246,7 @@ const tools = [
   },
   {
     name: 'update_action_in_weekly_plan',
-    description: 'Update a specific action in a weekly plan (change title, mapsTo, or description). Use this when the user wants to modify an existing action. Examples: "change action 2 in week of Nov 7 to map to KR 1.2", "update action 3 title to...", "change what action 1 maps to".',
+    description: 'Update a specific action in a weekly plan. COMPLETING/UNCOMPLETING: To mark complete, add "[DONE] " to start of title. To mark incomplete, REMOVE "[DONE] " from title. OTHER UPDATES: change mapsTo or description. Examples: "mark action 2 complete" - prepend [DONE] to title, "mark action 1 incomplete" - remove [DONE] from title, "uncheck action 3" - remove [DONE], "change action 2 to map to KR 1.2".',
     input_schema: {
       type: 'object',
       properties: {
@@ -254,7 +255,7 @@ const tools = [
         updates: {
           type: 'object',
           properties: {
-            title: { type: 'string', description: 'Optional: New title for the action' },
+            title: { type: 'string', description: 'Optional: New title. To COMPLETE: prepend "[DONE] " (e.g., "[DONE] Original Title"). To UNCOMPLETE: remove "[DONE] " prefix (e.g., "Original Title" without [DONE]).' },
             mapsTo: { type: 'string', description: 'Optional: New mapsTo value (e.g., "KR 1.2")' },
             description: { type: 'string', description: 'Optional: New description' },
           },
@@ -265,16 +266,32 @@ const tools = [
   },
   {
     name: 'add_win',
-    description: 'Add a win to the Recent Wins section of the progress summary. Use this AUTOMATICALLY when: (1) A key result is completed, (2) Significant progress is made on a KR (e.g., 0% → 50% or 50% → 100%), (3) User reports completing a meaningful action or achievement, (4) User expresses celebration or positive sentiment about an accomplishment. Examples: User says "I finished KR 1.2!" → auto-add win; User says "Just shipped my first app" → auto-add win; User completes a major milestone → auto-add win. DO NOT ask for permission - add wins autonomously when detected.',
+    description: 'Add a win to the Recent Wins section of the progress summary. Use this AUTOMATICALLY when: (1) A key result is completed, (2) Significant progress is made on a KR (e.g., 0% to 50% or 50% to 100%), (3) User reports completing a meaningful action or achievement, (4) User expresses celebration or positive sentiment about an accomplishment. Examples: User says "I finished KR 1.2!" - auto-add win; User says "Just shipped my first app" - auto-add win; User completes a major milestone - auto-add win. DO NOT ask for permission - add wins autonomously when detected.',
     input_schema: {
       type: 'object',
       properties: {
         winDescription: {
           type: 'string',
-          description: 'Description of the win. Should be concise and celebratory. Can include emojis (✅, 🏆, 🎉) to emphasize significance. Examples: "✅ Completed KR 1.2: Build 3 full-stack projects", "🏆 Shipped first production app", "✅ Received promotion to Director level"',
+          description: 'Description of the win. Should be concise and clear. No emojis. Examples: "Completed KR 1.2: Build 3 full-stack projects", "Shipped first production app", "Received promotion to Director level"',
         },
       },
       required: ['winDescription'],
+    },
+  },
+  {
+    name: 'save_checkin_summary',
+    description: 'Save a summary of the weekly check-in to the check-in history. Use this at the END of a weekly check-in conversation to preserve the summary for future reference. IMPORTANT: Call this tool when wrapping up a check-in, after all updates have been made and next week has been planned.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        weekStart: { type: 'string', description: 'Week start date (YYYY-MM-DD)' },
+        weekEnd: { type: 'string', description: 'Week end date (YYYY-MM-DD)' },
+        completions: { type: 'string', description: 'Summary of what was completed this week' },
+        updates: { type: 'string', description: 'Summary of what was updated (progress changes, blockers addressed, etc.)' },
+        nextWeekFocus: { type: 'string', description: 'Summary of focus areas for next week' },
+        insights: { type: 'string', description: 'Key insights, flags, or observations from the check-in' },
+      },
+      required: ['weekStart', 'weekEnd'],
     },
   },
 ];
@@ -302,7 +319,8 @@ async function executeTool(toolName, toolInput) {
         return await updateKeyResultProgress(
           PATHS.objectives.annual,
           toolInput.krId,
-          { current: toolInput.current, progress: toolInput.progress }
+          { current: toolInput.current, progress: toolInput.progress },
+          PATHS.tracking.progress // Auto-add wins for major progress jumps
         );
 
       case 'update_key_result':
@@ -321,7 +339,8 @@ async function executeTool(toolName, toolInput) {
         return await completeKeyResult(
           PATHS.objectives.annual,
           toolInput.krId,
-          toolInput.setProgressTo100 || false
+          toolInput.setProgressTo100 || false,
+          PATHS.tracking.progress // Auto-add wins
         );
 
       case 'delete_objective':
@@ -353,11 +372,15 @@ async function executeTool(toolName, toolInput) {
           PATHS.plans,
           toolInput.weekStart,
           toolInput.actionNumber,
-          toolInput.updates
+          toolInput.updates,
+          PATHS.tracking.progress // Auto-add wins
         );
 
       case 'add_win':
         return await addWin(PATHS.tracking.progress, toolInput.winDescription);
+
+      case 'save_checkin_summary':
+        return await saveCheckinSummary(PATHS.tracking.checkinHistory, toolInput);
 
       default:
         throw new Error(`Unknown tool: ${toolName}`);
@@ -378,14 +401,80 @@ export async function chatWithClaude(messages, context = {}) {
     const anthropic = getAnthropicClient();
 
     // Build system prompt with context
-    let systemPrompt = `You are an AI assistant helping the user manage their goals and objectives using the OKR (Objectives and Key Results) framework.
+    let systemPrompt = `You are an AI OKR Coach helping the user manage their goals and objectives using the OKR (Objectives and Key Results) framework.
 
-You help users:
-- Think critically about their objectives and how to measure success
-- Break down large goals into measurable key results
-- Plan weekly actions that align with their objectives
-- Analyze progress and provide insights
-- Coach them on effective goal-setting strategies
+CORE PHILOSOPHY:
+- You are the user's personal administrator and coach
+- Users tell you what they completed; you handle all the tracking
+- No manual file editing - conversation is the interface
+- Be proactive with insights, flags, and suggestions
+
+CONVERSATION FLOWS:
+
+1. QUICK STATUS (Read-Only, <1 min):
+   When user requests "Quick Status" or "status check":
+   a) Load and analyze all current data
+   b) Calculate progress percentages
+   c) Generate conversational summary with:
+      - Overall progress across all objectives
+      - Per-objective status (on-track/at-risk/ahead)
+      - Recent completions (last 5)
+      - PROACTIVE FLAGS (see below)
+      - Trend indicators (accelerating, flat, declining)
+   d) Present summary conversationally
+   e) Ask if they want to dive deeper or take action
+
+2. WEEKLY CHECK-IN (Interactive, 10-15 min):
+   When user requests "Weekly Check-in" or "check-in":
+   a) Load & analyze current state (same as Quick Status)
+   b) Present summary with flags
+   c) STEP 1: "What did you complete this week?"
+      - Listen to completions
+      - Ask clarifying questions (which KR? any blockers?)
+      - Use add_win tool AUTOMATICALLY for achievements
+   d) STEP 2: "Anything blocking or needs adjustment?"
+      - Capture needed changes to targets, timelines, or objectives
+      - Use appropriate update tools
+   e) STEP 3: "What are your 2-3 key actions for next week?"
+      - Plan next week's focus
+      - Map actions to specific KRs
+      - Check capacity vs. historical patterns
+   f) UPDATE FILES:
+      - Update progress percentages (update_progress tool)
+      - Create next week's plan (add_weekly_plan tool)
+      - Add any wins detected
+   g) Confirmation: "Updated [X] files. Your dashboard is refreshed!"
+
+3. FIRST-TIME SETUP (Guided, 10-15 min):
+   When user is new (no objectives exist):
+   a) Welcome: "Let's set up your OKR system!"
+   b) Guide through 2-5 annual objectives:
+      - What's the goal?
+      - Why does it matter?
+      - How will you measure success? (define 2-4 KRs per objective)
+   c) For each KR, clarify:
+      - Measurement type (binary/incremental/metric)
+      - Target value and date
+      - Weight/importance
+   d) Create initial objectives (add_objective tool)
+   e) Ask if they want to plan this week's actions
+
+PROACTIVE FLAGS - Detect and surface these patterns:
+- Stalled Objectives: "No progress on [Objective] for 3+ weeks - discuss?"
+- Drift Detection: "These actions don't map to any KR - intentional?"
+- Capacity Warnings: "You've committed to 8 actions this week vs. usual 4 - sustainable?"
+- Timeline Risks: "KR 1.1 is at 45% with only 8 weeks left - need to accelerate?"
+- Momentum Opportunities: "Objective 3 is at 78% - push to close it out?"
+- Velocity Changes: "Progress has slowed from 15%/week to 5%/week - what's changed?"
+
+STATUS INDICATORS:
+- Complete
+- In progress / Active
+- At risk / Reduced scope / Blocker
+- Blocked / Not started
+- Accelerating trend
+- Flat trend
+- Declining trend
 
 AVAILABLE TOOLS - You have these tools to modify the user's goal files:
 
@@ -401,7 +490,7 @@ OBJECTIVES & KEY RESULTS:
 WEEKLY PLANS:
 - add_weekly_plan: Create NEW weekly plan (only if week doesn't exist)
 - add_action_to_weekly_plan: Add ONE action to existing plan
-- update_action_in_weekly_plan: Change action title/mapsTo/description
+- update_action_in_weekly_plan: Mark actions complete (add [DONE] prefix) OR change title/mapsTo/description
 - remove_actions_from_weekly_plan: Remove specific actions by numbers (e.g., [6, 7])
 - update_weekly_plan: Replace ALL actions (destructive - use cautiously)
 - delete_weekly_plan: Delete entire weekly plan
@@ -425,16 +514,25 @@ You should AUTOMATICALLY call add_win (without asking permission) when you detec
 1. **KR Completion**: Anytime complete_key_result is called → add win celebrating the completion
 2. **Major Progress Jumps**: When progress goes from 0% → 50%+, or 50% → 100%
 3. **Significant Achievements**: User reports completing meaningful actions, shipping features, or reaching milestones
-4. **Celebratory Language**: User uses words like "finished", "completed", "shipped", "achieved", "done", or celebration emojis (🎉, 🏆, ✅)
+4. **Celebratory Language**: User uses words like "finished", "completed", "shipped", "achieved", "done"
 5. **External Recognition**: Promotions, awards, positive feedback, new opportunities
 
-Format wins concisely with appropriate emojis:
-- ✅ for completions and checkoffs
-- 🏆 for major achievements and milestones
-- 🎉 for celebrations and successes
+Format wins concisely:
 - Keep descriptions brief but specific
+- Use clear, direct language
+- No emojis
 
-Be concise, actionable, and supportive. Ask clarifying questions when needed.`;
+COMMUNICATION STYLE:
+- Be concise, actionable, and supportive
+- Ask clarifying questions when needed
+- ABSOLUTELY NO EMOJIS OR UNICODE SYMBOLS - this includes:
+  * NO checkmarks (✓, ✅, ☑)
+  * NO arrows (→, ↗, ↘)
+  * NO timers or clocks
+  * NO decorative symbols of any kind
+- Use plain text only: write "DONE" or "Completed" instead of checkmarks
+- Use words like "accelerating", "declining" instead of arrows
+- Use clear, direct language without any decorative symbols`;
 
     // Add context if provided
     if (context.objectives && context.objectives.length > 0) {
@@ -528,4 +626,45 @@ Be concise, actionable, and supportive. Ask clarifying questions when needed.`;
 export async function getCompletion(prompt, context = {}) {
   const messages = [{ role: 'user', content: prompt }];
   return chatWithClaude(messages, context);
+}
+
+/**
+ * Generate a contextual greeting based on whether user is new or returning
+ * @param {boolean} hasObjectives - Whether user has objectives set up
+ * @param {Object} context - Current objectives and progress data
+ * @returns {Object} Greeting message with suggested actions
+ */
+export function generateGreeting(hasObjectives, context = {}) {
+  if (!hasObjectives) {
+    // First-time user
+    return {
+      message: "Hi! I'm your AI OKR Coach.\n\nLooks like you're new here! I can help you set up a goal tracking system using the OKR (Objectives and Key Results) framework.\n\nWould you like me to guide you through setting up your first objectives?",
+      suggestedActions: [
+        { label: "Yes, let's set up", value: "setup", type: "primary" },
+        { label: "Not now", value: "cancel", type: "secondary" }
+      ],
+      isFirstTime: true
+    };
+  }
+
+  // Returning user
+  const { objectives = [] } = context;
+  const totalObjectives = objectives.length;
+  const overallProgress = objectives.length > 0
+    ? Math.round(objectives.reduce((sum, obj) => sum + (obj.progress || 0), 0) / objectives.length)
+    : 0;
+
+  return {
+    message: `Hi! I'm your AI OKR Coach.\n\nYou have ${totalObjectives} active objective${totalObjectives !== 1 ? 's' : ''} (${overallProgress}% overall progress).\n\nWhat would you like to do?`,
+    suggestedActions: [
+      { label: "Quick Status", value: "status", type: "primary", description: "See current progress (<1 min)" },
+      { label: "Weekly Check-in", value: "checkin", type: "primary", description: "Review & plan (10-15 min)" },
+      { label: "Something else", value: "chat", type: "secondary", description: "Ask me anything" }
+    ],
+    isFirstTime: false,
+    context: {
+      totalObjectives,
+      overallProgress
+    }
+  };
 }
