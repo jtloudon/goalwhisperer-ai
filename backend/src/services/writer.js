@@ -11,8 +11,23 @@ import fs from 'fs/promises';
  */
 export async function addObjective(filePath, objective) {
   try {
-    // Read existing file
-    const content = await fs.readFile(filePath, 'utf-8');
+    // Read existing file or create new one
+    let content;
+    try {
+      content = await fs.readFile(filePath, 'utf-8');
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        // File doesn't exist - create it with header
+        const year = new Date().getFullYear();
+        content = `# ${year} Annual Objectives\n\nTrack your annual goals and key results.\n\n`;
+        // Ensure directory exists
+        const path = await import('path');
+        const dir = path.dirname(filePath);
+        await fs.mkdir(dir, { recursive: true });
+      } else {
+        throw error;
+      }
+    }
     const lines = content.split('\n');
 
     // Find the highest objective ID

@@ -1,6 +1,9 @@
 # Personal OKR data - NEVER COMMIT
 personal/
 
+# Test/demo data directories - don't commit
+demo-new-user/
+
 # Environment variables
 .env
 .env.local
