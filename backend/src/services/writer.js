@@ -60,8 +60,13 @@ export async function addObjective(filePath, objective) {
       const krNum = index + 1;
       // Normalize status to valid values
       const status = kr.status === 'complete' ? 'complete' : 'in-progress';
+      const direction = kr.direction || 'increase';
       newContent += `#### KR ${newObjId}.${krNum}: ${kr.title}\n`;
       newContent += `- **Status**: ${status}\n`;
+      newContent += `- **Direction**: ${direction}\n`;
+      if (kr.baseline !== undefined && kr.baseline !== null) {
+        newContent += `- **Baseline**: ${kr.baseline}\n`;
+      }
       newContent += `- **Target**: ${kr.target}\n`;
       newContent += `- **Current**: ${kr.current || 0}\n`;
       newContent += `- **Progress**: ${kr.progress || 0}%\n`;
@@ -150,8 +155,22 @@ export async function addWeeklyPlan(plansDir, plan) {
  */
 export async function addCompletion(filePath, completion) {
   try {
-    // Read existing file
-    let content = await fs.readFile(filePath, 'utf-8');
+    // Read existing file or create new one
+    let content;
+    try {
+      content = await fs.readFile(filePath, 'utf-8');
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        // File doesn't exist - create it with header
+        content = `# Completed Items\n\nTrack completed tasks and milestones.\n\n`;
+        // Ensure directory exists
+        const path = await import('path');
+        const dir = path.dirname(filePath);
+        await fs.mkdir(dir, { recursive: true });
+      } else {
+        throw error;
+      }
+    }
 
     // Find the KR section or create it
     const krSectionRegex = new RegExp(`### ${completion.krId}:.*?\\n`, 'i');
@@ -301,6 +320,26 @@ export async function updateKeyResult(filePath, krId, updates) {
       const status = updates.status === 'complete' ? 'complete' : 'in-progress';
       const statusRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Status\\*\\*: )(.+?)\\n`, 's');
       content = content.replace(statusRegex, `$1${status}\n`);
+    }
+
+    // Update direction
+    if (updates.direction !== undefined) {
+      const direction = updates.direction === 'decrease' ? 'decrease' : 'increase';
+      const directionRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Direction\\*\\*: )(.+?)\\n`, 's');
+      content = content.replace(directionRegex, `$1${direction}\n`);
+    }
+
+    // Update baseline
+    if (updates.baseline !== undefined) {
+      const baselineRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Baseline\\*\\*: )(.+?)\\n`, 's');
+      if (baselineRegex.test(content)) {
+        // Baseline field exists, update it
+        content = content.replace(baselineRegex, `$1${updates.baseline}\n`);
+      } else {
+        // Baseline field doesn't exist, add it after Direction
+        const directionRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Direction\\*\\*: .+?\\n)`, 's');
+        content = content.replace(directionRegex, `$1- **Baseline**: ${updates.baseline}\n`);
+      }
     }
 
     // Update target
@@ -570,6 +609,7 @@ export async function addKeyResultToObjective(filePath, objectiveNumber, keyResu
 
     // Build new KR markdown
     const status = keyResult.status === 'complete' ? 'complete' : 'in-progress';
+    const direction = keyResult.direction || 'increase';
     const current = keyResult.current || 0;
     const target = keyResult.target;
     const progress = Math.min(100, Math.round((current / target) * 100));
@@ -578,12 +618,20 @@ export async function addKeyResultToObjective(filePath, objectiveNumber, keyResu
       '',
       `#### KR ${newKrId}: ${keyResult.title}`,
       `- **Status**: ${status}`,
+      `- **Direction**: ${direction}`,
+    ];
+
+    if (keyResult.baseline !== undefined && keyResult.baseline !== null) {
+      newKrLines.push(`- **Baseline**: ${keyResult.baseline}`);
+    }
+
+    newKrLines.push(
       `- **Target**: ${target}`,
       `- **Current**: ${current}`,
       `- **Progress**: ${progress}%`,
       `- **Target Date**: ${keyResult.targetDate}`,
       ''
-    ];
+    );
 
     // Insert the new KR
     lines.splice(insertIndex, 0, ...newKrLines);
@@ -833,9 +881,10 @@ export async function removeActionsFromWeeklyPlan(plansDir, weekStart, actionNum
  * @param {string} updates.mapsTo - Optional: New mapsTo value
  * @param {string} updates.description - Optional: New description
  * @param {string} progressFilePath - Optional: Path to progress summary file for auto-adding wins
+ * @param {string} completedItemsPath - Optional: Path to completed items file for tracking completions
  * @returns {Promise<Object>} Result with success status
  */
-export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber, updates, progressFilePath = null) {
+export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber, updates, progressFilePath = null, completedItemsPath = null) {
   try {
     const fileName = `${plansDir}/plan-${weekStart}.md`;
 
@@ -940,21 +989,44 @@ export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber
     // Write updated file
     await fs.writeFile(fileName, lines.join('\n'));
 
-    // Auto-add win if marking action as done
+    // Auto-add win and completion if marking action as done
     let autoWinAdded = false;
-    if (progressFilePath && updates.title && wasNotDone) {
+    let autoCompletionAdded = false;
+    if (updates.title && wasNotDone) {
       const newTitle = updates.title;
       const isNowDone = newTitle.startsWith('✅ ') || newTitle.startsWith('[DONE] ');
 
       if (isNowDone) {
-        try {
-          // Strip the done marker for the win description
-          const cleanTitle = newTitle.replace(/^(✅ |\[DONE\] )/, '');
-          await addWin(progressFilePath, cleanTitle);
-          autoWinAdded = true;
-        } catch (winError) {
-          console.warn('Failed to auto-add win:', winError.message);
-          // Don't fail the entire operation if win tracking fails
+        const cleanTitle = newTitle.replace(/^(✅ |\[DONE\] )/, '');
+
+        // Add win to progress summary
+        if (progressFilePath) {
+          try {
+            await addWin(progressFilePath, cleanTitle);
+            autoWinAdded = true;
+          } catch (winError) {
+            console.warn('Failed to auto-add win:', winError.message);
+          }
+        }
+
+        // Add to completed items if action maps to a KR
+        if (completedItemsPath && action.mapsToLine !== -1) {
+          try {
+            const mapsToLine = lines[action.mapsToLine];
+            const krMatch = mapsToLine.match(/KR (\d+\.\d+)/);
+            if (krMatch) {
+              const krId = `kr-${krMatch[1]}`;
+              const today = new Date().toISOString().split('T')[0];
+              await addCompletion(completedItemsPath, {
+                krId,
+                date: today,
+                description: cleanTitle,
+              });
+              autoCompletionAdded = true;
+            }
+          } catch (completionError) {
+            console.warn('Failed to auto-add completion:', completionError.message);
+          }
         }
       }
     }
@@ -965,6 +1037,7 @@ export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber
       actionNumber,
       message: `Successfully updated action ${actionNumber} in weekly plan for ${weekStart}`,
       autoWinAdded,
+      autoCompletionAdded,
     };
   } catch (error) {
     console.error('Error updating action in weekly plan:', error);

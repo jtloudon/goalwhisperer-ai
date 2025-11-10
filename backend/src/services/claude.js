@@ -50,6 +50,8 @@ const tools = [
             properties: {
               title: { type: 'string', description: 'Key result title' },
               status: { type: 'string', enum: ['in-progress', 'complete'], description: 'Current status' },
+              direction: { type: 'string', enum: ['increase', 'decrease'], description: 'Goal direction: "increase" for targets you grow toward (default), "decrease" for targets you reduce toward (e.g., weight loss, costs)' },
+              baseline: { type: 'number', description: 'Starting value (required for decrease goals). Example: if losing weight from 230 to 220, baseline=230' },
               target: { type: 'number', description: 'Target value as a NUMBER (required for UI display). Examples: 10 for "10 items", 5 for "5 lbs", 3 for "3%". Never use strings like "N/A" or "3%".' },
               current: { type: 'number', description: 'Current progress value' },
               progress: { type: 'number', description: 'Progress percentage (0-100)' },
@@ -155,6 +157,8 @@ const tools = [
         krId: { type: 'string', description: 'Key result ID (e.g., "kr-1.2")' },
         title: { type: 'string', description: 'New title for the key result' },
         status: { type: 'string', enum: ['in-progress', 'complete'], description: 'New status' },
+        direction: { type: 'string', enum: ['increase', 'decrease'], description: 'Goal direction: "increase" for targets you grow toward (default), "decrease" for targets you reduce toward (e.g., weight loss, costs)' },
+        baseline: { type: 'number', description: 'Starting value (required for decrease goals). Example: if losing weight from 230 to 220, baseline=230' },
         target: { type: 'number', description: 'New target value as a NUMBER (required for UI display). Examples: 10 for "10 items", 5 for "5 lbs", 3 for "3%".' },
         targetDate: { type: 'string', description: 'New target date (YYYY-MM-DD)' },
       },
@@ -206,6 +210,8 @@ const tools = [
           type: 'object',
           properties: {
             title: { type: 'string', description: 'Key result title' },
+            direction: { type: 'string', enum: ['increase', 'decrease'], description: 'Goal direction: "increase" for targets you grow toward (default), "decrease" for targets you reduce toward (e.g., weight loss, costs)' },
+            baseline: { type: 'number', description: 'Starting value (required for decrease goals). Example: if losing weight from 230 to 220, baseline=230' },
             target: { type: 'number', description: 'Target value as a NUMBER (required for UI display). Examples: 10 for "10 items", 5 for "5 lbs", 3 for "3%". Never use strings like "N/A" or "3%".' },
             current: { type: 'number', description: 'Current progress value (default: 0)' },
             targetDate: { type: 'string', description: 'Target completion date (YYYY-MM-DD)' },
@@ -373,7 +379,8 @@ async function executeTool(toolName, toolInput) {
           toolInput.weekStart,
           toolInput.actionNumber,
           toolInput.updates,
-          PATHS.tracking.progress // Auto-add wins
+          PATHS.tracking.progress, // Auto-add wins
+          PATHS.tracking.completed // Auto-add completions
         );
 
       case 'add_win':
@@ -517,6 +524,14 @@ CRITICAL RULES FOR TOOL USAGE:
 7. Only use update_weekly_plan when user wants to completely rewrite all actions for a week
 8. ALL KEY RESULTS MUST have numeric 'target' values (not "N/A" or strings like "3%") - the UI requires this to display progress
 9. When user wants to change a target value that's embedded in the KR title (e.g., "by 2%" → "by 3%"), you MUST update BOTH the title AND the target field
+10. KEY RESULT DIRECTION & BASELINE: All KRs have "direction" and optional "baseline" fields:
+    - "increase" (DEFAULT): Higher is better - progress grows toward target (e.g., revenue, customers, skills)
+    - "decrease": Lower is better - progress improves as value decreases (e.g., weight loss, costs, bugs)
+    - When creating KRs for goals like weight loss, debt reduction, or cost savings:
+      * ALWAYS set direction: "decrease"
+      * ALWAYS set baseline: starting value (e.g., baseline: 230 for weight loss from 230 to 220)
+      * Progress is calculated as: (baseline - current) / (baseline - target) * 100
+    - The system automatically calculates progress correctly based on direction and baseline
 
 WIN DETECTION & AUTONOMOUS TRACKING:
 You should AUTOMATICALLY call add_win (without asking permission) when you detect:

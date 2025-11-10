@@ -88,18 +88,54 @@ function Objectives() {
                         <span className={`kr-status-indicator status-${kr.status}`}></span>
                         <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
                       </div>
-                      <div className="progress-bar">
-                        <div
-                          className="progress-fill"
-                          style={{ width: `${Math.min(kr.progress, 100)}%` }}
-                        />
-                      </div>
-                      <div className="kr-details">
-                        {kr.target > 0 && (
-                          <span>{kr.current}/{kr.target}</span>
-                        )}
-                        <span>Target: {kr.targetDate}</span>
-                      </div>
+
+                      {/* Progress bar with baseline/target endpoints and current value */}
+                      {kr.baseline !== null && kr.baseline !== undefined && kr.target > 0 ? (
+                        <div className="progress-container">
+                          <div className="progress-bar-with-labels">
+                            <span className="progress-endpoint baseline">{kr.baseline}</span>
+                            <div style={{ position: 'relative', flex: 1 }}>
+                              <div className="progress-bar">
+                                <div
+                                  className="progress-fill"
+                                  style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                                />
+                              </div>
+                              <span
+                                className="progress-endpoint"
+                                style={{
+                                  position: 'absolute',
+                                  left: `${Math.min(kr.progress, 100)}%`,
+                                  top: '-4px',
+                                  transform: 'translateX(5px)',
+                                  whiteSpace: 'nowrap',
+                                  fontWeight: '700',
+                                  fontSize: '0.9rem',
+                                  color: '#9b7ab8'
+                                }}
+                              >
+                                {kr.current}
+                              </span>
+                            </div>
+                            <span className="progress-endpoint target">{kr.target}</span>
+                          </div>
+                          <div className="kr-target-date">Target: {kr.targetDate}</div>
+                        </div>
+                      ) : (
+                        // Fallback for KRs without baseline
+                        <>
+                          <div className="progress-bar">
+                            <div
+                              className="progress-fill"
+                              style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                            />
+                          </div>
+                          <div className="kr-details">
+                            {kr.target > 0 && <span>{kr.current}/{kr.target}</span>}
+                            <span>Target: {kr.targetDate}</span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -141,18 +177,54 @@ function Objectives() {
                         <span className={`kr-status-indicator status-${kr.status}`}></span>
                         <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
                       </div>
-                      <div className="progress-bar">
-                        <div
-                          className="progress-fill"
-                          style={{ width: `${Math.min(kr.progress, 100)}%` }}
-                        />
-                      </div>
-                      <div className="kr-details">
-                        {kr.target > 0 && (
-                          <span>{kr.current}/{kr.target}</span>
-                        )}
-                        <span>Target: {kr.targetDate}</span>
-                      </div>
+
+                      {/* Progress bar with baseline/target endpoints and current value */}
+                      {kr.baseline !== null && kr.baseline !== undefined && kr.target > 0 ? (
+                        <div className="progress-container">
+                          <div className="progress-bar-with-labels">
+                            <span className="progress-endpoint baseline">{kr.baseline}</span>
+                            <div style={{ position: 'relative', flex: 1 }}>
+                              <div className="progress-bar">
+                                <div
+                                  className="progress-fill"
+                                  style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                                />
+                              </div>
+                              <span
+                                className="progress-endpoint"
+                                style={{
+                                  position: 'absolute',
+                                  left: `${Math.min(kr.progress, 100)}%`,
+                                  top: '-4px',
+                                  transform: 'translateX(5px)',
+                                  whiteSpace: 'nowrap',
+                                  fontWeight: '700',
+                                  fontSize: '0.9rem',
+                                  color: '#9b7ab8'
+                                }}
+                              >
+                                {kr.current}
+                              </span>
+                            </div>
+                            <span className="progress-endpoint target">{kr.target}</span>
+                          </div>
+                          <div className="kr-target-date">Target: {kr.targetDate}</div>
+                        </div>
+                      ) : (
+                        // Fallback for KRs without baseline
+                        <>
+                          <div className="progress-bar">
+                            <div
+                              className="progress-fill"
+                              style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                            />
+                          </div>
+                          <div className="kr-details">
+                            {kr.target > 0 && <span>{kr.current}/{kr.target}</span>}
+                            <span>Target: {kr.targetDate}</span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -208,10 +280,20 @@ function Objectives() {
                             </div>
                             <div className="kr-details">
                               {kr.measurement === 'metric' && kr.target > 0 && (
-                                <span>{kr.current}/{kr.target}</span>
+                                <span>
+                                  {kr.baseline !== null && kr.baseline !== undefined
+                                    ? `${kr.baseline} → ${kr.current} → ${kr.target}`
+                                    : `${kr.current}/${kr.target}`
+                                  }
+                                </span>
                               )}
                               {kr.measurement === 'incremental' && kr.target > 0 && (
-                                <span>{kr.current}/{kr.target} completed</span>
+                                <span>
+                                  {kr.baseline !== null && kr.baseline !== undefined
+                                    ? `${kr.baseline} → ${kr.current} → ${kr.target} completed`
+                                    : `${kr.current}/${kr.target} completed`
+                                  }
+                                </span>
                               )}
                               <span>Target: {kr.targetDate}</span>
                             </div>

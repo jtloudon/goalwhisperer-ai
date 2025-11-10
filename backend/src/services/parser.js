@@ -64,6 +64,8 @@ export async function parseAnnualObjectives(filePath) {
           progress: 0,
           current: 0,
           target: 0,
+          baseline: null, // Starting value (for decrease goals)
+          direction: 'increase', // Default: higher is better
         };
         currentObj.keyResults.push(currentKR);
       }
@@ -109,6 +111,26 @@ export async function parseAnnualObjectives(filePath) {
         currentKR.targetDate = dateMatch[1].trim();
       }
     }
+
+    // KR Direction: - **Direction**: increase | decrease
+    else if (line.startsWith('- **Direction**:') && currentKR) {
+      const directionMatch = line.match(/Direction\*\*: (.+)/);
+      if (directionMatch) {
+        const dir = directionMatch[1].trim().toLowerCase();
+        if (dir === 'decrease' || dir === 'increase') {
+          currentKR.direction = dir;
+        }
+      }
+    }
+
+    // KR Baseline: - **Baseline**: numeric value (starting point for decrease goals)
+    else if (line.startsWith('- **Baseline**:') && currentKR) {
+      const baselineMatch = line.match(/Baseline\*\*: (.+)/);
+      if (baselineMatch) {
+        const value = parseFloat(baselineMatch[1].trim());
+        currentKR.baseline = isNaN(value) ? null : value;
+      }
+    }
   }
 
   // Push last objective
@@ -118,9 +140,29 @@ export async function parseAnnualObjectives(filePath) {
   for (const obj of objectives) {
     for (const kr of obj.keyResults) {
       if (kr.target > 0) {
-        kr.progress = Math.round((kr.current / kr.target) * 100);
-        // Cap at 100%
-        if (kr.progress > 100) kr.progress = 100;
+        if (kr.direction === 'decrease') {
+          // For decrease goals (e.g., weight loss, cost reduction)
+          if (kr.current <= kr.target) {
+            // Already at or below target = 100% complete
+            kr.progress = 100;
+          } else if (kr.baseline !== null && kr.baseline > kr.target) {
+            // Has baseline: calculate progress from baseline to target
+            // Example: baseline=230, current=225, target=220
+            // Progress = (230-225)/(230-220) * 100 = 50%
+            const totalDistance = kr.baseline - kr.target;
+            const progressDistance = kr.baseline - kr.current;
+            kr.progress = Math.max(0, Math.min(100, Math.round((progressDistance / totalDistance) * 100)));
+          } else {
+            // No valid baseline: can't calculate progress
+            // Show 0% if above target, 100% if at target
+            kr.progress = 0;
+          }
+        } else {
+          // Default: increase goals (higher is better)
+          kr.progress = Math.round((kr.current / kr.target) * 100);
+          // Cap at 100%
+          if (kr.progress > 100) kr.progress = 100;
+        }
       }
     }
   }
@@ -216,7 +258,7 @@ export async function parseProgressSummary(filePath, plansDir) {
   }
 
   // Extract wins (sort by date descending, limit to 10 most recent for display)
-  const winsSection = content.match(/## Wins This Week 🎉\n\n([\s\S]+?)(\n\n##|\n\n---|\Z)/);
+  const winsSection = content.match(/## Wins This Week 🎉\n\n([\s\S]+?)(\n\n##|\n\n---|$)/);
   if (winsSection) {
     const winLines = winsSection[1].split('\n');
     const allWins = winLines
