@@ -401,7 +401,16 @@ export async function chatWithClaude(messages, context = {}) {
     const anthropic = getAnthropicClient();
 
     // Build system prompt with context
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const todayFormatted = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
     let systemPrompt = `You are an AI OKR Coach helping the user manage their goals and objectives using the OKR (Objectives and Key Results) framework.
+
+IMPORTANT CONTEXT:
+- Today's date: ${todayFormatted} (${today})
+- When planning "next week", calculate based on TODAY'S date, not based on check-in dates
+- Weekly plans are Monday-Sunday ranges
+- Example: If today is Nov 10, 2025 (a Monday), current week is Nov 10-16, next week is Nov 17-23
 
 CORE PHILOSOPHY:
 - You are the user's personal administrator and coach
