@@ -17,7 +17,7 @@ function TopNav() {
       <div className="top-nav-content">
         <div className="top-nav-brand">
           <h1>
-            AI Powered Goal Tracker
+            GoalWhisperer AI
           </h1>
         </div>
         <div className="top-nav-links">

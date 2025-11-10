@@ -240,8 +240,8 @@ export async function parseProgressSummary(filePath, plansDir) {
       })
       .slice(0, 10);
 
-    // Calculate weekly timeline (last 8 weeks) - uses actual plan file date ranges
-    summary.winsTimeline = await calculateWeeklyWins(allWins.filter(w => w.date), 8, plansDir);
+    // Calculate weekly timeline (last 6 weeks) - uses actual plan file date ranges
+    summary.winsTimeline = await calculateWeeklyWins(allWins.filter(w => w.date), 6, plansDir);
   }
 
   return summary;

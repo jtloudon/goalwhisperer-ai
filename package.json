@@ -1,7 +1,7 @@
 {
   "name": "okr-web-app",
   "version": "0.1.0",
-  "description": "AI-powered OKR management system with conversational interface",
+  "description": "GoalWhisperer AI - AI-powered OKR management system with conversational interface",
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",

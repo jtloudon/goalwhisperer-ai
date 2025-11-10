@@ -133,7 +133,7 @@
 }
 
 .plan-card.current-week {
-  border-left: 4px solid #667eea;
+  border-left: none;
 }
 
 .plan-card.past-week {
@@ -284,9 +284,9 @@
 .objective-group .actions-list li {
   padding: 1rem;
   margin-bottom: 0.75rem;
-  background: #faf7ff;
+  background: white;
   border-radius: 8px;
-  border-left: 3px solid #e0e0e0;
+  border: 0.5px solid #764ba2;
   flex-direction: column;
 }
 
@@ -343,9 +343,9 @@
 .actions-ungrouped .actions-list li {
   padding: 1rem;
   margin-bottom: 0.75rem;
-  background: #faf7ff;
+  background: white;
   border-radius: 8px;
-  border-left: 3px solid #e0e0e0;
+  border: 0.5px solid #764ba2;
 }
 
 .actions-ungrouped .actions-list li:last-child {

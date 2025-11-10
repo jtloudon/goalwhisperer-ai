@@ -191,7 +191,7 @@ function ClaudePanel() {
     <aside className="claude-panel">
       <div className="claude-header">
         <div>
-          <h3>AI Goal Coach</h3>
+          <h3>AI Coach</h3>
           <p className="claude-subtitle">powered by claude-sonnet-4-5-20250929</p>
         </div>
       </div>

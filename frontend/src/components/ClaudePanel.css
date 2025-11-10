@@ -27,9 +27,12 @@
 .claude-header h3 {
   margin: 0 0 0.25rem 0;
   font-size: 1.5rem;
-  color: #764ba2;
   font-weight: 700;
   font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(90deg, #d946ef 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .claude-subtitle {
@@ -149,12 +152,12 @@
 }
 
 .action-button.primary {
-  background: #764ba2;
+  background: #9b59b6;
   color: white;
 }
 
 .action-button.primary:hover {
-  background: #5f3d82;
+  background: #8e44ad;
 }
 
 .action-button.secondary {
