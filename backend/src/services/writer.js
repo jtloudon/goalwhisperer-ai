@@ -93,6 +93,9 @@ export async function addObjective(filePath, objective) {
  */
 export async function addWeeklyPlan(plansDir, plan) {
   try {
+    // Ensure directory exists
+    await fs.mkdir(plansDir, { recursive: true });
+
     const fileName = `${plansDir}/plan-${plan.weekStart}.md`;
 
     // Check if file already exists
@@ -977,8 +980,24 @@ export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber
  */
 export async function addWin(filePath, winDescription) {
   try {
-    // Read existing file
-    let content = await fs.readFile(filePath, 'utf-8');
+    // Read existing file or create new one
+    let content;
+    try {
+      content = await fs.readFile(filePath, 'utf-8');
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        // File doesn't exist - create it with basic structure
+        const week = new Date();
+        const weekStr = week.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        content = `# Weekly Progress Summary\n\n## Week of ${weekStr}\n\n### Overview\nTracking progress on your objectives and key results.\n\n## Wins This Week 🎉\n\n`;
+        // Ensure directory exists
+        const path = await import('path');
+        const dir = path.dirname(filePath);
+        await fs.mkdir(dir, { recursive: true });
+      } else {
+        throw error;
+      }
+    }
 
     // Find the "Wins This Week" section
     const winsHeaderRegex = /## Wins This Week 🎉/;
@@ -1035,6 +1054,11 @@ export async function addWin(filePath, winDescription) {
  */
 export async function saveCheckinSummary(filePath, summary) {
   try {
+    // Ensure directory exists
+    const path = await import('path');
+    const dir = path.dirname(filePath);
+    await fs.mkdir(dir, { recursive: true });
+
     // Check if file exists, create if not
     let content = '';
     try {
