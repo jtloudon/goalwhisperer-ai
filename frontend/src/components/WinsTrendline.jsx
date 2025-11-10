@@ -42,8 +42,8 @@ function WinsTrendline({ data }) {
         <LineChart data={formattedData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
           <defs>
             <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#7c3aed" />
-              <stop offset="100%" stopColor="#c4b5fd" />
+              <stop offset="0%" stopColor="#d946ef" />
+              <stop offset="100%" stopColor="#6366f1" />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -63,7 +63,7 @@ function WinsTrendline({ data }) {
             dataKey="count"
             stroke="url(#lineGradient)"
             strokeWidth={3}
-            dot={{ fill: '#8b5cf6', r: 4 }}
+            dot={false}
             activeDot={{ r: 6 }}
           />
         </LineChart>

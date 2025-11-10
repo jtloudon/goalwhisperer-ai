@@ -60,8 +60,9 @@
 .kr-item {
   margin: 1rem 0;
   padding: 1rem;
-  background: #faf7ff;
+  background: white;
   border-radius: 8px;
+  border: 1px solid #764ba2;
 }
 
 .kr-title-row {
