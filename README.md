@@ -1,182 +1,305 @@
-# AI-Powered OKR System
+# GoalWhisperer AI
 
-A local-first OKR tracking web application with markdown-based data storage. Visualize your objectives, key results, weekly plans, and progress in a clean dashboard interface.
+**Your personal AI-powered goal tracking system.** Track objectives, visualize progress, and get AI coaching—all with local-first privacy and markdown-based data.
 
-## Current Features (Phase 6 - Complete)
+![GoalWhisperer AI](https://via.placeholder.com/800x400/764ba2/ffffff?text=GoalWhisperer+AI)
 
-- 📊 **Dashboard** - Overview stats, objectives, recent completions, and wins
-- 🎯 **Objectives Page** - Detailed annual objectives with KR progress tracking
-- 📅 **Plans Page** - Weekly plans timeline with action items
-- ✅ **Completed Page** - Completion history organized by objective and KR
-- 📈 **Progress Page** - Current week progress summary
-- 💬 **AI Goal Coach** - Conversational OKR management powered by Claude Sonnet 4.5
-- 🛡️ **Robust Validation** - Input validation with error feedback loop for data integrity
-- 📁 **Markdown-Based** - All data stored in human-readable markdown files
-- 🏠 **Local-First** - Runs on your machine, complete privacy
+---
 
-## Recent Updates (Nov 6, 2024)
+## ⚡ Quick Start (5 minutes)
 
-**Phase 6: Agent Reliability & Data Validation**
-- Fixed critical issue where chat agent claimed to make changes without actually calling tools
-- Implemented three-layer validation system for numeric targets:
-  1. Tool schema enforcement (type-level validation)
-  2. Runtime validation with helpful error messages
-  3. Error logging and feedback to agent
-- Upgraded from Claude Haiku to Claude Sonnet 4.5 for more reliable tool calling
-- Enhanced system prompts with explicit rules about tool invocation and data requirements
-- Added model version display in chat interface for transparency
-- Fixed issues where KR progress wasn't displaying due to non-numeric target values
+### 1. Clone & Install
+```bash
+git clone https://github.com/jtloudon/goalwhisperer-ai.git
+cd goalwhisperer-ai
+npm run install:all
+```
 
-**Key Technical Improvements:**
-- All key results now require numeric `target` values for proper UI display
-- Agent validates and rejects invalid inputs (e.g., "X lbs", "N/A") with clear error messages
-- Agent now reliably updates both title AND target fields when values are embedded in both
-- Comprehensive error feedback loop ensures data integrity
+### 2. Choose Your Path
 
-## Planned Features (Future Phases)
+#### 🎯 Option A: Try Demo Data (Fastest)
+Perfect for seeing what the app can do before setting up your goals.
 
-- 📊 **Enhanced Visualizations** - Better charts, animations, loading states
-- 🔄 **Progress Tracking** - Historical trend analysis and insights
+```bash
+DATA_DIR=./demo npm run dev
+```
 
-## Tech Stack
+**Then open:** http://localhost:5173
 
-- **Frontend**: React + Vite + vanilla CSS
-- **Backend**: Node.js + Express
-- **Data**: Markdown files (parsed to JSON)
-- **AI**: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929)
+You'll see a coffee shop owner's goals—completely fake data to explore features!
 
-## Setup
+#### 🚀 Option B: Interactive Setup Wizard
+Guided setup that helps you create your first goal.
+
+```bash
+npm run setup
+```
+
+The wizard will:
+- Create your data folder structure
+- Help you write your first objective
+- Set up the AI coach (optional)
+
+Then run:
+```bash
+npm run dev
+```
+
+#### 📝 Option C: Manual Setup
+For those who prefer full control.
+
+```bash
+# 1. Copy demo structure
+cp -r demo personal
+
+# 2. Edit your goals
+nano personal/objectives/annual-2025.md
+
+# 3. Run the app
+npm run dev
+```
+
+---
+
+## 🎯 Features
+
+### Core Tracking
+- **📊 Dashboard** - Visual overview of all objectives and recent wins
+- **🎯 Objectives** - Annual goals with measurable Key Results
+- **📅 Weekly Actions** - Break goals into weekly action items
+- **📈 Progress Tracking** - Automatic progress calculation and visualization
+- **✅ Check-in History** - Reflect on what's working each week
+
+### AI Coach (Optional)
+- **💬 Conversational Interface** - Chat with Claude Sonnet 4.5 about your goals
+- **🤖 Smart Updates** - "Mark action 3 complete", "Update KR 1.2 to 75%"
+- **📝 Weekly Check-ins** - Guided reflection and insights
+- **🎯 Goal Creation** - Natural language objective setting
+
+### Privacy & Data
+- **🏠 Local-First** - All data stays on your machine
+- **📁 Markdown Storage** - Human-readable, version control friendly
+- **🔒 No Cloud Required** - Works offline (AI features need API key)
+- **📤 Git-Friendly** - Track goals alongside your code
+
+---
+
+## 📖 How It Works
+
+GoalWhisperer uses a simple markdown structure:
+
+```
+personal/
+├── objectives/
+│   └── annual-2025.md        # Your yearly goals
+├── plans/
+│   └── plan-2025-11-10.md   # Weekly action items
+└── tracking/
+    ├── completed-items.md    # What you've accomplished
+    ├── checkin-history.md    # Weekly reflections
+    └── progress-summary.md   # Current status
+```
+
+Example objective:
+```markdown
+## Objective 1: Launch My Side Business
+
+**Description**: Build and launch a sustainable side business
+
+**Progress**: 45%
+
+### Key Results
+
+#### KR 1.1: Acquire 100 customers
+- **Status**: in-progress
+- **Target**: 100
+- **Current**: 45
+- **Progress**: 45%
+- **Target Date**: 2025-12-31
+```
+
+The app parses these files and creates beautiful visualizations!
+
+---
+
+## 🛠️ Setup Details
 
 ### Prerequisites
+- **Node.js 18+** ([download](https://nodejs.org/))
+- **Anthropic API Key** (optional, for AI features) - [Get one here](https://console.anthropic.com/)
 
-- Node.js 18+ installed
-- Claude API key ([get one here](https://console.anthropic.com/)) - only needed for Phase 3 (chat feature)
+### Enable AI Coach
 
-### Installation
+1. Get API key from https://console.anthropic.com/
+2. Edit `backend/.env`:
+   ```bash
+   ANTHROPIC_API_KEY=sk-ant-your-key-here
+   ```
+3. Restart: `npm run dev`
 
-```bash
-# Install dependencies for both frontend and backend
-npm install
+### Validate Your Data
 
-# Your OKR markdown files should be in the personal/ folder:
-personal/
-  objectives/
-    annual-2025.md
-    2025-q4.md
-  plans/
-    2025-week-N-q4.md
-  tracking/
-    completed-items.md
-    progress-summary.md
-
-# The .env file is already configured to point to personal/
-# (API key only needed later for chat feature)
-```
-
-### Running the App
+Check if your markdown files are formatted correctly:
 
 ```bash
-# Start both frontend and backend concurrently
-npm run dev
-
-# Frontend: http://localhost:5173
-# Backend:  http://localhost:3001
+npm run validate
 ```
 
-## Usage
+This will show errors like:
+- Missing required fields
+- Invalid date formats
+- Non-numeric target values
+- Structural issues
 
-**Current functionality:**
+---
 
-1. **View Dashboard** - See overview stats, recent wins
-2. **Browse Pages** - Use sidebar navigation to explore:
-   - **Objectives** - Annual goals with detailed KR breakdowns
-   - **Weekly Actions** - Current and past weekly action plans with status tracking
-   - **Completed** - Historical completion log
-   - **About** - System information
-3. **Auto-Refresh** - Pages auto-refresh every 5 seconds to reflect markdown file changes
+## 🎨 Screenshots
 
-### Working with the Chat Agent
+### Dashboard View
+Clean overview of objectives, progress, and recent wins.
 
-The AI Goal Coach panel (powered by Claude) can help you manage your weekly actions. Here's how to use it:
+### AI Coach Panel
+Chat naturally about your goals—"Show my progress" or "Create a new objective".
 
-**Marking Actions Complete:**
+### Weekly Actions
+See all action items organized by objective with completion tracking.
 
-When you want to mark a weekly action as complete, reference it by number:
-- "Close action 3" or "Mark action 2 as done"
-- The agent will add ✅ to the beginning of that action's title in the markdown file
+---
 
-**How it works:**
-1. Actions are numbered sequentially (1, 2, 3...) on the Weekly Actions page
-2. The agent needs to:
-   - Identify the weekly plan file (e.g., `personal/plans/plan-2025-10-31.md`)
-   - Count actions in the order they appear in the file
-   - Use the Edit tool to add `✅ ` at the start of the action title (e.g., `## Design app` → `## ✅ Design app`)
-3. The page will auto-refresh and show the completed action with a checkmark and strikethrough
+## 💡 Tips & Best Practices
 
-**CRITICAL for the agent:**
-- **YOU MUST USE THE EDIT TOOL.** Simply saying "I've marked it complete" or "I've updated the file" is NOT enough. You must actually invoke the Edit tool with the file path and the exact old_string/new_string parameters.
-- **ONLY modify the action title line (the `##` heading).** Do NOT touch the `**Maps to**:` line or any other content below the action title.
-- **Verify your work:** After using the Edit tool, the system will confirm the edit was successful. If you don't see this confirmation, the file was NOT modified.
-- Example of correct workflow:
-  ```
-  1. User says: "Mark action 1 complete from week 10/7"
-  2. You read: personal/plans/plan-2025-10-07.md
-  3. You identify action 1: "## Create career/current-profile.md"
-  4. You use Edit tool:
-     - old_string: "## Create career/current-profile.md"
-     - new_string: "## ✅ Create career/current-profile.md"
-  5. System confirms: "File has been updated"
-  6. You tell user: "I've marked action 1 complete"
+### Writing Good Objectives
+✅ **Good:** "Launch sustainable coffee shop business"
+❌ **Too vague:** "Do business stuff"
 
-  (Keep everything else unchanged, including the **Maps to**: line)
-  ```
+### Measurable Key Results
+✅ **Good:** "Acquire 100 customers by Dec 31"
+❌ **Not measurable:** "Get some customers"
 
-**Coming soon:**
-- **Enhanced Chat Features** - More conversational OKR management
-- **Enhanced Visualizations** - Better charts, animations, and visual polish
+### Weekly Planning
+- Keep actions to 3-5 per week
+- Map each action to a specific Key Result
+- Mark complete as you finish them
 
-## Project Structure
+### Using the AI Coach
+- Be specific: "Mark action 2 complete from this week"
+- Ask for help: "What should I focus on this week?"
+- Weekly check-ins: "Let's do my weekly check-in"
+
+---
+
+## 🏗️ Tech Stack
+
+- **Frontend:** React 18 + Vite + React Router
+- **Backend:** Node.js + Express
+- **AI:** Claude Sonnet 4.5 (Anthropic)
+- **Data:** Markdown files (no database!)
+- **Styling:** Vanilla CSS with gradient accents
+
+---
+
+## 📦 Project Structure
 
 ```
-okr-web-app/
-├── frontend/          # React application (Vite + React Router)
+goalwhisperer-ai/
+├── frontend/              # React application
 │   ├── src/
-│   │   ├── components/  # Sidebar, etc.
-│   │   ├── pages/       # Dashboard, Objectives, Plans, etc.
+│   │   ├── components/    # UI components
+│   │   ├── pages/         # Route pages
 │   │   └── App.jsx
-├── backend/           # Node.js API server
+├── backend/               # API server
 │   ├── src/
-│   │   ├── routes/      # API endpoints
-│   │   ├── services/    # Markdown parser
-│   │   └── config/      # File paths
-├── personal/          # Your OKR data (gitignored)
+│   │   ├── routes/        # API endpoints
+│   │   ├── services/      # Parser & AI logic
+│   │   └── server.js
+├── demo/                  # Sample data (coffee shop owner)
 │   ├── objectives/
 │   ├── plans/
 │   └── tracking/
-├── docs/              # Technical documentation
-│   └── project-plan.md  # Phase-by-phase build plan
-├── .env               # Configuration
-├── .gitignore         # Excludes personal/ folder
-├── package.json       # Root dependencies and scripts
-└── README.md
+├── scripts/               # Setup & validation tools
+│   ├── setup.js          # Interactive wizard
+│   └── validate-data.js  # Data checker
+└── personal/             # YOUR data (gitignored)
 ```
 
-## Demo Data (Coming Soon)
+---
 
-A `/demo` folder with sanitized example data will be added for others to try the app without personal information.
+## 🚀 Development
 
-## Development
+### Available Scripts
 
-Built as a portfolio project demonstrating:
-- Full-stack development (React + Node.js)
-- AI integration (Claude API)
-- Product thinking (conversational UX)
-- Systems design (markdown-based data layer)
+```bash
+npm run dev              # Start both frontend & backend
+npm run dev:frontend     # Frontend only (port 5173)
+npm run dev:backend      # Backend only (port 3001)
+npm run build            # Build for production
+npm run setup            # Interactive setup wizard
+npm run validate         # Check markdown data
+```
 
-## License
+### Running with Different Data
 
-MIT
+```bash
+# Use demo data
+DATA_DIR=./demo npm run dev
 
-## Author
+# Use personal data (default)
+npm run dev
 
-Jesse Loudon - [GitHub](https://github.com/jtloudon)
+# Use custom location
+DATA_DIR=/path/to/data npm run dev
+```
+
+---
+
+## 🤝 Contributing
+
+This is a personal portfolio project, but I welcome:
+- 🐛 Bug reports
+- 💡 Feature suggestions
+- 📝 Documentation improvements
+
+Please open an issue to discuss!
+
+---
+
+## 📄 License
+
+MIT License - Feel free to use this for your own goals!
+
+---
+
+## 👤 Author
+
+**Jesse Loudon**
+- Portfolio project demonstrating full-stack + AI integration
+- [GitHub](https://github.com/jtloudon)
+
+---
+
+## 🎯 Why GoalWhisperer?
+
+Traditional goal tracking tools are either:
+- **Too complex** (enterprise OKR software)
+- **Too simple** (todo lists)
+- **Not private** (cloud-only services)
+
+GoalWhisperer gives you:
+✅ **Structure** of OKR methodology
+✅ **Simplicity** of markdown files
+✅ **Intelligence** of AI coaching
+✅ **Privacy** of local-first architecture
+
+**Your goals. Your data. Your machine.**
+
+---
+
+## 📚 Additional Resources
+
+- **Demo Data:** See `demo/` folder for examples
+- **Data Format:** Check `demo/objectives/annual-2025.md` for template
+- **Troubleshooting:** Run `npm run validate` to check data
+
+---
+
+*Made with ❤️ and Claude Sonnet 4.5*

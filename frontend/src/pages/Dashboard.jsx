@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import WinsTrendline from '../components/WinsTrendline';
+import EmptyState from '../components/EmptyState';
 import './Dashboard.css';
 
 const API_URL = 'http://localhost:3001/api';
@@ -56,6 +57,11 @@ function Dashboard() {
   }
 
   if (error) {
+    // Check if error is due to missing data
+    if (error.includes('ENOENT') || error.includes('no such file') || error.includes('Cannot read')) {
+      return <EmptyState />;
+    }
+
     return (
       <div className="error">
         <h2>Error Loading Data</h2>
@@ -63,6 +69,11 @@ function Dashboard() {
         <button onClick={fetchDashboard}>Retry</button>
       </div>
     );
+  }
+
+  // Show empty state if no objectives exist
+  if (!dashboard || !dashboard.objectives || dashboard.objectives.length === 0) {
+    return <EmptyState />;
   }
 
   const { overview, objectives, recentCompletions, wins, winsTimeline } = dashboard;
