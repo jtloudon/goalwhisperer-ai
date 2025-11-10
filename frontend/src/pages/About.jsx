@@ -44,23 +44,6 @@ function About() {
       </section>
 
       <section>
-        <h2>Development Status</h2>
-        <p><strong>Current Phase:</strong> Phase 6 - Agent Reliability & Testing (Complete)</p>
-        <ul>
-          <li>Phase 1: Core Dashboard & Data Parsing <span className="status-complete">✓ Complete</span></li>
-          <li>Phase 2: Multi-page Navigation <span className="status-complete">✓ Complete</span></li>
-          <li>Phase 3: AI Chat Integration <span className="status-complete">✓ Complete</span></li>
-          <li>Phase 4: Goal Management Tools <span className="status-complete">✓ Complete</span></li>
-          <li>Phase 5: Enhancement & Refinement <span className="status-complete">✓ Complete</span></li>
-          <li>Phase 6: Agent Reliability & Testing <span className="status-complete">✓ Complete</span></li>
-        </ul>
-        <p>
-          <strong>Agent Capabilities:</strong> 9/10 operation scenarios supported with comprehensive tool coverage.
-          See <code>docs/agent-test-plan.md</code> for testing framework.
-        </p>
-      </section>
-
-      <section>
         <h2>Portfolio Project</h2>
         <p>
           Built by Jesse Loudon as a portfolio demonstration of full-stack development,

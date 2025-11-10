@@ -174,9 +174,23 @@
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #f0f0f0;
+  text-align: left;
 }
 
 .plan-header h3 {
+  margin: 0;
+  color: #667eea;
+  text-align: left;
+}
+
+.plan-header-current {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.plan-header-current h3 {
   margin: 0;
   color: #667eea;
 }
@@ -232,14 +246,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 24px;
-  height: 24px;
+  padding: 0.25rem 0.65rem;
   font-size: 0.75rem;
   font-weight: 600;
   color: #667eea;
   background: #f0f7ff;
-  border-radius: 50%;
+  border-radius: 12px;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .action-checkbox {
@@ -267,8 +281,6 @@
   color: #764ba2;
   font-size: 1.3rem;
   font-weight: 600;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #f0f0f0;
 }
 
 .objective-group .actions-list {
@@ -565,6 +577,10 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   color: #333;
+}
+
+.page-content section h2 {
+  margin-top: 0;
 }
 
 .page-content ul,

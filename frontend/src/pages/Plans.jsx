@@ -148,13 +148,13 @@ function Plans() {
                               return (
                                 <li key={actionCounter} className={action.status === 'completed' ? 'completed' : ''}>
                                   <div>
-                                    <span className="action-number">{actionCounter}</span>
+                                    <span className="action-number">Action {actionCounter}</span>
                                     <span className="action-checkbox">{action.status === 'completed' ? '☑' : '☐'}</span>
                                     <div>
                                       <span className="action-title">{action.title}</span>
                                       {action.krTitle && (
                                         <span className="kr-reference">
-                                          → KR {action.krNumber}: {action.krTitle}
+                                          Contributes to → KR {action.krNumber}: {action.krTitle}
                                         </span>
                                       )}
                                     </div>
@@ -178,7 +178,7 @@ function Plans() {
                         return (
                           <li key={actionCounter} className={action.status === 'completed' ? 'completed' : ''}>
                             <div>
-                              <span className="action-number">{actionCounter}</span>
+                              <span className="action-number">Action {actionCounter}</span>
                               <span className="action-checkbox">{action.status === 'completed' ? '☑' : '☐'}</span>
                               <div>
                                 <span className="action-title">{action.title}</span>
@@ -201,7 +201,7 @@ function Plans() {
           if (isCurrent) {
             return (
               <div key={plan.file} className="plan-card current-week">
-                <div className="plan-header">
+                <div className="plan-header-current">
                   <h3>Current Week: {formatDateRange(plan.dateRange)}</h3>
                   <span className="completion-badge">{stats.completed}/{stats.total} completed</span>
                 </div>
