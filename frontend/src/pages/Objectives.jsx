@@ -90,7 +90,7 @@ function Objectives() {
                       </div>
 
                       {/* Progress bar with baseline/target endpoints and current value */}
-                      {kr.baseline !== null && kr.baseline !== undefined && kr.target > 0 ? (
+                      {kr.baseline !== null && kr.baseline !== undefined && kr.target >= 0 ? (
                         <div className="progress-container">
                           <div className="progress-bar-with-labels">
                             <span className="progress-endpoint baseline">{kr.baseline}</span>
@@ -179,7 +179,7 @@ function Objectives() {
                       </div>
 
                       {/* Progress bar with baseline/target endpoints and current value */}
-                      {kr.baseline !== null && kr.baseline !== undefined && kr.target > 0 ? (
+                      {kr.baseline !== null && kr.baseline !== undefined && kr.target >= 0 ? (
                         <div className="progress-container">
                           <div className="progress-bar-with-labels">
                             <span className="progress-endpoint baseline">{kr.baseline}</span>
