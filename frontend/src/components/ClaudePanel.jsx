@@ -87,8 +87,8 @@ function ClaudePanel() {
 
     // Map action values to user prompts
     const promptMap = {
-      'status': 'Quick Status',
-      'checkin': 'Weekly Check-in',
+      'status': 'How am I doing',
+      'checkin': 'Review & Plan',
       'setup': "Yes, let's set up my first objectives",
       'chat': '',
       'cancel': 'Not now',

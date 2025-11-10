@@ -4,8 +4,15 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Project root directory (3 levels up from backend/src/config/)
+const PROJECT_ROOT = path.join(__dirname, '../../..');
+
 // Data directory (personal MD files)
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../../../personal');
+// If DATA_DIR is relative (e.g., ./demo), resolve it from project root
+// If DATA_DIR is absolute, use it as-is
+const DATA_DIR = process.env.DATA_DIR
+  ? path.resolve(PROJECT_ROOT, process.env.DATA_DIR)
+  : path.join(PROJECT_ROOT, 'personal');
 
 export const PATHS = {
   objectives: {

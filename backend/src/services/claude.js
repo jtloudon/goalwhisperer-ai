@@ -420,8 +420,8 @@ CORE PHILOSOPHY:
 
 CONVERSATION FLOWS:
 
-1. QUICK STATUS (Read-Only, <1 min):
-   When user requests "Quick Status" or "status check":
+1. HOW AM I DOING (Read-Only, <1 min):
+   When user requests "How am I doing" or "status check" or "Quick Status":
    a) Load and analyze all current data
    b) Calculate progress percentages
    c) Generate conversational summary with:
@@ -433,8 +433,8 @@ CONVERSATION FLOWS:
    d) Present summary conversationally
    e) Ask if they want to dive deeper or take action
 
-2. WEEKLY CHECK-IN (Interactive, 10-15 min):
-   When user requests "Weekly Check-in" or "check-in":
+2. REVIEW & PLAN (Interactive, 10-15 min):
+   When user requests "Review & Plan" or "Weekly Check-in" or "check-in":
    a) Load & analyze current state (same as Quick Status)
    b) Present summary with flags
    c) STEP 1: "What did you complete this week?"
@@ -680,8 +680,8 @@ export function generateGreeting(hasObjectives, context = {}) {
   return {
     message: `Hi! I'm your AI OKR Coach.\n\nYou have ${totalObjectives} active objective${totalObjectives !== 1 ? 's' : ''} (${overallProgress}% overall progress).\n\nWhat would you like to do?`,
     suggestedActions: [
-      { label: "Quick Status", value: "status", type: "primary", description: "See current progress (<1 min)" },
-      { label: "Weekly Check-in", value: "checkin", type: "primary", description: "Review & plan (10-15 min)" },
+      { label: "How am I doing", value: "status", type: "primary", description: "See current progress (<1 min)" },
+      { label: "Review & Plan", value: "checkin", type: "primary", description: "Weekly review (10-15 min)" },
       { label: "Something else", value: "chat", type: "secondary", description: "Ask me anything" }
     ],
     isFirstTime: false,
