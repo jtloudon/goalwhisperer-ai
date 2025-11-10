@@ -517,10 +517,21 @@ You should AUTOMATICALLY call add_win (without asking permission) when you detec
 4. **Celebratory Language**: User uses words like "finished", "completed", "shipped", "achieved", "done"
 5. **External Recognition**: Promotions, awards, positive feedback, new opportunities
 
+CRITICAL: DUPLICATE PREVENTION
+Before calling add_win, CHECK if a similar win already exists in the context:
+- If you see wins in the context data, compare the new win description with existing ones
+- If a win with very similar wording already exists (even with slight variations), DO NOT add it again
+- Only add the win if it's truly new or substantially different
+- Example duplicates to AVOID:
+  * "Started creating demo files" vs "Start creating demo files"
+  * "Completed remaining flows" vs "Continue building remaining flows"
+  * Multiple versions of the same achievement with different wording
+
 Format wins concisely:
 - Keep descriptions brief but specific
 - Use clear, direct language
 - No emojis
+- Use consistent verb tenses (prefer past tense: "Created", "Completed", "Built")
 
 COMMUNICATION STYLE:
 - Be concise, actionable, and supportive
@@ -543,6 +554,9 @@ COMMUNICATION STYLE:
     }
     if (context.completed && context.completed.length > 0) {
       systemPrompt += `\n\nCompleted Items:\n${JSON.stringify(context.completed, null, 2)}`;
+    }
+    if (context.wins && context.wins.length > 0) {
+      systemPrompt += `\n\nExisting Wins (check for duplicates before adding new ones):\n${JSON.stringify(context.wins, null, 2)}`;
     }
 
     let currentMessages = [...messages];

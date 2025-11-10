@@ -187,16 +187,18 @@ router.post('/claude/chat', async (req, res) => {
     // Gather context if requested
     let context = {};
     if (includeContext) {
-      const [objectivesData, weeklyPlans, completed] = await Promise.all([
+      const [objectivesData, weeklyPlans, completed, dashboardData] = await Promise.all([
         parseAllAnnualObjectives(PATHS.objectives.dir).catch(() => null),
         parseWeeklyPlans(PATHS.plans).catch(() => []),
         parseCompletedItems(PATHS.tracking.completed).catch(() => []),
+        generateDashboardData().catch(() => null),
       ]);
 
       context = {
         objectives: objectivesData?.current?.objectives || [],
         weeklyPlans: weeklyPlans.slice(0, 10), // Last 10 weeks
         completed: completed.slice(0, 5), // Recent completions
+        wins: dashboardData?.wins || [], // Recent wins for duplicate detection
       };
     }
 
