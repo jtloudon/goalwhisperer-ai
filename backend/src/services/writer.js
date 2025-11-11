@@ -61,12 +61,12 @@ export async function addObjective(filePath, objective) {
       // Normalize status to valid values
       const status = kr.status === 'complete' ? 'complete' : 'in-progress';
       const direction = kr.direction || 'increase';
+      // Default baseline to 0 if not provided (for increase goals)
+      const baseline = kr.baseline !== undefined && kr.baseline !== null ? kr.baseline : 0;
       newContent += `#### KR ${newObjId}.${krNum}: ${kr.title}\n`;
       newContent += `- **Status**: ${status}\n`;
       newContent += `- **Direction**: ${direction}\n`;
-      if (kr.baseline !== undefined && kr.baseline !== null) {
-        newContent += `- **Baseline**: ${kr.baseline}\n`;
-      }
+      newContent += `- **Baseline**: ${baseline}\n`;
       newContent += `- **Target**: ${kr.target}\n`;
       newContent += `- **Current**: ${kr.current || 0}\n`;
       newContent += `- **Progress**: ${kr.progress || 0}%\n`;
@@ -612,6 +612,8 @@ export async function addKeyResultToObjective(filePath, objectiveNumber, keyResu
     const direction = keyResult.direction || 'increase';
     const current = keyResult.current || 0;
     const target = keyResult.target;
+    // Default baseline to 0 if not provided (for increase goals)
+    const baseline = keyResult.baseline !== undefined && keyResult.baseline !== null ? keyResult.baseline : 0;
     const progress = Math.min(100, Math.round((current / target) * 100));
 
     const newKrLines = [
@@ -619,19 +621,13 @@ export async function addKeyResultToObjective(filePath, objectiveNumber, keyResu
       `#### KR ${newKrId}: ${keyResult.title}`,
       `- **Status**: ${status}`,
       `- **Direction**: ${direction}`,
-    ];
-
-    if (keyResult.baseline !== undefined && keyResult.baseline !== null) {
-      newKrLines.push(`- **Baseline**: ${keyResult.baseline}`);
-    }
-
-    newKrLines.push(
+      `- **Baseline**: ${baseline}`,
       `- **Target**: ${target}`,
       `- **Current**: ${current}`,
       `- **Progress**: ${progress}%`,
       `- **Target Date**: ${keyResult.targetDate}`,
       ''
-    );
+    ];
 
     // Insert the new KR
     lines.splice(insertIndex, 0, ...newKrLines);
