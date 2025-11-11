@@ -69,7 +69,7 @@ function CheckinHistory() {
   if (!checkins || checkins.length === 0) {
     return (
       <div className="page-content">
-        <p className="empty-state">No check-ins yet. Complete a weekly check-in to see it here!</p>
+        <p className="empty-state">No review history yet. Complete a Review & Plan session to see it here!</p>
       </div>
     );
   }

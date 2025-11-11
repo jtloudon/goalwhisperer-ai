@@ -81,13 +81,15 @@ function ClaudePanel() {
     fetchGreeting();
   }
 
-  async function handleSuggestedAction(actionValue) {
-    // Clear suggested actions once user makes a choice
-    setSuggestedActions([]);
+  async function handleSuggestedAction(actionValue, isFromPersistentPills = false) {
+    // Clear suggested actions only if from initial greeting pills
+    if (!isFromPersistentPills) {
+      setSuggestedActions([]);
+    }
 
     // Map action values to user prompts
     const promptMap = {
-      'status': 'How am I doing',
+      'status': 'My Progress',
       'checkin': 'Review & Plan',
       'setup': "Yes, let's set up my first objectives",
       'chat': '',
@@ -244,6 +246,28 @@ function ClaudePanel() {
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Persistent quick actions - only show after initial greeting */}
+      {!isInitializing && messages.length > 1 && (
+        <div className="persistent-actions">
+          <button
+            className="persistent-pill"
+            onClick={() => handleSuggestedAction('status', true)}
+            disabled={isLoading}
+            title="Quick status check (<1 min)"
+          >
+            My Progress
+          </button>
+          <button
+            className="persistent-pill"
+            onClick={() => handleSuggestedAction('checkin', true)}
+            disabled={isLoading}
+            title="Weekly review (10-15 min)"
+          >
+            Review & Plan
+          </button>
+        </div>
+      )}
 
       <form className="claude-input-form" onSubmit={sendMessage}>
         <textarea

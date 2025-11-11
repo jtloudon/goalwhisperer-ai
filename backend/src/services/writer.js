@@ -1090,6 +1090,30 @@ export async function addWin(filePath, winDescription) {
     const now = new Date();
     const dateStamp = now.toISOString().split('T')[0];
 
+    // Check for duplicate wins with same date
+    // Normalize both strings for comparison (lowercase, remove punctuation)
+    const normalizeText = (text) => text.toLowerCase().replace(/[^\w\s]/g, '').trim();
+    const normalizedNewWin = normalizeText(winDescription);
+
+    // Extract existing wins for today
+    const winPattern = /^- (.+?) \[(\d{4}-\d{2}-\d{2})\]/gm;
+    let match;
+    const todaysWins = [];
+    while ((match = winPattern.exec(content)) !== null) {
+      if (match[2] === dateStamp) {
+        todaysWins.push(normalizeText(match[1]));
+      }
+    }
+
+    // Check if this win already exists today
+    if (todaysWins.some(existingWin => existingWin === normalizedNewWin)) {
+      return {
+        success: true,
+        message: `Win already exists for today: "${winDescription}"`,
+        duplicate: true,
+      };
+    }
+
     // Build the new win entry with date stamp at the end
     const winEntry = `- ${winDescription} [${dateStamp}]\n`;
 

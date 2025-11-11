@@ -429,8 +429,8 @@ CORE PHILOSOPHY:
 
 CONVERSATION FLOWS:
 
-1. HOW AM I DOING (Read-Only, <1 min):
-   When user requests "How am I doing" or "status check" or "Quick Status":
+1. MY PROGRESS (Read-Only, <1 min):
+   When user requests "My Progress" or "status check" or "Quick Status":
    a) Load and analyze all current data
    b) Calculate progress percentages
    c) Generate conversational summary with:
@@ -710,7 +710,7 @@ export function generateGreeting(hasObjectives, context = {}) {
   return {
     message: `Hi! I'm your AI OKR Coach.\n\nYou have ${totalObjectives} active objective${totalObjectives !== 1 ? 's' : ''} (${overallProgress}% overall progress).\n\nWhat would you like to do?`,
     suggestedActions: [
-      { label: "How am I doing", value: "status", type: "primary", description: "See current progress (<1 min)" },
+      { label: "My Progress", value: "status", type: "primary", description: "See current progress (<1 min)" },
       { label: "Review & Plan", value: "checkin", type: "primary", description: "Weekly review (10-15 min)" },
       { label: "Something else", value: "chat", type: "secondary", description: "Ask me anything" }
     ],
