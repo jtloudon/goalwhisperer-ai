@@ -6,8 +6,8 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  border-bottom: 2px solid rgba(118, 75, 162, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .top-nav-content {
@@ -45,12 +45,12 @@
 
 .nav-link:hover {
   background: transparent;
-  color: #764ba2;
+  color: #a855f7;
 }
 
 .nav-link.active {
   background: transparent;
-  color: #764ba2;
+  color: #a855f7;
 }
 
 .nav-link.active::after {
@@ -61,7 +61,7 @@
   transform: translateX(-50%);
   width: 60%;
   height: 3px;
-  background: linear-gradient(90deg, #d946ef 0%, #6366f1 60%, #5BA3FF 100%);
+  background: #a855f7;
   border-radius: 2px 2px 0 0;
 }
 

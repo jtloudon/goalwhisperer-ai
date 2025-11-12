@@ -124,7 +124,10 @@ function CheckinHistory() {
             return (
               <div key={checkinId} className="checkin-card current-checkin">
                 <div className="checkin-header">
-                  <h3>Check-in: {formatDate(checkin.weekStart)} - {formatDate(checkin.weekEnd)}</h3>
+                  <h3>
+                    <span className="checkin-label">Check-in:</span>
+                    <span className="checkin-date-range"> {formatDate(checkin.weekStart)} - {formatDate(checkin.weekEnd)}</span>
+                  </h3>
                   <span className="recent-badge">Most Recent</span>
                 </div>
                 {renderContent()}
@@ -136,7 +139,10 @@ function CheckinHistory() {
           return (
             <details key={checkinId} className="checkin-card past-checkin" data-checkin-id={checkinId}>
               <summary className="checkin-header">
-                <h3>Check-in: {formatDate(checkin.weekStart)} - {formatDate(checkin.weekEnd)}</h3>
+                <h3>
+                  <span className="checkin-label">Check-in:</span>
+                  <span className="checkin-date-range"> {formatDate(checkin.weekStart)} - {formatDate(checkin.weekEnd)}</span>
+                </h3>
               </summary>
               {renderContent()}
             </details>

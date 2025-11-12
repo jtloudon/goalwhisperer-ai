@@ -139,8 +139,10 @@ function Plans() {
                       return (
                         <div key={objectiveTitle} className="objective-group">
                           <h4 className="objective-title">
-                            {objectiveNumber && `Objective ${objectiveNumber}: `}
-                            {objectiveTitle}
+                            {objectiveNumber && (
+                              <span className="objective-label">Objective {objectiveNumber}: </span>
+                            )}
+                            <span className="objective-title-text">{objectiveTitle}</span>
                           </h4>
                           <ul className="actions-list">
                             {actions.map((action) => {
@@ -202,7 +204,10 @@ function Plans() {
             return (
               <div key={plan.file} className="plan-card current-week">
                 <div className="plan-header-current">
-                  <h3>Current Week: {formatDateRange(plan.dateRange)}</h3>
+                  <h3>
+                    <span className="week-label">Current Week:</span>
+                    <span className="week-date"> {formatDateRange(plan.dateRange)}</span>
+                  </h3>
                   <span className="completion-badge">{stats.completed}/{stats.total} completed</span>
                 </div>
                 {renderContent()}
@@ -214,7 +219,9 @@ function Plans() {
           return (
             <details key={plan.file} className="plan-card past-week" data-week-id={plan.file}>
               <summary className="plan-header">
-                <h3>{formatDateRange(plan.dateRange)}</h3>
+                <h3>
+                  <span className="week-label">{formatDateRange(plan.dateRange)}</span>
+                </h3>
                 <span className="completion-badge">{stats.completed}/{stats.total} completed</span>
               </summary>
               <div className="plan-content">

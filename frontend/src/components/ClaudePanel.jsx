@@ -8,7 +8,6 @@ function ClaudePanel() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [suggestedActions, setSuggestedActions] = useState([]);
   const [isInitializing, setIsInitializing] = useState(true);
   const messagesEndRef = useRef(null);
 
@@ -29,7 +28,6 @@ function ClaudePanel() {
             role: 'assistant',
             content: result.data.message,
           }]);
-          setSuggestedActions(result.data.suggestedActions || []);
         }
       } catch (err) {
         console.error('Error fetching greeting:', err);
@@ -50,7 +48,6 @@ function ClaudePanel() {
     // Reload greeting
     setIsInitializing(true);
     setMessages([]);
-    setSuggestedActions([]);
     setInput('');
     setError(null);
 
@@ -65,7 +62,6 @@ function ClaudePanel() {
             role: 'assistant',
             content: result.data.message,
           }]);
-          setSuggestedActions(result.data.suggestedActions || []);
         }
       } catch (err) {
         console.error('Error fetching greeting:', err);
@@ -214,20 +210,6 @@ function ClaudePanel() {
                 <div className="message-content">{msg.content}</div>
               </div>
             ))}
-            {suggestedActions.length > 0 && (
-              <div className="suggested-actions">
-                {suggestedActions.map((action, idx) => (
-                  <button
-                    key={idx}
-                    className={`action-button ${action.type}`}
-                    onClick={() => handleSuggestedAction(action.value)}
-                    title={action.description}
-                  >
-                    {action.label}
-                  </button>
-                ))}
-              </div>
-            )}
             {isLoading && (
               <div className="message assistant">
                 <div className="message-content typing">
@@ -266,6 +248,14 @@ function ClaudePanel() {
           >
             Weekly Check-in
           </button>
+          <button
+            type="button"
+            className="persistent-pill new-chat-pill"
+            onClick={clearConversation}
+            title="Start a fresh conversation"
+          >
+            New Chat →
+          </button>
         </div>
       )}
 
@@ -285,13 +275,6 @@ function ClaudePanel() {
         />
         <button type="submit" disabled={isLoading || !input.trim()}>
           Send
-        </button>
-        <button
-          type="button"
-          className="new-chat-link"
-          onClick={clearConversation}
-        >
-          Start a new chat →
         </button>
       </form>
     </aside>

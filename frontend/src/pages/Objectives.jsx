@@ -65,7 +65,10 @@ function Objectives() {
               <div key={obj.id} className="objective-card">
                 <div className="objective-header">
                   <div>
-                    <h3>Objective {obj.number}: {obj.title}</h3>
+                    <h3>
+                      <span className="objective-label">Objective {obj.number}:</span>
+                      <span className="objective-title-text"> {obj.title}</span>
+                    </h3>
                   </div>
                   <div className="progress-circle">
                     <span>{obj.progress}%</span>
@@ -100,7 +103,7 @@ function Objectives() {
                                   bottom: '100%',
                                   transform: 'translateX(-50%)',
                                   marginBottom: '8px',
-                                  background: '#5BA3FF',
+                                  background: '#a855f7',
                                   color: 'white',
                                   padding: '3px 6px',
                                   borderRadius: '3px',
@@ -122,7 +125,7 @@ function Objectives() {
                                     height: 0,
                                     borderLeft: '5px solid transparent',
                                     borderRight: '5px solid transparent',
-                                    borderTop: '5px solid #5BA3FF'
+                                    borderTop: '5px solid #a855f7'
                                   }}
                                 />
                               </div>
@@ -164,7 +167,10 @@ function Objectives() {
               <div key={obj.id} className="objective-card completed">
                 <div className="objective-header">
                   <div>
-                    <h3>Objective {obj.number}: {obj.title}</h3>
+                    <h3>
+                      <span className="objective-label">Objective {obj.number}:</span>
+                      <span className="objective-title-text"> {obj.title}</span>
+                    </h3>
                   </div>
                   <div className="progress-circle">
                     <span>{obj.progress}%</span>
@@ -199,7 +205,7 @@ function Objectives() {
                                   bottom: '100%',
                                   transform: 'translateX(-50%)',
                                   marginBottom: '8px',
-                                  background: '#5BA3FF',
+                                  background: '#a855f7',
                                   color: 'white',
                                   padding: '3px 6px',
                                   borderRadius: '3px',
@@ -221,7 +227,7 @@ function Objectives() {
                                     height: 0,
                                     borderLeft: '5px solid transparent',
                                     borderRight: '5px solid transparent',
-                                    borderTop: '5px solid #5BA3FF'
+                                    borderTop: '5px solid #a855f7'
                                   }}
                                 />
                               </div>
@@ -266,7 +272,10 @@ function Objectives() {
                   <div key={obj.id} className="objective-card completed">
                     <div className="objective-header">
                       <div>
-                        <h3>Objective {obj.number}: {obj.title}</h3>
+                        <h3>
+                          <span className="objective-label">Objective {obj.number}:</span>
+                          <span className="objective-title-text"> {obj.title}</span>
+                        </h3>
                       </div>
                       <div className="progress-circle">
                         <span>{obj.progress}%</span>
