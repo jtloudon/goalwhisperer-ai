@@ -363,23 +363,44 @@ section h2 {
 .wins-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0;
 }
 
 .win-item {
-  padding: 0.75rem;
-  background: white;
-  border-radius: 4px;
-  color: #333;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border-radius: 8px;
+  color: #9b87b5 !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  border: 0.5px solid #764ba2;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.win-item:last-child {
+  border-bottom: none;
+}
+
+.win-item:hover {
+  background: #f8f4ff;
+  border-bottom-color: #e0d4f7;
 }
 
 .win-text {
   flex: 1;
+  color: #a855f7 !important;
+}
+
+.win-text::before {
+  content: "✓";
+  color: #a855f7;
+  font-weight: 600;
+  margin-right: 0.75rem;
+  font-size: 1rem;
 }
 
 .win-date {

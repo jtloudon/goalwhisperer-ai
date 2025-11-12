@@ -261,7 +261,7 @@ export async function updateKeyResultProgress(filePath, krId, updates, progressF
 
       if (progressJump >= 25 || hitsMilestone) {
         try {
-          await addWin(progressFilePath, `${markdownKrId}: ${krTitle} reached ${updates.progress}%`);
+          await addWin(progressFilePath, `${markdownKrId}: ${krTitle} reached ${updates.progress}%`, 'kr-progress');
           autoWinAdded = true;
         } catch (winError) {
           console.warn('Failed to auto-add win for progress jump:', winError.message);
@@ -418,7 +418,7 @@ export async function completeKeyResult(filePath, krId, setProgressTo100 = false
     // Auto-add win if progress file path provided
     if (progressFilePath) {
       try {
-        await addWin(progressFilePath, `Completed ${markdownKrId}: ${krTitle}`);
+        await addWin(progressFilePath, `Completed ${markdownKrId}: ${krTitle}`, 'kr-complete');
       } catch (winError) {
         console.warn('Failed to auto-add win:', winError.message);
         // Don't fail the entire operation if win tracking fails
@@ -1012,7 +1012,7 @@ export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber
         // Add win to progress summary
         if (progressFilePath) {
           try {
-            await addWin(progressFilePath, cleanTitle);
+            await addWin(progressFilePath, cleanTitle, 'weekly-action');
             autoWinAdded = true;
           } catch (winError) {
             console.warn('Failed to auto-add win:', winError.message);
@@ -1061,7 +1061,21 @@ export async function updateActionInWeeklyPlan(plansDir, weekStart, actionNumber
  * @param {string} winDescription - Description of the win to add
  * @returns {Promise<Object>} Result with success status
  */
-export async function addWin(filePath, winDescription) {
+/**
+ * Calculate similarity between two strings (0-1, where 1 is identical)
+ * Uses Jaccard similarity on word sets
+ */
+function calculateSimilarity(str1, str2) {
+  const words1 = new Set(str1.toLowerCase().split(/\s+/));
+  const words2 = new Set(str2.toLowerCase().split(/\s+/));
+
+  const intersection = new Set([...words1].filter(x => words2.has(x)));
+  const union = new Set([...words1, ...words2]);
+
+  return intersection.size / union.size;
+}
+
+export async function addWin(filePath, winDescription, source = 'manual') {
   try {
     // Read existing file or create new one
     let content;
@@ -1109,27 +1123,49 @@ export async function addWin(filePath, winDescription) {
     const normalizeText = (text) => text.toLowerCase().replace(/[^\w\s]/g, '').trim();
     const normalizedNewWin = normalizeText(winDescription);
 
-    // Extract existing wins for today
-    const winPattern = /^- (.+?) \[(\d{4}-\d{2}-\d{2})\]/gm;
+    // Extract existing wins for today with their sources
+    const winPattern = /^- (.+?) \[(\d{4}-\d{2}-\d{2})\](?:<!--\s*source:\s*(\w+)\s*-->)?/gm;
     let match;
     const todaysWins = [];
     while ((match = winPattern.exec(content)) !== null) {
       if (match[2] === dateStamp) {
-        todaysWins.push(normalizeText(match[1]));
+        todaysWins.push({
+          text: normalizeText(match[1]),
+          source: match[3] || 'unknown'
+        });
       }
     }
 
-    // Check if this win already exists today
-    if (todaysWins.some(existingWin => existingWin === normalizedNewWin)) {
+    // Check for exact match
+    const exactMatch = todaysWins.find(w => w.text === normalizedNewWin);
+    if (exactMatch) {
       return {
         success: true,
         message: `Win already exists for today: "${winDescription}"`,
         duplicate: true,
+        reason: 'exact-match'
       };
     }
 
-    // Build the new win entry with date stamp at the end
-    const winEntry = `- ${winDescription} [${dateStamp}]\n`;
+    // Check for similar wins (70%+ similarity) from same source
+    const SIMILARITY_THRESHOLD = 0.7;
+    const similarWin = todaysWins.find(w => {
+      const similarity = calculateSimilarity(w.text, normalizedNewWin);
+      return similarity >= SIMILARITY_THRESHOLD && w.source === source;
+    });
+
+    if (similarWin) {
+      return {
+        success: true,
+        message: `Similar win already exists from same source today: "${winDescription}"`,
+        duplicate: true,
+        reason: 'similar-match',
+        similarity: calculateSimilarity(similarWin.text, normalizedNewWin)
+      };
+    }
+
+    // Build the new win entry with date stamp and source tracking
+    const winEntry = `- ${winDescription} [${dateStamp}]<!-- source: ${source} -->\n`;
 
     // Insert the win at the top of the wins list
     content = content.slice(0, insertIndex) + winEntry + content.slice(insertIndex);
@@ -1139,7 +1175,8 @@ export async function addWin(filePath, winDescription) {
 
     return {
       success: true,
-      message: `Successfully added win: "${winDescription}" with date ${dateStamp}`,
+      message: `Successfully added win: "${winDescription}" with date ${dateStamp} from source: ${source}`,
+      source: source
     };
   } catch (error) {
     console.error('Error adding win:', error);

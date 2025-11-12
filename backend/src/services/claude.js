@@ -386,7 +386,7 @@ async function executeTool(toolName, toolInput) {
         );
 
       case 'add_win':
-        return await addWin(PATHS.tracking.progress, toolInput.winDescription);
+        return await addWin(PATHS.tracking.progress, toolInput.winDescription, 'claude-tool');
 
       case 'save_checkin_summary':
         return await saveCheckinSummary(PATHS.tracking.checkinHistory, toolInput);
