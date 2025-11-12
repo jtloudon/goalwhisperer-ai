@@ -59,8 +59,7 @@
 **Frontend:**
 - **React** - Component-based UI, rich ecosystem
 - **Vite** - Fast build tool, hot module replacement
-- **Tailwind CSS** - Rapid styling
-- **shadcn/ui** - Pre-built accessible components
+- **Vanilla CSS** - Custom styling with design system
 - **Recharts** - Chart/visualization library
 - **React Router** - Navigation
 
@@ -83,21 +82,19 @@
 ### Navigation Layout
 
 ```
-┌─────────────────────────────────────────────┐
-│  OKR System      [Dashboard] [Chat] 💬      │ ← Header
-├──────────┬──────────────────────────────────┤
-│ Sidebar  │  Main Content Area               │
-│          │                                   │
-│ 📊 Dash  │  [Content changes based on       │
-│ 🎯 Obj   │   sidebar selection]             │
-│ 📅 Plans │                                   │
-│ ✅ Done  │                                   │
-│ 📈 Prog  │                                   │
-│ ℹ️  About│                                   │
-└──────────┴──────────────────────────────────┘
-      ↑                                    ↑
-   Always visible               Floating chat button
-                               (bottom-right, slides in)
+┌─────────────────────────────────────────────────────────┐
+│  Logo  [Dashboard] [Objectives] [Plans] [History] [About] │ ← Top Nav
+├─────────────────────────────────┬───────────────────────┤
+│                                 │                       │
+│  Main Content Area              │   AI Coach Panel      │
+│  (Dashboard, Objectives, etc.)  │   (Fixed right side)  │
+│                                 │                       │
+│                                 │   [Chat messages]     │
+│                                 │                       │
+│                                 │   [My Progress]       │
+│                                 │   [Weekly Check-in]   │
+│                                 │   [New Chat →]        │
+└─────────────────────────────────┴───────────────────────┘
 ```
 
 ### Page Definitions
@@ -257,15 +254,15 @@
 
 ---
 
-### Chat Interface 💬
+### Chat Interface 💬 (AI Coach Panel)
 
 **UI:**
-- **Floating button** (bottom-right, always visible)
-- Click opens **chat panel** (slides in from right side)
+- **Fixed right panel** (always visible, 440px width)
 - Panel layout:
   ```
   ┌─────────────────────┐
-  │ Chat with Claude    │ ← Header
+  │ AI Coach            │ ← Header with gradient wash
+  │ powered by claude   │
   ├─────────────────────┤
   │                     │
   │  [Chat transcript]  │ ← Scrollable
@@ -274,33 +271,35 @@
   │  Claude: ...        │
   │                     │
   ├─────────────────────┤
+  │ [My Progress]       │ ← Persistent action pills
+  │ [Weekly Check-in]   │   (solid purple buttons)
+  │ [New Chat →]        │   (outlined for secondary)
+  ├─────────────────────┤
   │  [Type message...]  │ ← Input
   │          [Send] →   │
   └─────────────────────┘
   ```
 
 **Features:**
-- **Quick Actions** (buttons above input):
-  - "Start weekly check-in"
-  - "Log a completion"
-  - "Adjust objectives"
-  - "Show status"
+- **Persistent Action Pills** (bottom, above input):
+  - "My Progress" - Quick status check
+  - "Weekly Check-in" - Start guided check-in
+  - "New Chat →" - Clear conversation history
 
 - **Real-Time Indicators**:
-  - Typing indicator when Claude is responding
-  - File update notification ("Updated progress-summary.md ✓")
-  - Dashboard refresh indicator
+  - Typing indicator when Claude is responding (animated dots)
+  - Auto-refresh every 5 seconds for data changes
 
 - **Session Management**:
-  - Chat transcript saved per session
-  - New session on page reload
-  - Export transcript option
+  - Chat history persists during session
+  - "New Chat" button clears conversation
+  - Re-fetches greeting on clear
 
 **Integration:**
-- Uses Claude API (Anthropic SDK)
-- Conversational context maintained
-- Parses user responses → updates MD files
-- Triggers dashboard refresh via WebSocket
+- Uses Claude Sonnet 4.5 API (Anthropic SDK)
+- Conversational context maintained throughout session
+- Parses user responses → updates MD files via agent tools
+- Auto-refresh mechanism detects file changes
 
 ---
 
@@ -804,7 +803,61 @@ okr-web-app/
 
 ---
 
-### Phase 7: Future Enhancements
+### Phase 7: Design System Implementation (Week 3) ✅ COMPLETE
+
+**Goal**: Establish comprehensive design system for cohesive UI/UX
+
+**Tasks:**
+1. Design system documentation
+   - Created comprehensive design-system.md
+   - Documented colors, typography, shadows, patterns
+   - Captured rejected approaches and rationale
+
+2. Color unification
+   - Standardized purple to #a855f7 throughout
+   - Replaced old colors (#764ba2, #667eea)
+   - Applied gray scale hierarchy (#858a94, #9b87b5, #9ca3af)
+   - Neutral borders (#e5e7eb) instead of purple
+
+3. Typography patterns
+   - Split-color titles (gradient label + gray text)
+   - Applied to all page headers (Dashboard, Objectives, Plans, Check-in History)
+   - Consistent heading hierarchy
+
+4. Visual polish
+   - Subtle shadows: 0 1px 3px rgba(0,0,0,0.08) on all cards
+   - Light gray header backgrounds (#fafafa) for visual separation
+   - Status indicators: 12px with 3px colored glow rings
+   - Thin progress bars (4-6px) with vibrant gradient
+
+5. Component refinements
+   - Top navigation: Lighter shadow, neutral border
+   - AI Coach panel: Removed duplicate suggested actions
+   - Persistent action pills: Solid purple with white text
+   - Badge styling: Neutral backgrounds, strategic purple accents
+   - Gradient wash: Refined to 30px height
+
+6. Code cleanup
+   - Removed legacy Progress.jsx page (unused)
+   - Consolidated duplicate UI patterns
+   - Updated all CSS files for consistency
+
+7. Pages updated
+   - Dashboard: Stats, wins, chart, shadows
+   - Objectives: Titles, progress bars, status indicators
+   - Weekly Actions: Headers, badges, borders
+   - Check-in History: Headers, section styling
+   - About: Headings, links, shadows
+
+**Deliverable**: Cohesive design system applied across entire application
+
+**Time Estimate**: 8-10 hours
+
+**Status**: ✅ Complete (Nov 12, 2025)
+
+---
+
+### Phase 8: Future Enhancements
 
 **Goal**: Improve user experience and add advanced features
 
@@ -850,23 +903,33 @@ okr-web-app/
 
 ## Total Timeline
 
-**Estimated Total**: 38-55 hours (3-4 weeks part-time)
+**Estimated Total**: 46-65 hours (4-5 weeks part-time)
 
 **Week 1** (Oct 31 - Nov 6): ✅ COMPLETE
 - Phase 1: Dashboard foundation (you can see your data!)
 - Phase 2: Navigation pages (all pages working)
-
-**Week 2** (Nov 6 - Nov 13): ⏳ IN PROGRESS
-- Phase 3: Chat integration (can talk to Claude)
-- Phase 4: Write capability + real-time updates (full system!)
-
-**Week 3** (Nov 13 - Nov 20):
-- Phase 5: Polish
-
-**Week 4** (Nov 6 actual): ✅ COMPLETE
 - Phase 6: Agent reliability + testing (comprehensive tool coverage)
 
-**Launch Status**: Core functionality complete, ready for portfolio use
+**Week 2** (Nov 6 - Nov 13): ✅ COMPLETE
+- Phase 3: Chat integration (can talk to Claude)
+- Phase 4: Write capability + real-time updates (full system!)
+- Phase 5: Polish & enhancement
+
+**Week 3** (Nov 10 - Nov 12): ✅ COMPLETE
+- Phase 7: Design system implementation
+
+**Launch Status**: ✅ Core functionality complete, polished UI, ready for portfolio use
+
+**Completed Features:**
+- Full dashboard with charts and real-time updates
+- All navigation pages (Objectives, Plans, Check-in History, About)
+- AI Coach integration with Claude API
+- Conversational check-ins and file updates
+- Comprehensive agent tooling (9/10 scenarios)
+- Cohesive design system across entire app
+- Auto-refresh on data changes (5 second polling)
+- Duplicate win prevention
+- Persistent action pills for quick access
 
 ---
 

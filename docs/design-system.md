@@ -221,6 +221,26 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 ```
 
+### Top Navigation Bar
+**Philosophy:** Subtle elevation without heavy shadows
+
+```css
+.top-nav {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* Subtle shadow, not heavy */
+  border-bottom: 1px solid #e5e7eb; /* Neutral gray border */
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #a855f7; /* Updated from old purple #764ba2 */
+}
+```
+
+**Changed from:**
+- Shadow: `0 4px 16px rgba(0, 0, 0, 0.15)` → `0 1px 3px rgba(0, 0, 0, 0.08)`
+- Border: `2px solid rgba(118, 75, 162, 0.3)` → `1px solid #e5e7eb`
+- Link colors: `#764ba2` → `#a855f7`
+
 ### Chat Messages (AI Coach)
 **Philosophy:** Subtle backgrounds, not borders
 
@@ -242,14 +262,50 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 **Final Implementation:**
 ```css
 .claude-panel::before {
-  height: 40px; /* Short strip at top */
+  height: 30px; /* Subtle strip at top (reduced from 40px) */
   background: linear-gradient(135deg, #ec4899 0%, #d946ef 33%, #8b5cf6 66%, #3b82f6 100%);
-  opacity: 0.4;
+  opacity: 0.5;
   filter: blur(12px);
   mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
   /* Stays above "AI Coach" title, doesn't interfere with content */
 }
 ```
+
+### AI Coach Persistent Action Pills
+**Philosophy:** Remove duplicate suggested actions, use only persistent bottom pills
+
+```css
+/* Primary action pills - solid purple */
+.persistent-pill {
+  background: #a855f7;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.7rem;
+  border-radius: 50px;
+  font-size: 0.7rem;
+}
+
+.persistent-pill:hover {
+  background: #9333ea; /* Darker purple on hover */
+}
+
+/* "New Chat" pill - outlined style for secondary action */
+.new-chat-pill {
+  background: white !important;
+  color: #a855f7 !important;
+  border: 1px solid #a855f7 !important;
+}
+
+.new-chat-pill:hover {
+  background: #faf5ff !important; /* Very light purple tint */
+}
+```
+
+**Changed:**
+- Removed suggested actions feature entirely (was duplicate of persistent pills)
+- Primary pills: Purple background with white text (not outlined)
+- "New Chat" pill: White with purple outline for visual distinction
+- Gradient wash height: 40px → 30px for subtlety
 
 ---
 
@@ -262,10 +318,13 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 ### AI Coach Panel (Right Side)
 **Changed:**
 - Background: Full gradient → **White with top gradient accent**
-- Gradient wash: Tall/organic attempts → **40px straight blur at top**
+- Gradient wash: Tall/organic attempts → **30px straight blur at top** (reduced from 40px)
 - Message borders: Purple border → **Subtle gray background** (`#f3f4f6`)
 - Message font: Default → **0.9rem** (more history visible)
 - Title size: 1.5rem → **1.25rem** (de-emphasize UI)
+- Suggested actions: **Removed entirely** (was duplicate of persistent pills)
+- Persistent pills: Outlined → **Solid purple `#a855f7` with white text**
+- "New Chat" pill: **White with purple outline** (secondary action style)
 - Bottom UI: Compacted padding, moved "New Chat" to pill row
 
 ### Objectives Page
@@ -292,9 +351,38 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 - Win dates: 0.75rem → **0.7rem, `#9ca3af`**
 - Wins hover: Border change removed → **Background only**
 
+### Weekly Actions Page
+**Changed:**
+- Week titles: Full gradient → **Split-color** (gradient label + gray date `#858a94`)
+- Objective titles: Full purple → **Split-color** (gradient label + gray text `#858a94`)
+- Card shadows: Heavy → **Subtle `0 1px 3px 0.08`**
+- Borders: Purple `#764ba2` → **Neutral gray `#e5e7eb`**
+- Header treatment: Simple border → **Light gray background `#fafafa` with bottom border**
+- Completion badge: Light blue background → **No background, purple text only**
+- Action number badges: Light blue background → **Subtle gray `#f3f4f6`**
+- Purple colors: `#667eea`, `#764ba2` → **`#a855f7`**
+
+### Check-in History Page
+**Changed:**
+- Check-in titles: Full gradient → **Split-color** (gradient label + gray date `#858a94`)
+- Header treatment: **Light gray background `#fafafa` with bottom border**
+- "Most Recent" badge: Old purple `#764ba2` → **`#a855f7`**
+- Section headings: `#764ba2` → **`#a855f7`**
+- Card shadows: Heavy → **Subtle `0 1px 3px 0.08`**
+- Border-left on current card: **Removed** (consistency with other cards)
+
+### About Page
+**Changed:**
+- Section h2 headings: `#764ba2` → **`#a855f7`**
+- Card shadows: `0 2px 8px 0.1` → **`0 1px 3px 0.08`**
+- Link colors: `#667eea` → **`#a855f7`**
+
 ### Top Navigation
 **Changed:**
+- Shadow: `0 4px 16px rgba(0,0,0,0.15)` → **`0 1px 3px rgba(0,0,0,0.08)`**
+- Border: Purple `rgba(118,75,162,0.3)` → **Neutral gray `#e5e7eb`**
 - Active underline: Gradient → **Solid purple `#a855f7`**
+- Hover/active link colors: `#764ba2` → **`#a855f7`**
 
 ---
 
@@ -344,12 +432,13 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 ## Rejected Approaches
 
 ### ❌ Organic Gradient Shape (AI Coach)
-**Tried:** Apple-style asymmetric blob with bulge on right
+**Tried:** Apple-style asymmetric blob with bulge on right, oval/ellipse shape
 **Why rejected:**
 - Clip-path killed blur effect
 - Border-radius asymmetry looked awkward
 - Too complex for minimal benefit
-**Final:** Simple 40px blur at top, symmetric
+- Oval shape felt too prominent
+**Final:** Simple 30px blur at top, symmetric rectangular strip
 
 ### ❌ Full Panel Gradients
 **Tried:** Entire AI Coach panel with gradient background
@@ -367,23 +456,47 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 - Fights with progress bars
 **Final:** Split-color (gradient label + gray text)
 
+### ❌ Suggested Actions in AI Coach
+**Tried:** Contextual suggested action buttons in assistant messages
+**Why rejected:**
+- Duplicate of persistent pills at bottom
+- No real estate savings (still need "New Chat" button)
+- Visual clutter
+- Confusing to have two sets of similar actions
+**Final:** Only persistent action pills at bottom (My Progress, Weekly Check-in, New Chat)
+
+### ❌ Light Purple/Blue Backgrounds for Badges
+**Tried:** Action badges with light purple `#f3e8ff` or light blue `#f0f7ff` backgrounds
+**Why rejected:**
+- Poor contrast with purple text
+- Too much purple everywhere (overload)
+- Color combinations lacked harmony
+**Final:**
+- Action number badges: Neutral gray `#f3f4f6` background
+- Completion badges: No background, just purple text
+- Persistent pills: Solid purple with white text
+
 ---
 
-## Remaining Pages to Review
+## Design System Status
 
-### Not Yet Analyzed:
-1. **Weekly Actions page**
-2. **Check-in History page**
-3. **About page**
-4. **Plans/Timeline pages** (if any)
+### ✅ Completed Pages:
+1. **Dashboard** - Stats, wins, chart, shadows all updated
+2. **Objectives** - Split-color titles, progress bars, status indicators, shadows
+3. **Weekly Actions** - Headers, titles, badges, borders, all aligned
+4. **Check-in History** - Headers, badges, shadows, borders
+5. **About** - Headings, links, shadows
+6. **Top Navigation** - Shadow, border, link colors
+7. **AI Coach Panel** - Gradient wash, persistent pills, removed duplicates
 
-### Recommendations to Apply Consistently:
-- Use split-color pattern for section headings
-- Apply subtle shadows `0 1px 3px 0.08`
-- Use solid purple `#a855f7` instead of gradients where appropriate
-- Ensure status indicators are 12px with glow rings
-- Keep card padding/spacing consistent
-- Use gray scale hierarchy (`#858a94`, `#9b87b5`, `#9ca3af`)
+### Design System Principles Applied:
+- Split-color pattern for all page headers (gradient label + gray text `#858a94`)
+- Subtle shadows `0 1px 3px rgba(0,0,0,0.08)` on all cards
+- Unified purple `#a855f7` throughout (no more `#764ba2` or `#667eea`)
+- Neutral gray borders `#e5e7eb` instead of purple
+- Light gray header backgrounds `#fafafa` for visual separation
+- Status indicators: 12px with 3px colored glow rings
+- Gray scale hierarchy: `#858a94` (medium), `#9b87b5` (soft), `#9ca3af` (light)
 
 ---
 
@@ -457,11 +570,8 @@ background-clip: text;
 
 ---
 
-## Next Session Prompt
-
-**"Continue design system refinement for remaining pages (Weekly Actions, Check-in History, About). Apply established patterns: split-color titles, subtle shadows (0 1px 3px 0.08), solid purple accents instead of gradients, 12px status dots with rings, gray hierarchy (#858a94, #9b87b5, #9ca3af). Review typography, spacing, color usage for consistency with Objectives and Dashboard pages."**
-
 ---
 
 *Document created: 2025-11-12*
 *Last updated: 2025-11-12*
+*Status: Complete - All pages aligned with design system*
