@@ -16,7 +16,7 @@ function TopNav() {
     <nav className="top-nav">
       <div className="top-nav-content">
         <div className="top-nav-brand">
-          <img src="/goalwhisperer-ai-logo.png" alt="GoalWhisperer AI" className="logo" />
+          <img src="/logo-goalwhisperer-ai.png" alt="GoalWhisperer AI" className="logo" />
         </div>
         <div className="top-nav-links">
           {navItems.map(item => (
