@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Get the directory where the app bundle lives
+APP_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+
+# Change to the project root
+cd "$APP_DIR"
+
+# Function to check if a port is listening
+wait_for_port() {
+    local port=$1
+    local max_attempts=30
+    local attempt=0
+
+    while [ $attempt -lt $max_attempts ]; do
+        if lsof -i :$port > /dev/null 2>&1; then
+            return 0
+        fi
+        sleep 1
+        ((attempt++))
+    done
+    return 1
+}
+
+# Clear screen and show banner
+clear
+echo "========================================="
+echo "  GoalWhisperer AI"
+echo "========================================="
+echo ""
+echo "Starting servers..."
+echo ""
+
+# Start the development servers (NOT in background, so we see logs)
+npm run dev &
+SERVER_PID=$!
+
+# Wait for both servers to be ready
+wait_for_port 3001
+echo "✓ Backend ready on port 3001"
+wait_for_port 5173
+echo "✓ Frontend ready on port 5173"
+echo ""
+echo "Opening Safari..."
+echo ""
+
+# Open Safari to the application
+open -a Safari http://localhost:5173
+
+echo "========================================="
+echo "  App is running!"
+echo "  Press Cmd+Q to quit"
+echo "========================================="
+echo ""
+
+# Keep terminal open and show server logs
+wait $SERVER_PID

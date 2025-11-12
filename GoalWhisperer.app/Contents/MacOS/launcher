@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Get the directory where the actual script lives
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Open the main script in Terminal
+open -a Terminal.app "$SCRIPT_DIR/GoalWhisperer"
