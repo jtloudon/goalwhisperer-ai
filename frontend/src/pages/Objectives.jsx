@@ -61,20 +61,11 @@ function Objectives() {
       {objectivesData?.current && activeObjectives.length > 0 && (
         <section className="current-objectives">
           {activeObjectives.map(obj => {
-            // Calculate KR stats for this objective
-            const totalKRs = obj.keyResults.length;
-            const completeKRs = obj.keyResults.filter(kr => kr.status === 'complete').length;
-            const inProgressKRs = obj.keyResults.filter(kr => kr.status === 'in-progress').length;
-
             return (
               <div key={obj.id} className="objective-card">
                 <div className="objective-header">
                   <div>
                     <h3>Objective {obj.number}: {obj.title}</h3>
-                    <div className="kr-summary">
-                      {completeKRs > 0 && <span className="kr-stat status-complete">{completeKRs} Complete</span>}
-                      {inProgressKRs > 0 && <span className="kr-stat status-in-progress">{inProgressKRs} In Progress</span>}
-                    </div>
                   </div>
                   <div className="progress-circle">
                     <span>{obj.progress}%</span>
@@ -109,7 +100,7 @@ function Objectives() {
                                   bottom: '100%',
                                   transform: 'translateX(-50%)',
                                   marginBottom: '8px',
-                                  background: '#5a4a6a',
+                                  background: '#5BA3FF',
                                   color: 'white',
                                   padding: '3px 6px',
                                   borderRadius: '3px',
@@ -131,7 +122,7 @@ function Objectives() {
                                     height: 0,
                                     borderLeft: '5px solid transparent',
                                     borderRight: '5px solid transparent',
-                                    borderTop: '5px solid #5a4a6a'
+                                    borderTop: '5px solid #5BA3FF'
                                   }}
                                 />
                               </div>
@@ -169,20 +160,11 @@ function Objectives() {
         <section className="completed-objectives">
           <h2>Completed This Year ({objectivesData.current.year})</h2>
           {completedThisYear.map(obj => {
-            // Calculate KR stats for this objective
-            const totalKRs = obj.keyResults.length;
-            const completeKRs = obj.keyResults.filter(kr => kr.status === 'complete').length;
-            const inProgressKRs = obj.keyResults.filter(kr => kr.status === 'in-progress').length;
-
             return (
               <div key={obj.id} className="objective-card completed">
                 <div className="objective-header">
                   <div>
                     <h3>Objective {obj.number}: {obj.title}</h3>
-                    <div className="kr-summary">
-                      {completeKRs > 0 && <span className="kr-stat status-complete">{completeKRs} Complete</span>}
-                      {inProgressKRs > 0 && <span className="kr-stat status-in-progress">{inProgressKRs} In Progress</span>}
-                    </div>
                   </div>
                   <div className="progress-circle">
                     <span>{obj.progress}%</span>
@@ -217,7 +199,7 @@ function Objectives() {
                                   bottom: '100%',
                                   transform: 'translateX(-50%)',
                                   marginBottom: '8px',
-                                  background: '#5a4a6a',
+                                  background: '#5BA3FF',
                                   color: 'white',
                                   padding: '3px 6px',
                                   borderRadius: '3px',
@@ -239,7 +221,7 @@ function Objectives() {
                                     height: 0,
                                     borderLeft: '5px solid transparent',
                                     borderRight: '5px solid transparent',
-                                    borderTop: '5px solid #5a4a6a'
+                                    borderTop: '5px solid #5BA3FF'
                                   }}
                                 />
                               </div>
@@ -280,21 +262,11 @@ function Objectives() {
             <div key={yearData.year} className="year-section">
               <h3>{yearData.year}</h3>
               {yearData.objectives.map(obj => {
-                // Calculate KR stats for this objective
-                const totalKRs = obj.keyResults.length;
-                const completeKRs = obj.keyResults.filter(kr => kr.status === 'complete').length;
-                const inProgressKRs = obj.keyResults.filter(kr => kr.status === 'in-progress').length;
-
                 return (
                   <div key={obj.id} className="objective-card completed">
                     <div className="objective-header">
                       <div>
                         <h3>Objective {obj.number}: {obj.title}</h3>
-                        <div className="kr-summary">
-                          {completeKRs > 0 && <span className="kr-stat status-complete">{completeKRs} Complete</span>}
-                          {inProgressKRs > 0 && <span className="kr-stat status-in-progress">{inProgressKRs} In Progress</span>}
-                          <span className="kr-stat total">({completeKRs}/{totalKRs} KRs Done)</span>
-                        </div>
                       </div>
                       <div className="progress-circle">
                         <span>{obj.progress}%</span>

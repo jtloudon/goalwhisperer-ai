@@ -83,7 +83,7 @@ section h2 {
 /* Objectives */
 .objective-card {
   background: white;
-  padding: 1.5rem;
+  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
@@ -93,13 +93,16 @@ section h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.5rem 0;
 }
 
 .objective-header h3 {
   font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 0.5rem;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(90deg, #d946ef 0%, #6366f1 60%, #5BA3FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .kr-summary {

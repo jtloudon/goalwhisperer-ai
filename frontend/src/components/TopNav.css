@@ -19,7 +19,7 @@
 }
 
 .top-nav-brand .logo {
-  height: 80px;
+  height: 40px;
   width: auto;
   display: block;
 }
@@ -61,7 +61,7 @@
   transform: translateX(-50%);
   width: 60%;
   height: 3px;
-  background: #764ba2;
+  background: linear-gradient(90deg, #d946ef 0%, #6366f1 60%, #5BA3FF 100%);
   border-radius: 2px 2px 0 0;
 }
 
@@ -74,7 +74,7 @@
   }
 
   .top-nav-brand .logo {
-    height: 64px;
+    height: 32px;
   }
 
   .top-nav-links {
