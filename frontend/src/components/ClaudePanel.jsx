@@ -90,7 +90,7 @@ function ClaudePanel() {
     // Map action values to user prompts
     const promptMap = {
       'status': 'My Progress',
-      'checkin': 'Review & Plan',
+      'checkin': 'Weekly Check-in',
       'setup': "Yes, let's set up my first objectives",
       'chat': '',
       'cancel': 'Not now',
@@ -262,9 +262,9 @@ function ClaudePanel() {
             className="persistent-pill"
             onClick={() => handleSuggestedAction('checkin', true)}
             disabled={isLoading}
-            title="Weekly review (10-15 min)"
+            title="Weekly check-in (10-15 min)"
           >
-            Review & Plan
+            Weekly Check-in
           </button>
         </div>
       )}

@@ -101,21 +101,40 @@ function Objectives() {
                                   style={{ width: `${Math.min(kr.progress, 100)}%` }}
                                 />
                               </div>
-                              <span
-                                className="progress-endpoint"
+                              {/* Tooltip box with current value */}
+                              <div
                                 style={{
                                   position: 'absolute',
                                   left: `${Math.min(kr.progress, 100)}%`,
-                                  top: '-4px',
-                                  transform: 'translateX(5px)',
+                                  bottom: '100%',
+                                  transform: 'translateX(-50%)',
+                                  marginBottom: '8px',
+                                  background: '#5a4a6a',
+                                  color: 'white',
+                                  padding: '3px 6px',
+                                  borderRadius: '3px',
+                                  fontSize: '0.7rem',
+                                  fontWeight: '600',
                                   whiteSpace: 'nowrap',
-                                  fontWeight: '700',
-                                  fontSize: '0.9rem',
-                                  color: '#9b7ab8'
+                                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                                 }}
                               >
                                 {kr.current}
-                              </span>
+                                {/* Arrow pointing down */}
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    left: '50%',
+                                    top: '100%',
+                                    transform: 'translateX(-50%)',
+                                    width: 0,
+                                    height: 0,
+                                    borderLeft: '5px solid transparent',
+                                    borderRight: '5px solid transparent',
+                                    borderTop: '5px solid #5a4a6a'
+                                  }}
+                                />
+                              </div>
                             </div>
                             <span className="progress-endpoint target">{kr.target}</span>
                           </div>
@@ -190,21 +209,40 @@ function Objectives() {
                                   style={{ width: `${Math.min(kr.progress, 100)}%` }}
                                 />
                               </div>
-                              <span
-                                className="progress-endpoint"
+                              {/* Tooltip box with current value */}
+                              <div
                                 style={{
                                   position: 'absolute',
                                   left: `${Math.min(kr.progress, 100)}%`,
-                                  top: '-4px',
-                                  transform: 'translateX(5px)',
+                                  bottom: '100%',
+                                  transform: 'translateX(-50%)',
+                                  marginBottom: '8px',
+                                  background: '#5a4a6a',
+                                  color: 'white',
+                                  padding: '3px 6px',
+                                  borderRadius: '3px',
+                                  fontSize: '0.7rem',
+                                  fontWeight: '600',
                                   whiteSpace: 'nowrap',
-                                  fontWeight: '700',
-                                  fontSize: '0.9rem',
-                                  color: '#9b7ab8'
+                                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                                 }}
                               >
                                 {kr.current}
-                              </span>
+                                {/* Arrow pointing down */}
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    left: '50%',
+                                    top: '100%',
+                                    transform: 'translateX(-50%)',
+                                    width: 0,
+                                    height: 0,
+                                    borderLeft: '5px solid transparent',
+                                    borderRight: '5px solid transparent',
+                                    borderTop: '5px solid #5a4a6a'
+                                  }}
+                                />
+                              </div>
                             </div>
                             <span className="progress-endpoint target">{kr.target}</span>
                           </div>

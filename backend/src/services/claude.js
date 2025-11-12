@@ -252,16 +252,16 @@ const tools = [
   },
   {
     name: 'update_action_in_weekly_plan',
-    description: 'Update a specific action in a weekly plan. COMPLETING/UNCOMPLETING: To mark complete, add "[DONE] " to start of title. To mark incomplete, REMOVE "[DONE] " from title. OTHER UPDATES: change mapsTo or description. Examples: "mark action 2 complete" - prepend [DONE] to title, "mark action 1 incomplete" - remove [DONE] from title, "uncheck action 3" - remove [DONE], "change action 2 to map to KR 1.2".',
+    description: 'Update a specific action in a weekly plan. CRITICAL: You MUST call this tool when user asks to complete/mark done/close an action - do NOT just acknowledge without calling the tool. To mark complete: prepend "[DONE] " to the FULL original title. To mark incomplete: provide title WITHOUT [DONE] prefix. Examples: User says "complete action 2" (title is "Set up savings") → call with {weekStart: "2025-11-10", actionNumber: 2, updates: {title: "[DONE] Set up savings"}}. User says "uncheck action 1" → call with title without [DONE] prefix.',
     input_schema: {
       type: 'object',
       properties: {
         weekStart: { type: 'string', description: 'Week start date (YYYY-MM-DD) of the plan' },
-        actionNumber: { type: 'number', description: 'Action number to update (1-indexed)' },
+        actionNumber: { type: 'number', description: 'Action number to update (1-indexed, matches what user sees in UI)' },
         updates: {
           type: 'object',
           properties: {
-            title: { type: 'string', description: 'Optional: New title. To COMPLETE: prepend "[DONE] " (e.g., "[DONE] Original Title"). To UNCOMPLETE: remove "[DONE] " prefix (e.g., "Original Title" without [DONE]).' },
+            title: { type: 'string', description: 'REQUIRED when completing/uncompleting. To COMPLETE: "[DONE] " + full original title (e.g., if action is "Research banks", pass "[DONE] Research banks"). To UNCOMPLETE: just the title without [DONE] prefix. CRITICAL: You must provide the COMPLETE title with [DONE] prepended - do not abbreviate or summarize.' },
             mapsTo: { type: 'string', description: 'Optional: New mapsTo value (e.g., "KR 1.2")' },
             description: { type: 'string', description: 'Optional: New description' },
           },
@@ -708,10 +708,10 @@ export function generateGreeting(hasObjectives, context = {}) {
     : 0;
 
   return {
-    message: `Hi! I'm your AI OKR Coach.\n\nYou have ${totalObjectives} active objective${totalObjectives !== 1 ? 's' : ''} (${overallProgress}% overall progress).\n\nWhat would you like to do?`,
+    message: `Hi! I'm your AI OKR Coach.\n\nYou have ${totalObjectives} active objective${totalObjectives !== 1 ? 's' : ''} (${overallProgress}% overall progress).\n\nI can help you:\n- Check your progress and see how you're tracking\n- Do a weekly check-in (review what's done, plan next week)\n- Update key results, mark actions complete, or adjust goals\n\nWhat would you like to do?`,
     suggestedActions: [
       { label: "My Progress", value: "status", type: "primary", description: "See current progress (<1 min)" },
-      { label: "Review & Plan", value: "checkin", type: "primary", description: "Weekly review (10-15 min)" },
+      { label: "Weekly Check-in", value: "checkin", type: "primary", description: "Weekly check-in (10-15 min)" },
       { label: "Something else", value: "chat", type: "secondary", description: "Ask me anything" }
     ],
     isFirstTime: false,

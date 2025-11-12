@@ -5,6 +5,12 @@
   margin: 0 auto;
 }
 
+/* Headings font */
+.page-content h2,
+.page-content h3 {
+  font-family: Arial, sans-serif;
+}
+
 .loading, .error {
   text-align: center;
   padding: 3rem;
@@ -163,7 +169,7 @@ section h2 {
 .kr-header {
   display: flex;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 3rem;
 }
 
 .kr-title {

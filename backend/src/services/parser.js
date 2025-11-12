@@ -159,9 +159,19 @@ export async function parseAnnualObjectives(filePath) {
           }
         } else {
           // Default: increase goals (higher is better)
-          kr.progress = Math.round((kr.current / kr.target) * 100);
-          // Cap at 100%
-          if (kr.progress > 100) kr.progress = 100;
+          if (kr.baseline !== null && kr.baseline !== undefined && kr.baseline < kr.target) {
+            // Has baseline: calculate progress from baseline to target
+            // Example: baseline=50k, current=75k, target=100k
+            // Progress = (75k-50k)/(100k-50k) * 100 = 50%
+            const totalDistance = kr.target - kr.baseline;
+            const progressDistance = kr.current - kr.baseline;
+            kr.progress = Math.max(0, Math.min(100, Math.round((progressDistance / totalDistance) * 100)));
+          } else {
+            // No baseline: calculate from 0 to target
+            kr.progress = Math.round((kr.current / kr.target) * 100);
+            // Cap at 100%
+            if (kr.progress > 100) kr.progress = 100;
+          }
         }
       }
     }

@@ -28,6 +28,20 @@ DATA_DIR=./demo npm run dev
 
 You'll see a coffee shop owner's goals—completely fake data to explore features!
 
+#### 🧪 Option A.2: Test New User Experience
+Simulate a brand new user with empty data (for testing or development).
+
+```bash
+DATA_DIR=./demo-new-user npm run dev
+# or use the npm script:
+npm run dev:newuser
+```
+
+This runs the app with empty directories to test:
+- New user onboarding flows
+- Automatic file/directory creation
+- Empty state handling
+
 #### 🚀 Option B: Interactive Setup Wizard
 Guided setup that helps you create your first goal.
 

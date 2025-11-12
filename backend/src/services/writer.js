@@ -390,9 +390,20 @@ export async function completeKeyResult(filePath, krId, setProgressTo100 = false
     const titleMatch = content.match(titleRegex);
     const krTitle = titleMatch ? titleMatch[1] : 'Key Result';
 
+    // Extract target value to set Current = Target when completing
+    const targetRegex = new RegExp(`#### ${markdownKrId}:.*?- \\*\\*Target\\*\\*: (\\d+(?:\\.\\d+)?)`, 's');
+    const targetMatch = content.match(targetRegex);
+    const targetValue = targetMatch ? parseFloat(targetMatch[1]) : null;
+
     // Update status to complete
     const statusRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Status\\*\\*: )(.+?)\\n`, 's');
     content = content.replace(statusRegex, `$1complete\n`);
+
+    // Set Current = Target (if target exists)
+    if (targetValue !== null) {
+      const currentRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Current\\*\\*: )([\\d.]+)`, 's');
+      content = content.replace(currentRegex, `$1${targetValue}`);
+    }
 
     // Optionally set progress to 100%
     if (setProgressTo100) {

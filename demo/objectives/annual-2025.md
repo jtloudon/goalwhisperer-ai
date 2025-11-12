@@ -10,6 +10,7 @@
 
 #### KR 1.1: Secure commercial lease and complete renovations
 - **Status**: complete
+- **Direction**: increase
 - **Target**: 1
 - **Current**: 1
 - **Progress**: 100%
@@ -37,21 +38,32 @@
 
 ### Key Results
 
-#### KR 2.1: Run a half-marathon by end of year
+#### KR 2.1: Reach target weight of 165 lbs
 - **Status**: in-progress
+- **Direction**: decrease
+- **Baseline**: 185
+- **Target**: 165
+- **Current**: 178
+- **Progress**: 35%
+- **Target Date**: 2025-08-31
+
+#### KR 2.2: Run a half-marathon by end of year
+- **Status**: in-progress
+- **Direction**: increase
 - **Target**: 1
 - **Current**: 0
 - **Progress**: 75%
 - **Target Date**: 2025-12-15
 
-#### KR 2.2: Meditate 20 minutes daily for 200 days total
+#### KR 2.3: Meditate 20 minutes daily for 200 days total
 - **Status**: in-progress
+- **Direction**: increase
 - **Target**: 200
 - **Current**: 85
 - **Progress**: 42%
 - **Target Date**: 2025-12-31
 
-#### KR 2.3: Complete 50 yoga classes
+#### KR 2.4: Complete 50 yoga classes
 - **Status**: in-progress
 - **Target**: 50
 - **Current**: 29
