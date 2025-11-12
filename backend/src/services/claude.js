@@ -150,16 +150,16 @@ const tools = [
   },
   {
     name: 'update_key_result',
-    description: 'Update key result details including title, status, target value, or target date. Use this when the user wants to CHANGE or MODIFY or UPDATE the title, description, wording, status, target value, or due date of a key result. IMPORTANT: If the user changes a numeric value that appears in BOTH the title and target (e.g., "by 2%" → "by 3%"), you MUST update BOTH fields. Examples: "change the title", "update KR 1.2 to say...", "rename KR 1.3", "change the target date", "update kr 3.2 to target 3%" (must update both title and target).',
+    description: 'Update key result details including title, status, DIRECTION, baseline, target value, or target date. Use this when the user wants to CHANGE or MODIFY or UPDATE the title, description, wording, status, direction, target value, or due date of a key result. IMPORTANT: If the user changes a numeric value that appears in BOTH the title and target (e.g., "by 2%" → "by 3%"), you MUST update BOTH fields. Examples: "change the title", "update KR 1.2 to say...", "rename KR 1.3", "change the target date", "update kr 3.2 to target 3%" (must update both title and target), "change KR 2.1 to decrease direction".',
     input_schema: {
       type: 'object',
       properties: {
         krId: { type: 'string', description: 'Key result ID (e.g., "kr-1.2")' },
         title: { type: 'string', description: 'New title for the key result' },
         status: { type: 'string', enum: ['in-progress', 'complete'], description: 'New status' },
-        direction: { type: 'string', enum: ['increase', 'decrease'], description: 'Goal direction: "increase" for targets you grow toward (default), "decrease" for targets you reduce toward (e.g., weight loss, costs)' },
-        baseline: { type: 'number', description: 'Starting value (required for decrease goals). Example: if losing weight from 230 to 220, baseline=230' },
-        target: { type: 'number', description: 'New target value as a NUMBER (required for UI display). Examples: 10 for "10 items", 5 for "5 lbs", 3 for "3%".' },
+        direction: { type: 'string', enum: ['increase', 'decrease'], description: 'Goal direction: "increase" for targets you grow toward (default), "decrease" for targets you reduce toward (e.g., weight loss, costs, DEBT PAYDOWN). CRITICAL: Target=0 is VALID and REQUIRED for decrease goals like "pay off debt".' },
+        baseline: { type: 'number', description: 'Starting value (REQUIRED for decrease goals). Example: if losing weight from 230 to 220, baseline=230. For paying off $30k debt, baseline=30000.' },
+        target: { type: 'number', description: 'New target value as a NUMBER. Can be ANY number including 0. Examples: 10 for "10 items", 5 for "5 lbs", 3 for "3%", 0 for "pay off debt completely". CRITICAL: Target=0 is VALID for decrease goals.' },
         targetDate: { type: 'string', description: 'New target date (YYYY-MM-DD)' },
       },
       required: ['krId'],
@@ -286,7 +286,7 @@ const tools = [
   },
   {
     name: 'save_checkin_summary',
-    description: 'Save a summary of the weekly check-in to the check-in history. Use this at the END of a weekly check-in conversation to preserve the summary for future reference. IMPORTANT: Call this tool when wrapping up a check-in, after all updates have been made and next week has been planned.',
+    description: 'MANDATORY: Save a summary of the weekly check-in to the check-in history. CRITICAL: You MUST call this tool at the END of EVERY weekly check-in conversation. This is NOT optional. After completing steps 1-3 of a check-in (completions, blockers, next week planning) and updating files, you MUST call this tool before saying goodbye to the user. Without this, the check-in history will not be saved and the user will lose their record of the conversation.',
     input_schema: {
       type: 'object',
       properties: {
@@ -461,7 +461,11 @@ CONVERSATION FLOWS:
       - Update progress percentages (update_progress tool)
       - Create next week's plan (add_weekly_plan tool)
       - Add any wins detected
-   g) Confirmation: "Updated [X] files. Your dashboard is refreshed!"
+   g) SAVE CHECK-IN SUMMARY (MANDATORY):
+      - ALWAYS call save_checkin_summary tool before ending the check-in
+      - This is NOT optional - you MUST save the summary
+      - Include: weekStart, weekEnd, completions, updates, nextWeekFocus, insights
+   h) Confirmation: "Updated [X] files. Your dashboard is refreshed!"
 
 3. FIRST-TIME SETUP (Guided, 10-15 min):
    When user is new (no objectives exist):
@@ -530,14 +534,24 @@ CRITICAL RULES FOR TOOL USAGE:
     - BASELINE IS REQUIRED FOR ALL KEY RESULTS - it enables proper progress visualization in the UI
     - "increase" (DEFAULT): Higher is better - progress grows toward target (e.g., revenue, customers, skills)
       * For increase goals, baseline is typically 0 (starting from zero)
-      * Example: "Build 3 apps" → baseline: 0, target: 3
-    - "decrease": Lower is better - progress improves as value decreases (e.g., weight loss, costs, bugs, debt)
-      * For decrease goals, baseline is the starting value
-      * Example: "Lose weight from 230 to 220" → baseline: 230, target: 220
-      * Example: "Pay off $34k debt" → baseline: 34000, target: 0
+      * Example: "Build 3 apps" → direction: "increase", baseline: 0, target: 3, current: 0
+      * Example: "Grow savings to $5000" → direction: "increase", baseline: 0, target: 5000, current: 0
+    - "decrease": Lower is better - progress improves as value decreases toward target (e.g., weight loss, costs, bugs, DEBT)
+      * For decrease goals, baseline is the STARTING VALUE (what you have NOW)
+      * Target is the END VALUE (what you want to reach)
+      * Current starts equal to baseline and decreases over time
+      * CRITICAL DEBT EXAMPLES:
+        - "Pay off $30,000 car loan" → direction: "decrease", baseline: 30000, target: 0, current: 30000
+        - "Pay down $50,000 boat loan" → direction: "decrease", baseline: 50000, target: 0, current: 50000
+        - "Reduce credit card debt from $8k to $2k" → direction: "decrease", baseline: 8000, target: 2000, current: 8000
+      * Other decrease examples:
+        - "Lose weight from 230 to 220" → direction: "decrease", baseline: 230, target: 220, current: 230
+        - "Reduce bug count from 50 to 0" → direction: "decrease", baseline: 50, target: 0, current: 50
     - Progress is calculated as: (baseline - current) / (baseline - target) * 100 for decrease, (current - baseline) / (target - baseline) * 100 for increase
     - The system automatically calculates progress correctly based on direction and baseline
     - NEVER omit baseline - the UI requires it to display the progress bar with labels
+    - DEBT PAYDOWN PATTERN RECOGNITION: When user mentions "pay off", "pay down", "reduce debt", "eliminate debt" → ALWAYS use direction: "decrease" with baseline = current debt amount, target = 0
+    - CRITICAL: Target=0 is COMPLETELY VALID for decrease goals. Do NOT claim the system requires positive targets. The system fully supports target=0 for debt payoff, cost elimination, etc.
 
 OBJECTIVE STRUCTURE CLARIFICATION:
 When user mentions multiple goals, ALWAYS ask for clarification BEFORE creating objectives:

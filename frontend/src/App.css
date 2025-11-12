@@ -30,7 +30,7 @@ body {
 .main-content {
   flex: 1;
   overflow-y: auto;
-  background: transparent;
+  background: #fafafa;
   color: #333;
   padding-right: 440px;
 }

@@ -43,9 +43,10 @@ export async function addObjective(filePath, objective) {
     const newObjIdStr = `obj-${newObjId}`;
 
     // Validate that all key results have numeric targets
+    // Note: target can be 0 for decrease goals (e.g., pay off debt completely)
     for (const kr of objective.keyResults) {
-      if (typeof kr.target !== 'number' || kr.target <= 0) {
-        throw new Error(`Key result "${kr.title}" must have a numeric target value greater than 0 (got: ${kr.target}). The UI requires numeric targets to display progress.`);
+      if (typeof kr.target !== 'number' || kr.target < 0) {
+        throw new Error(`Key result "${kr.title}" must have a numeric target value >= 0 (got: ${kr.target}). The UI requires numeric targets to display progress.`);
       }
     }
 
@@ -293,9 +294,10 @@ export async function updateKeyResultProgress(filePath, krId, updates, progressF
 export async function updateKeyResult(filePath, krId, updates) {
   try {
     // Validate target if provided
+    // Note: target can be 0 for decrease goals (e.g., pay off debt completely)
     if (updates.target !== undefined) {
-      if (typeof updates.target !== 'number' || updates.target <= 0) {
-        throw new Error(`Target must be a numeric value greater than 0 (got: ${updates.target}). The UI requires numeric targets to display progress. Please provide a number like 5 for "5 lbs" or 3 for "3%".`);
+      if (typeof updates.target !== 'number' || updates.target < 0) {
+        throw new Error(`Target must be a numeric value >= 0 (got: ${updates.target}). The UI requires numeric targets to display progress. For debt payoff goals, use target=0 with direction="decrease".`);
       }
     }
 
@@ -601,8 +603,9 @@ export async function addKeyResultToObjective(filePath, objectiveNumber, keyResu
     const newKrId = `${objectiveNumber}.${newKrNum}`;
 
     // Validate that target is numeric
-    if (typeof keyResult.target !== 'number' || keyResult.target <= 0) {
-      throw new Error(`Key result "${keyResult.title}" must have a numeric target value greater than 0 (got: ${keyResult.target}). The UI requires numeric targets to display progress.`);
+    // Note: target can be 0 for decrease goals (e.g., pay off debt completely)
+    if (typeof keyResult.target !== 'number' || keyResult.target < 0) {
+      throw new Error(`Key result "${keyResult.title}" must have a numeric target value >= 0 (got: ${keyResult.target}). The UI requires numeric targets to display progress.`);
     }
 
     // Find insertion point (after last KR or after "### Key Results" header)

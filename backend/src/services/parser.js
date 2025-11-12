@@ -3,11 +3,25 @@ import matter from 'gray-matter';
 import { marked } from 'marked';
 
 /**
+ * Safely read a file, returning empty string if it doesn't exist
+ */
+async function safeReadFile(filePath) {
+  try {
+    return await fs.readFile(filePath, 'utf-8');
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return '';
+    }
+    throw error;
+  }
+}
+
+/**
  * Parse annual objectives file
  * Standard format: ## Objective N: Title with #### KR N.M: Title
  */
 export async function parseAnnualObjectives(filePath) {
-  const content = await fs.readFile(filePath, 'utf-8');
+  const content = await safeReadFile(filePath);
   const lines = content.split('\n');
 
   // Extract year from filename (e.g., annual-2025.md -> 2025)
@@ -139,39 +153,41 @@ export async function parseAnnualObjectives(filePath) {
   // Recalculate KR progress from current/target (overrides manual Progress field)
   for (const obj of objectives) {
     for (const kr of obj.keyResults) {
-      if (kr.target > 0) {
-        if (kr.direction === 'decrease') {
-          // For decrease goals (e.g., weight loss, cost reduction)
-          if (kr.current <= kr.target) {
-            // Already at or below target = 100% complete
-            kr.progress = 100;
-          } else if (kr.baseline !== null && kr.baseline > kr.target) {
-            // Has baseline: calculate progress from baseline to target
-            // Example: baseline=230, current=225, target=220
-            // Progress = (230-225)/(230-220) * 100 = 50%
-            const totalDistance = kr.baseline - kr.target;
-            const progressDistance = kr.baseline - kr.current;
-            kr.progress = Math.max(0, Math.min(100, Math.round((progressDistance / totalDistance) * 100)));
-          } else {
-            // No valid baseline: can't calculate progress
-            // Show 0% if above target, 100% if at target
-            kr.progress = 0;
-          }
+      // Calculate progress for both increase and decrease goals
+      // NOTE: target can be 0 for decrease goals (e.g., pay off debt completely)
+      if (kr.direction === 'decrease') {
+        // For decrease goals (e.g., weight loss, cost reduction, debt payoff)
+        if (kr.current <= kr.target) {
+          // Already at or below target = 100% complete
+          kr.progress = 100;
+        } else if (kr.baseline !== null && kr.baseline > kr.target) {
+          // Has baseline: calculate progress from baseline to target
+          // Example: baseline=230, current=225, target=220
+          // Progress = (230-225)/(230-220) * 100 = 50%
+          // Example: baseline=30000, current=30000, target=0
+          // Progress = (30000-30000)/(30000-0) * 100 = 0%
+          const totalDistance = kr.baseline - kr.target;
+          const progressDistance = kr.baseline - kr.current;
+          kr.progress = Math.max(0, Math.min(100, Math.round((progressDistance / totalDistance) * 100)));
         } else {
-          // Default: increase goals (higher is better)
-          if (kr.baseline !== null && kr.baseline !== undefined && kr.baseline < kr.target) {
-            // Has baseline: calculate progress from baseline to target
-            // Example: baseline=50k, current=75k, target=100k
-            // Progress = (75k-50k)/(100k-50k) * 100 = 50%
-            const totalDistance = kr.target - kr.baseline;
-            const progressDistance = kr.current - kr.baseline;
-            kr.progress = Math.max(0, Math.min(100, Math.round((progressDistance / totalDistance) * 100)));
-          } else {
-            // No baseline: calculate from 0 to target
-            kr.progress = Math.round((kr.current / kr.target) * 100);
-            // Cap at 100%
-            if (kr.progress > 100) kr.progress = 100;
-          }
+          // No valid baseline: can't calculate progress
+          // Show 0% if above target, 100% if at target
+          kr.progress = 0;
+        }
+      } else if (kr.target > 0) {
+        // Increase goals (higher is better) - target must be > 0 to avoid division by zero
+        if (kr.baseline !== null && kr.baseline !== undefined && kr.baseline < kr.target) {
+          // Has baseline: calculate progress from baseline to target
+          // Example: baseline=50k, current=75k, target=100k
+          // Progress = (75k-50k)/(100k-50k) * 100 = 50%
+          const totalDistance = kr.target - kr.baseline;
+          const progressDistance = kr.current - kr.baseline;
+          kr.progress = Math.max(0, Math.min(100, Math.round((progressDistance / totalDistance) * 100)));
+        } else {
+          // No baseline: calculate from 0 to target
+          kr.progress = Math.round((kr.current / kr.target) * 100);
+          // Cap at 100%
+          if (kr.progress > 100) kr.progress = 100;
         }
       }
     }
@@ -223,7 +239,7 @@ export async function parseAllAnnualObjectives(objectivesDir) {
  * @param {string} plansDir - Path to plans directory (for aligning week boundaries)
  */
 export async function parseProgressSummary(filePath, plansDir) {
-  const content = await fs.readFile(filePath, 'utf-8');
+  const content = await safeReadFile(filePath);
   const lines = content.split('\n');
 
   const summary = {
@@ -320,7 +336,7 @@ async function calculateWeeklyWins(wins, numWeeks, plansDir) {
 
     // Parse date ranges from plan files
     for (const file of planFiles.slice(0, numWeeks)) {
-      const content = await fs.readFile(`${plansDir}/${file}`, 'utf-8');
+      const content = await safeReadFile(`${plansDir}/${file}`);
       const titleMatch = content.match(/# Weekly Plan: (.+?) to (.+)/);
 
       if (titleMatch) {
@@ -408,7 +424,7 @@ async function calculateWeeklyWins(wins, numWeeks, plansDir) {
  * Parse completed items file
  */
 export async function parseCompletedItems(filePath) {
-  const content = await fs.readFile(filePath, 'utf-8');
+  const content = await safeReadFile(filePath);
   const lines = content.split('\n');
 
   const objectives = [];
@@ -473,7 +489,7 @@ export async function parseWeeklyPlans(plansDir) {
   const plans = [];
 
   for (const file of planFiles) {
-    const content = await fs.readFile(`${plansDir}/${file}`, 'utf-8');
+    const content = await safeReadFile(`${plansDir}/${file}`);
     const lines = content.split('\n');
 
     const plan = {
@@ -608,7 +624,7 @@ export async function generateDashboardData(objectives, progressSummary, complet
  */
 export async function parseCheckinHistory(filePath) {
   try {
-    const content = await fs.readFile(filePath, 'utf-8');
+    const content = await safeReadFile(filePath);
     const lines = content.split('\n');
 
     const checkins = [];
