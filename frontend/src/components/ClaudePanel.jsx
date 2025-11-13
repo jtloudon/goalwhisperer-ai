@@ -152,6 +152,7 @@ function ClaudePanel() {
             ...newMessages,
             { role: 'assistant', content: result.data.message },
           ]);
+          playBeep(); // Play notification sound when response is ready
         } else {
           setError(result.error || 'Failed to get response from Claude');
         }
@@ -194,6 +195,7 @@ function ClaudePanel() {
           ...newMessages,
           { role: 'assistant', content: result.data.message },
         ]);
+        playBeep(); // Play notification sound when response is ready
       } else {
         setError(result.error || 'Failed to get response from Claude');
       }
@@ -202,6 +204,29 @@ function ClaudePanel() {
       setError('Failed to connect to Claude. Make sure your API key is configured.');
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  // Play notification beep when Claude responds
+  function playBeep() {
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 400; // Frequency in Hz (higher = higher pitch)
+      oscillator.type = 'sine'; // Smooth sine wave tone
+
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime); // Volume (0-1)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15); // Fade out
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.15); // Duration: 150ms
+    } catch (error) {
+      console.error('Failed to play beep:', error);
     }
   }
 
@@ -278,6 +303,17 @@ function ClaudePanel() {
         setIsRecording(false);
         if (recordingIntervalRef.current) {
           clearInterval(recordingIntervalRef.current);
+        }
+
+        // Auto-send the transcribed text
+        if (finalTranscriptAccumulator.trim()) {
+          // Trigger form submission
+          setTimeout(() => {
+            const form = document.querySelector('.claude-input-form');
+            if (form) {
+              form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            }
+          }, 100);
         }
       };
 
@@ -407,8 +443,8 @@ function ClaudePanel() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Persistent quick actions - only show after initial greeting */}
-      {!isInitializing && messages.length > 1 && (
+      {/* Persistent quick actions - always show after greeting loads */}
+      {!isInitializing && messages.length > 0 && (
         <div className="persistent-actions">
           <button
             className="persistent-pill"

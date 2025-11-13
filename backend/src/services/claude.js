@@ -236,7 +236,7 @@ const tools = [
   },
   {
     name: 'remove_actions_from_weekly_plan',
-    description: 'Remove specific actions from a weekly plan by their action numbers. Use this when the user wants to delete or remove specific actions from a week. Examples: "remove action 3 from this week", "delete actions 2 and 5 from week of Oct 31". IMPORTANT: Action numbers are 1-indexed (first action is 1, not 0) and correspond to the order shown in the UI.',
+    description: 'Remove specific actions from a weekly plan by their action numbers. CRITICAL: You MUST call this tool when user asks to delete/remove/cancel actions - do NOT just acknowledge without calling the tool. Use this when the user wants to delete or remove specific actions from a week. Examples: "remove action 3 from this week" → MUST call tool with actionNumbers: [3], "delete actions 2 and 5 from week of Oct 31" → MUST call tool with actionNumbers: [2, 5], "I decided not to do action 2" → MUST call tool with actionNumbers: [2]. IMPORTANT: Action numbers are 1-indexed (first action is 1, not 0) and correspond to the order shown in the UI.',
     input_schema: {
       type: 'object',
       properties: {
@@ -261,7 +261,7 @@ const tools = [
         updates: {
           type: 'object',
           properties: {
-            title: { type: 'string', description: 'REQUIRED when completing/uncompleting. To COMPLETE: "[DONE] " + full original title (e.g., if action is "Research banks", pass "[DONE] Research banks"). To UNCOMPLETE: just the title without [DONE] prefix. CRITICAL: You must provide the COMPLETE title with [DONE] prepended - do not abbreviate or summarize.' },
+            title: { type: 'string', description: 'New action title. THREE USE CASES: (1) RETITLE/CHANGE: When user asks to "change title", "retitle", "rename", or "update action name", use the EXACT new title they specify. Example: "retitle to X" means title="X". (2) COMPLETE: To mark done, use "[DONE] " + existing title. Example: existing="Research banks" → "[DONE] Research banks". (3) UNCOMPLETE: Remove [DONE] prefix. CRITICAL: Do NOT use old title when user explicitly requests a new title!' },
             mapsTo: { type: 'string', description: 'Optional: New mapsTo value (e.g., "KR 1.2")' },
             description: { type: 'string', description: 'Optional: New description' },
           },
@@ -524,13 +524,14 @@ CRITICAL RULES FOR TOOL USAGE:
 1. You MUST actually invoke tools when the user requests changes - simply saying "I've done it" is NEVER acceptable
 2. ALWAYS wait for tool result confirmation before responding to the user
 3. NEVER tell the user you've made a change unless you actually called a tool and received a success response
-4. Action numbers are 1-indexed (first action = 1) matching what the user sees in the UI
-5. When user says "remove action 6 and 7" → call remove_actions_from_weekly_plan with actionNumbers: [6, 7]
-6. To add a single action to existing plan → use add_action_to_weekly_plan (NOT update_weekly_plan)
-7. Only use update_weekly_plan when user wants to completely rewrite all actions for a week
-8. ALL KEY RESULTS MUST have numeric 'target' values (not "N/A" or strings like "3%") - the UI requires this to display progress
-9. When user wants to change a target value that's embedded in the KR title (e.g., "by 2%" → "by 3%"), you MUST update BOTH the title AND the target field
-10. KEY RESULT DIRECTION & BASELINE: All KRs MUST have both "direction" and "baseline" fields:
+4. When user asks to DELETE/REMOVE/CANCEL actions → MUST call remove_actions_from_weekly_plan tool with actionNumbers array (e.g., [2] or [2, 5])
+5. When user asks to COMPLETE/MARK DONE actions → MUST call update_action_in_weekly_plan tool with [DONE] prefix in title
+6. Action numbers are 1-indexed (first action = 1) matching what the user sees in the UI
+7. To add a single action to existing plan → use add_action_to_weekly_plan (NOT update_weekly_plan)
+8. Only use update_weekly_plan when user wants to completely rewrite all actions for a week
+9. ALL KEY RESULTS MUST have numeric 'target' values (not "N/A" or strings like "3%") - the UI requires this to display progress
+10. When user wants to change a target value that's embedded in the KR title (e.g., "by 2%" → "by 3%"), you MUST update BOTH the title AND the target field
+11. KEY RESULT DIRECTION & BASELINE: All KRs MUST have both "direction" and "baseline" fields:
     - BASELINE IS REQUIRED FOR ALL KEY RESULTS - it enables proper progress visualization in the UI
     - "increase" (DEFAULT): Higher is better - progress grows toward target (e.g., revenue, customers, skills)
       * For increase goals, baseline is typically 0 (starting from zero)
@@ -696,20 +697,23 @@ export async function getCompletion(prompt, context = {}) {
 }
 
 /**
- * Generate a contextual greeting based on whether user is new or returning
+ * Generate a contextual greeting - always shows persistent action buttons
  * @param {boolean} hasObjectives - Whether user has objectives set up
  * @param {Object} context - Current objectives and progress data
  * @returns {Object} Greeting message with suggested actions
  */
 export function generateGreeting(hasObjectives, context = {}) {
+  // Always show persistent buttons - simpler and consistent UX
+  const persistentActions = [
+    { label: "My Progress", value: "status", type: "primary", description: "See current progress (<1 min)" },
+    { label: "Weekly Check-in", value: "checkin", type: "primary", description: "Weekly check-in (10-15 min)" }
+  ];
+
   if (!hasObjectives) {
-    // First-time user
+    // First-time user - encourage setup but still show persistent buttons
     return {
-      message: "Hi! I'm your AI OKR Coach.\n\nLooks like you're new here! I can help you set up a goal tracking system using the OKR (Objectives and Key Results) framework.\n\nWould you like me to guide you through setting up your first objectives?",
-      suggestedActions: [
-        { label: "Yes, let's set up", value: "setup", type: "primary" },
-        { label: "Not now", value: "cancel", type: "secondary" }
-      ],
+      message: "Hi! I'm your AI OKR Coach.\n\nLooks like you're new here! I can help you set up a goal tracking system using the OKR (Objectives and Key Results) framework.\n\nI can help you:\n- Check your progress and see how you're tracking\n- Do a weekly check-in (review what's done, plan next week)\n- Update key results, mark actions complete, or adjust goals\n\nWhat would you like to do?",
+      suggestedActions: persistentActions,
       isFirstTime: true
     };
   }
@@ -723,11 +727,7 @@ export function generateGreeting(hasObjectives, context = {}) {
 
   return {
     message: `Hi! I'm your AI OKR Coach.\n\nYou have ${totalObjectives} active objective${totalObjectives !== 1 ? 's' : ''} (${overallProgress}% overall progress).\n\nI can help you:\n- Check your progress and see how you're tracking\n- Do a weekly check-in (review what's done, plan next week)\n- Update key results, mark actions complete, or adjust goals\n\nWhat would you like to do?`,
-    suggestedActions: [
-      { label: "My Progress", value: "status", type: "primary", description: "See current progress (<1 min)" },
-      { label: "Weekly Check-in", value: "checkin", type: "primary", description: "Weekly check-in (10-15 min)" },
-      { label: "Something else", value: "chat", type: "secondary", description: "Ask me anything" }
-    ],
+    suggestedActions: persistentActions,
     isFirstTime: false,
     context: {
       totalObjectives,

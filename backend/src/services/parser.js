@@ -291,9 +291,12 @@ export async function parseProgressSummary(filePath, plansDir) {
       .filter(line => line.trim().startsWith('-'))
       .map(line => {
         const text = line.replace(/^-\s*/, '').trim();
-        const dateMatch = text.match(/\[(\d{4}-\d{2}-\d{2})\]$/);
+        // Strip out the metadata comment (<!-- source: X -->) for display
+        // Use [\w-]+ to match source names with hyphens like "weekly-action", "kr-complete", etc.
+        const cleanText = text.replace(/<!--\s*source:\s*[\w-]+\s*-->/, '').trim();
+        const dateMatch = cleanText.match(/\[(\d{4}-\d{2}-\d{2})\]$/);
         return {
-          text,
+          text: cleanText,
           date: dateMatch ? dateMatch[1] : null
         };
       });
@@ -326,82 +329,77 @@ export async function parseProgressSummary(filePath, plansDir) {
 async function calculateWeeklyWins(wins, numWeeks, plansDir) {
   const weeks = [];
 
-  // Read actual weekly plan files to get real week boundaries
+  // Generate the last numWeeks calendar weeks from today (ensures consistent timeline)
+  const now = new Date();
+
+  // First, calculate all weeks we want to show (going backward from current week)
+  const calculatedWeeks = [];
+  for (let i = numWeeks - 1; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - (i * 7));
+
+    // Get Monday of this week
+    const dayOfWeek = date.getDay();
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - daysToMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    // Get Sunday of this week
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    calculatedWeeks.push({
+      weekStart: monday.toISOString().split('T')[0],
+      weekEnd: sunday.toISOString().split('T')[0],
+      count: 0
+    });
+  }
+
+  // Now try to overlay actual plan file data if it exists
   try {
     const files = await fs.readdir(plansDir);
-    const planFiles = files
-      .filter(f => f.match(/plan-\d{4}-\d{2}-\d{2}\.md$/))
-      .sort()
-      .reverse(); // Most recent first
+    const planFiles = files.filter(f => f.match(/plan-\d{4}-\d{2}-\d{2}\.md$/));
 
-    // Parse date ranges from plan files
-    for (const file of planFiles.slice(0, numWeeks)) {
-      const content = await safeReadFile(`${plansDir}/${file}`);
-      const titleMatch = content.match(/# Weekly Plan: (.+?) to (.+)/);
+    // For each calculated week, check if a plan file exists for that week
+    for (const calcWeek of calculatedWeeks) {
+      let foundPlanFile = false;
 
-      if (titleMatch) {
-        weeks.push({
-          weekStart: titleMatch[1],
-          weekEnd: titleMatch[2],
-          count: 0
-        });
+      for (const file of planFiles) {
+        const fileDate = file.match(/plan-(\d{4}-\d{2}-\d{2})\.md$/)[1];
+
+        // Check if this plan file's date falls within the calculated week
+        const planFileDate = new Date(fileDate + 'T00:00:00');
+        const weekStart = new Date(calcWeek.weekStart + 'T00:00:00');
+        const weekEnd = new Date(calcWeek.weekEnd + 'T23:59:59');
+
+        if (planFileDate >= weekStart && planFileDate <= weekEnd) {
+          // Read the actual date range from the plan file
+          const content = await safeReadFile(`${plansDir}/${file}`);
+          const titleMatch = content.match(/# Weekly Plan: (.+?) to (.+)/);
+
+          if (titleMatch) {
+            weeks.push({
+              weekStart: titleMatch[1],
+              weekEnd: titleMatch[2],
+              count: 0
+            });
+            foundPlanFile = true;
+            break;
+          }
+        }
       }
-    }
 
-    // If we don't have enough plan files, fill in with calculated weeks
-    if (weeks.length < numWeeks) {
-      const now = new Date();
-      const weeksNeeded = numWeeks - weeks.length;
-
-      for (let i = 0; i < weeksNeeded; i++) {
-        const date = new Date(now);
-        date.setDate(date.getDate() - ((weeks.length + i) * 7));
-
-        // Get Monday of this week
-        const dayOfWeek = date.getDay();
-        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-        const monday = new Date(date);
-        monday.setDate(date.getDate() - daysToMonday);
-        monday.setHours(0, 0, 0, 0);
-
-        // Get Sunday of this week
-        const sunday = new Date(monday);
-        sunday.setDate(monday.getDate() + 6);
-
-        weeks.push({
-          weekStart: monday.toISOString().split('T')[0],
-          weekEnd: sunday.toISOString().split('T')[0],
-          count: 0
-        });
+      // If no plan file found for this week, use calculated week
+      if (!foundPlanFile) {
+        weeks.push(calcWeek);
       }
     }
   } catch (err) {
     console.error('Error reading plan files for week boundaries:', err);
     // Fallback to calculated weeks if we can't read plan files
-    const now = new Date();
-    for (let i = numWeeks - 1; i >= 0; i--) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - (i * 7));
-
-      const dayOfWeek = date.getDay();
-      const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-      const monday = new Date(date);
-      monday.setDate(date.getDate() - daysToMonday);
-      monday.setHours(0, 0, 0, 0);
-
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
-
-      weeks.push({
-        weekStart: monday.toISOString().split('T')[0],
-        weekEnd: sunday.toISOString().split('T')[0],
-        count: 0
-      });
-    }
+    weeks.push(...calculatedWeeks);
   }
-
-  // Reverse to get chronological order (oldest first)
-  weeks.reverse();
 
   // Count wins per week
   wins.forEach(win => {

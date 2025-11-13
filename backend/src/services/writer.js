@@ -1147,17 +1147,37 @@ export async function addWin(filePath, winDescription, source = 'manual') {
       };
     }
 
-    // Check for similar wins (70%+ similarity) from same source
+    // Check for KR-specific duplicates (e.g., "KR 2.1" mentioned in both)
+    const krPattern = /kr\s*(\d+\.\d+)/i;
+    const newWinKR = normalizedNewWin.match(krPattern);
+    if (newWinKR) {
+      const sameKRWin = todaysWins.find(w => {
+        const existingKR = w.text.match(krPattern);
+        return existingKR && existingKR[1] === newWinKR[1];
+      });
+
+      if (sameKRWin) {
+        return {
+          success: true,
+          message: `Win for KR ${newWinKR[1]} already recorded today`,
+          duplicate: true,
+          reason: 'kr-duplicate'
+        };
+      }
+    }
+
+    // Check for similar wins (70%+ similarity) regardless of source to prevent duplicates
+    // This catches action duplicates and other non-KR wins
     const SIMILARITY_THRESHOLD = 0.7;
     const similarWin = todaysWins.find(w => {
       const similarity = calculateSimilarity(w.text, normalizedNewWin);
-      return similarity >= SIMILARITY_THRESHOLD && w.source === source;
+      return similarity >= SIMILARITY_THRESHOLD;
     });
 
     if (similarWin) {
       return {
         success: true,
-        message: `Similar win already exists from same source today: "${winDescription}"`,
+        message: `Similar win already exists today: "${winDescription}"`,
         duplicate: true,
         reason: 'similar-match',
         similarity: calculateSimilarity(similarWin.text, normalizedNewWin)

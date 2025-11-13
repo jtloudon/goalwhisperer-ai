@@ -178,22 +178,24 @@
   margin: 0;
 }
 
-/* Week label gradient */
+/* Week label - use solid color instead of gradient to reduce visual noise */
 .week-label {
-  background: linear-gradient(90deg, #d946ef 0%, #6366f1 60%, #5BA3FF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #3b3f4a;
+  font-weight: 600;
+  display: inline-block;
+  text-align: left;
 }
 
-/* Week date in gray */
+/* Week date - same color as label for consistency */
 .week-date {
-  color: #858a94;
+  color: #3b3f4a;
 }
 
 .plan-header h3 {
   margin: 0;
   text-align: left;
+  flex: 0 0 auto;
+  margin-right: auto;
 }
 
 .plan-header-current {
