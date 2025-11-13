@@ -221,6 +221,63 @@ router.post('/claude/chat', async (req, res) => {
 });
 
 /**
+ * POST /api/claude/transcribe
+ * Transcribe audio to text using OpenAI Whisper API
+ * Body: FormData with 'audio' file
+ */
+router.post('/claude/transcribe', async (req, res) => {
+  try {
+    if (!req.files || !req.files.audio) {
+      return res.status(400).json({
+        success: false,
+        error: 'Audio file required'
+      });
+    }
+
+    const audioFile = req.files.audio;
+
+    // Check if OpenAI API key is configured
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({
+        success: false,
+        error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to your .env file.'
+      });
+    }
+
+    // Import OpenAI SDK dynamically
+    const OpenAI = (await import('openai')).default;
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+
+    // Create a File object from the uploaded file
+    const file = new File([audioFile.data], audioFile.name, {
+      type: audioFile.mimetype
+    });
+
+    // Transcribe using Whisper API
+    const transcription = await openai.audio.transcriptions.create({
+      file: file,
+      model: 'whisper-1',
+    });
+
+    res.json({
+      success: true,
+      data: {
+        transcript: transcription.text
+      }
+    });
+
+  } catch (error) {
+    console.error('Transcription error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to transcribe audio'
+    });
+  }
+});
+
+/**
  * POST /api/objectives/add
  * Add a new objective with key results
  * Body: { title, description, keyResults: [{title, status, target, current, progress, targetDate}] }
