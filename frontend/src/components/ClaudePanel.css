@@ -253,15 +253,26 @@
   gap: 0.5rem;
 }
 
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .form-buttons {
   display: flex;
   gap: 0.5rem;
-  justify-content: flex-end;
+  width: 100%;
+}
+
+.form-buttons button[type="submit"] {
+  flex: 1;
+  width: 100%;
 }
 
 .claude-input-form textarea {
   width: 100%;
   padding: 0.75rem;
+  padding-right: 3rem;
   border: 1px solid #d0d0d0;
   border-radius: 8px;
   font-family: inherit;
@@ -304,33 +315,91 @@
   cursor: not-allowed;
 }
 
-/* Voice recording buttons */
-.microphone-btn {
-  padding: 0.6rem 1rem;
-  background: #a855f7;
-  color: white;
+/* Voice icon button inside textarea */
+.voice-icon-btn {
+  position: absolute;
+  right: 0.4rem;
+  bottom: 0.5rem;
+  background: transparent !important;
   border: none;
-  border-radius: 8px;
-  font-size: 1.2rem;
   cursor: pointer;
-  transition: background 0.2s;
+  padding: 0.3rem 0.15rem !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
+  color: #9ca3af !important;
+  transition: color 0.2s;
+  border-radius: 4px;
+  min-width: auto;
+  min-height: auto;
+  outline: none;
 }
 
-.microphone-btn:hover:not(:disabled) {
-  background: #9333ea;
+.voice-icon-btn:focus {
+  outline: none;
+  box-shadow: none;
 }
 
-.microphone-btn:disabled {
-  background: #d1d5db;
+.voice-icon-btn:hover:not(:disabled) {
+  color: #6b7280 !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.voice-icon-btn:disabled {
+  opacity: 0.3;
   cursor: not-allowed;
-  opacity: 0.5;
+  background: transparent !important;
 }
 
+.microphone-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.voice-wave-icon {
+  width: 20px;
+  height: 20px;
+  color: #764ba2 !important;
+  display: block;
+}
+
+/* Animated voice wave bars */
+.wave-bar {
+  transform-origin: center;
+  animation: wave 1.2s ease-in-out infinite;
+}
+
+.wave-bar.bar-1 {
+  animation-delay: 0s;
+}
+
+.wave-bar.bar-2 {
+  animation-delay: 0.1s;
+}
+
+.wave-bar.bar-3 {
+  animation-delay: 0.2s;
+}
+
+.wave-bar.bar-4 {
+  animation-delay: 0.3s;
+}
+
+.wave-bar.bar-5 {
+  animation-delay: 0.4s;
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.5);
+  }
+}
+
+/* Legacy button styles (kept for fallback mode) */
 .stop-recording-btn {
   padding: 0.6rem 1rem;
   background: #ef4444;

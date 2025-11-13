@@ -438,47 +438,50 @@ function ClaudePanel() {
       )}
 
       <form className="claude-input-form" onSubmit={sendMessage}>
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              sendMessage(e);
-            }
-          }}
-          placeholder="Ask me anything about your goals..."
-          rows={3}
-          disabled={isLoading || isRecording}
-        />
+        <div className="input-wrapper">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage(e);
+              }
+            }}
+            placeholder="Ask me anything about your goals..."
+            rows={3}
+            disabled={isLoading || isRecording}
+          />
+          <button
+            type="button"
+            className={`voice-icon-btn ${isRecording ? 'recording' : ''}`}
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={isLoading}
+            title={isRecording ? "Stop recording" : "Speak to chat"}
+          >
+            {isRecording ? (
+              <svg className="voice-wave-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect className="wave-bar bar-1" x="4" y="8" width="2" height="8" rx="1" fill="currentColor"/>
+                <rect className="wave-bar bar-2" x="8" y="5" width="2" height="14" rx="1" fill="currentColor"/>
+                <rect className="wave-bar bar-3" x="12" y="3" width="2" height="18" rx="1" fill="currentColor"/>
+                <rect className="wave-bar bar-4" x="16" y="6" width="2" height="12" rx="1" fill="currentColor"/>
+                <rect className="wave-bar bar-5" x="20" y="9" width="2" height="6" rx="1" fill="currentColor"/>
+              </svg>
+            ) : (
+              <svg className="microphone-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14Z" fill="currentColor"/>
+                <path d="M17 11C17 13.76 14.76 16 12 16C9.24 16 7 13.76 7 11H5C5 14.53 7.61 17.43 11 17.92V21H13V17.92C16.39 17.43 19 14.53 19 11H17Z" fill="currentColor"/>
+              </svg>
+            )}
+          </button>
+        </div>
         <div className="form-buttons">
-          {isRecording ? (
-            <button
-              type="button"
-              className="stop-recording-btn"
-              onClick={stopRecording}
-            >
-              {useWebSpeech ? '⏹ Stop Speaking' : `⏹ Stop Recording (${recordingTime}s)`}
-            </button>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="microphone-btn"
-                onClick={startRecording}
-                disabled={isLoading}
-                title={useWebSpeech ? "Speak to chat (real-time)" : "Record voice message"}
-              >
-                🎤
-              </button>
-              <button
-                type="submit"
-                disabled={isLoading || !input.trim()}
-              >
-                Send
-              </button>
-            </>
-          )}
+          <button
+            type="submit"
+            disabled={isLoading || !input.trim()}
+          >
+            Send
+          </button>
         </div>
       </form>
     </aside>
