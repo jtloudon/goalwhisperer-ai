@@ -2,19 +2,36 @@
 
 ## Overview
 
-GoalWhisperer AI now supports voice input! You can speak to your AI coach instead of typing, making it easier and faster to update your goals, log wins, and check in on your progress.
+GoalWhisperer AI now supports **real-time voice input**! You can speak to your AI coach instead of typing, making it easier and faster to update your goals, log wins, and check in on your progress.
 
 ## Features
 
-- **Voice Recording**: Click the microphone button to start recording your message
-- **Real-time Transcription**: Audio is transcribed to text using OpenAI's Whisper API
-- **Seamless Integration**: Transcribed text appears in the input field, ready to send
-- **Visual Feedback**: Recording timer shows how long you've been recording
-- **Browser-based**: Uses native browser APIs for audio capture (no plugins required)
+- **🎤 Real-Time Streaming** (Chrome/Edge): Text appears as you speak using Web Speech API - **FREE!**
+- **🔄 Smart Fallback** (Firefox/Safari): Falls back to OpenAI Whisper API for browsers without Web Speech API
+- **⚡ Instant Feedback**: See your words appear in real-time (no waiting for transcription)
+- **💚 Live Indicator**: Green dot shows when streaming is active
+- **🌐 Browser-based**: Uses native browser APIs for audio capture (no plugins required)
+- **📱 Works Everywhere**: Automatically detects best method for your browser
 
 ## Setup Instructions
 
-### 1. Get an OpenAI API Key
+### Quick Start (Chrome/Edge Users - FREE!)
+
+If you're using **Chrome or Edge**, voice input works **immediately with NO setup required**! Just:
+
+1. Click the 🎤 microphone button
+2. Allow microphone access
+3. Start speaking - text appears in real-time!
+
+**Cost:** $0 (completely free)
+
+---
+
+### Full Setup (For Firefox/Safari or Better Accuracy)
+
+If you want voice input to work in **all browsers** or prefer **OpenAI's Whisper** for better accuracy:
+
+#### 1. Get an OpenAI API Key
 
 1. Go to [OpenAI Platform](https://platform.openai.com/)
 2. Sign up or log in to your account
@@ -22,7 +39,7 @@ GoalWhisperer AI now supports voice input! You can speak to your AI coach instea
 4. Click **Create new secret key**
 5. Copy the key (it starts with `sk-...`)
 
-### 2. Configure Your Environment
+#### 2. Configure Your Environment
 
 Add your OpenAI API key to the backend `.env` file:
 
@@ -32,11 +49,11 @@ Add your OpenAI API key to the backend `.env` file:
 # Existing keys
 ANTHROPIC_API_KEY=your-claude-api-key-here
 
-# Add this new key for voice transcription
+# Add this new key for voice transcription fallback
 OPENAI_API_KEY=your-openai-api-key-here
 ```
 
-### 3. Install Dependencies
+#### 3. Install Dependencies
 
 If you haven't already installed the new dependencies:
 
@@ -45,7 +62,7 @@ cd backend
 npm install
 ```
 
-### 4. Restart the Server
+#### 4. Restart the Server
 
 ```bash
 # From the root directory
@@ -61,11 +78,21 @@ npm run dev
 
 ## How to Use
 
+### Real-Time Mode (Chrome/Edge)
+
+1. **Click the Microphone Button** (🎤) in the chat interface
+2. **Allow Microphone Access** when prompted by your browser
+3. **Start Speaking** - text appears in real-time as you talk! 🎉
+4. **Click "Stop Speaking"** when you're done
+5. **Review and Send** - edit if needed, then click Send
+
+### Fallback Mode (Firefox/Safari)
+
 1. **Click the Microphone Button** (🎤) in the chat interface
 2. **Allow Microphone Access** when prompted by your browser
 3. **Speak Your Message** - talk naturally about your goals
-4. **Click "Stop Recording"** when you're done
-5. **Wait for Transcription** - your speech will be converted to text
+4. **Click "Stop Recording"** when you're done (timer shows duration)
+5. **Wait for Transcription** - ~2-4 seconds using OpenAI Whisper
 6. **Review and Send** - the text appears in the input field, edit if needed, then click Send
 
 ## Example Use Cases
@@ -77,21 +104,38 @@ npm run dev
 
 ## Browser Compatibility
 
-The voice feature works in modern browsers with MediaRecorder API support:
+### Real-Time Streaming (Web Speech API)
+
+- ✅ **Chrome 25+** - Real-time streaming, FREE
+- ✅ **Edge 79+** - Real-time streaming, FREE
+- ❌ Firefox - Falls back to OpenAI Whisper
+- ❌ Safari - Falls back to OpenAI Whisper
+
+### Fallback Mode (OpenAI Whisper API)
 
 - ✅ Chrome 47+
 - ✅ Firefox 25+
 - ✅ Edge 79+
 - ✅ Safari 14.1+
-- ⚠️ **Requires HTTPS** (or localhost for development)
+
+**All browsers require HTTPS** (or localhost for development)
 
 ## Cost Considerations
 
-Voice transcription uses OpenAI's Whisper API:
+### Chrome/Edge Users (Web Speech API)
+
+- **Cost**: **$0.00 - Completely FREE!** 🎉
+- **No API key needed**
+- **Unlimited usage**
+
+### Firefox/Safari Users (OpenAI Whisper Fallback)
 
 - **Cost**: $0.006 per minute of audio
 - **Example**: 15 minutes/day = ~$2.70/month
 - **Billing**: Charged to your OpenAI account
+- **Required**: OpenAI API key in `.env` file
+
+**Recommendation:** Use Chrome or Edge for free, real-time voice input!
 
 ## Troubleshooting
 
@@ -130,21 +174,56 @@ Voice transcription uses OpenAI's Whisper API:
 
 ## Technical Details
 
+### Hybrid Architecture
+
+The app **automatically detects** which method to use:
+
+#### Mode 1: Web Speech API (Chrome/Edge)
+
+- **Detection**: Checks for `window.webkitSpeechRecognition` or `window.SpeechRecognition`
+- **Streaming**: Real-time continuous recognition with interim results
+- **Latency**: ~200-500ms (instant feel)
+- **Cost**: $0 (Google's free service)
+- **Privacy**: Audio sent to Google servers
+
+#### Mode 2: OpenAI Whisper Fallback (Firefox/Safari)
+
+- **Trigger**: When Web Speech API not available
+- **Recording**: Uses `MediaRecorder` API
+- **Processing**: Audio uploaded to backend → OpenAI Whisper API
+- **Latency**: ~2-4 seconds for transcription
+- **Cost**: $0.006/minute
+- **Privacy**: Audio sent to OpenAI servers
+
 ### Frontend Implementation
 
 - **Component**: `frontend/src/components/ClaudePanel.jsx`
 - **Styling**: `frontend/src/components/ClaudePanel.css`
-- **Audio API**: Native `MediaRecorder` API
-- **Audio Format**: WebM (browser default)
+- **Detection Logic**: Checks browser capabilities on mount
+- **Real-Time Updates**: `setInput()` called on interim/final results
 
-### Backend Implementation
+### Backend Implementation (Fallback Only)
 
 - **Endpoint**: `POST /api/claude/transcribe`
 - **Middleware**: `express-fileupload` for audio uploads
 - **Transcription**: OpenAI Whisper API (`whisper-1` model)
 - **Max File Size**: 50MB
 
-### Architecture Flow
+### Architecture Flow (Real-Time Mode)
+
+```
+User clicks 🎤
+    ↓
+Web Speech API starts listening
+    ↓
+User speaks → Text appears in real-time! ✨
+    ↓
+User clicks "Stop Speaking"
+    ↓
+User reviews and sends to Claude
+```
+
+### Architecture Flow (Fallback Mode)
 
 ```
 User clicks 🎤

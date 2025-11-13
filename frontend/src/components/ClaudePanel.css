@@ -342,10 +342,23 @@
   transition: background 0.2s;
   animation: pulse 1.5s infinite;
   flex: 1;
+  position: relative;
 }
 
 .stop-recording-btn:hover {
   background: #dc2626;
+}
+
+/* Add a subtle "live" indicator for Web Speech API mode */
+.stop-recording-btn::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  animation: blink 1s infinite;
 }
 
 @keyframes pulse {
@@ -354,6 +367,15 @@
   }
   50% {
     opacity: 0.75;
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
   }
 }
 

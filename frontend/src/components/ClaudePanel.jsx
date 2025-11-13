@@ -14,9 +14,22 @@ function ClaudePanel() {
   // Voice recording state
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [useWebSpeech, setUseWebSpeech] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const recordingIntervalRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  // Check for Web Speech API support
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      setUseWebSpeech(true);
+      console.log('✅ Web Speech API available - using real-time streaming');
+    } else {
+      console.log('⚠️ Web Speech API not available - using OpenAI Whisper fallback');
+    }
+  }, []);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -194,6 +207,90 @@ function ClaudePanel() {
 
   // Voice recording functions
   async function startRecording() {
+    if (useWebSpeech) {
+      // Use Web Speech API for real-time streaming
+      startWebSpeechRecognition();
+    } else {
+      // Fall back to MediaRecorder + OpenAI Whisper
+      startMediaRecording();
+    }
+  }
+
+  function startWebSpeechRecognition() {
+    try {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsRecording(true);
+        setRecordingTime(0);
+        setError(null);
+
+        // Timer for recording duration
+        recordingIntervalRef.current = setInterval(() => {
+          setRecordingTime(prev => prev + 1);
+        }, 1000);
+      };
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        // Update input with the transcript (real-time!)
+        if (finalTranscript) {
+          setInput(prev => prev + finalTranscript);
+        } else if (interimTranscript) {
+          // Show interim results (will be replaced by final)
+          setInput(prev => {
+            const lastFinalIndex = prev.lastIndexOf(' ');
+            const baseText = lastFinalIndex > 0 ? prev.substring(0, lastFinalIndex + 1) : prev;
+            return baseText + interimTranscript;
+          });
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'no-speech') {
+          setError('No speech detected. Please try again.');
+        } else if (event.error === 'not-allowed') {
+          setError('Microphone access denied. Please check browser permissions.');
+        } else {
+          setError(`Speech recognition error: ${event.error}`);
+        }
+        stopRecording();
+      };
+
+      recognition.onend = () => {
+        if (isRecording) {
+          // User didn't manually stop, restart
+          recognition.start();
+        }
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+
+    } catch (error) {
+      console.error('Web Speech API error:', error);
+      setError('Could not start speech recognition. Please check browser permissions.');
+    }
+  }
+
+  async function startMediaRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
@@ -226,11 +323,17 @@ function ClaudePanel() {
   }
 
   function stopRecording() {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      clearInterval(recordingIntervalRef.current);
+    if (recognitionRef.current && useWebSpeech) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
     }
+
+    if (mediaRecorderRef.current && !useWebSpeech) {
+      mediaRecorderRef.current.stop();
+    }
+
+    setIsRecording(false);
+    clearInterval(recordingIntervalRef.current);
   }
 
   async function transcribeAudio(audioBlob) {
@@ -355,7 +458,7 @@ function ClaudePanel() {
               className="stop-recording-btn"
               onClick={stopRecording}
             >
-              ⏹ Stop Recording ({recordingTime}s)
+              {useWebSpeech ? '⏹ Stop Speaking' : `⏹ Stop Recording (${recordingTime}s)`}
             </button>
           ) : (
             <>
@@ -364,7 +467,7 @@ function ClaudePanel() {
                 className="microphone-btn"
                 onClick={startRecording}
                 disabled={isLoading}
-                title="Record voice message"
+                title={useWebSpeech ? "Speak to chat (real-time)" : "Record voice message"}
               >
                 🎤
               </button>

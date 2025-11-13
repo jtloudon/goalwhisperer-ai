@@ -86,7 +86,7 @@ npm run dev
 
 ### AI Coach (Optional)
 - **💬 Conversational Interface** - Chat with Claude Sonnet 4.5 about your goals
-- **🎤 Voice-to-Text** - Speak to your AI coach instead of typing (NEW!)
+- **🎤 Real-Time Voice Input** - Speak and watch text appear instantly (Chrome/Edge - FREE!) ✨
 - **🤖 Smart Updates** - "Mark action 3 complete", "Update KR 1.2 to 75%"
 - **📝 Weekly Check-ins** - Guided reflection and insights
 - **🎯 Goal Creation** - Natural language objective setting
@@ -152,9 +152,11 @@ The app parses these files and creates beautiful visualizations!
    ```
 3. Restart: `npm run dev`
 
-### Enable Voice-to-Text (Optional)
+### Enable Voice Input (Optional but Awesome!)
 
-Want to speak to your AI coach instead of typing? Enable voice input:
+**Chrome/Edge users:** Voice input works **immediately for FREE!** Just click 🎤 and start talking - text appears in real-time! No setup needed. ✨
+
+**Firefox/Safari users:** Want voice input too? Add OpenAI API key:
 
 1. Get OpenAI API key from https://platform.openai.com/
 2. Add to `backend/.env`:
