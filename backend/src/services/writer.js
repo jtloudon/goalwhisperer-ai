@@ -237,14 +237,14 @@ export async function updateKeyResultProgress(filePath, krId, updates, progressF
 
     // Update current value
     if (updates.current !== undefined) {
-      const currentRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Current\\*\\*: )(\\d+)`, 's');
-      content = content.replace(currentRegex, `$1${updates.current}`);
+      const currentRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Current\\*\\*: )(.+?)\\n`, 's');
+      content = content.replace(currentRegex, `$1${updates.current}\n`);
     }
 
     // Update progress
     if (updates.progress !== undefined) {
-      const progressRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Progress\\*\\*: )(\\d+)%`, 's');
-      content = content.replace(progressRegex, `$1${updates.progress}%`);
+      const progressRegex = new RegExp(`(#### ${markdownKrId}:.*?- \\*\\*Progress\\*\\*: )(.+?)\\n`, 's');
+      content = content.replace(progressRegex, `$1${updates.progress}%\n`);
     }
 
     await fs.writeFile(filePath, content);
