@@ -253,6 +253,12 @@
   gap: 0.5rem;
 }
 
+.form-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
 .claude-input-form textarea {
   width: 100%;
   padding: 0.75rem;
@@ -296,6 +302,59 @@
   background: #e8e8e8;
   color: #764ba2;
   cursor: not-allowed;
+}
+
+/* Voice recording buttons */
+.microphone-btn {
+  padding: 0.6rem 1rem;
+  background: #a855f7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.microphone-btn:hover:not(:disabled) {
+  background: #9333ea;
+}
+
+.microphone-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.stop-recording-btn {
+  padding: 0.6rem 1rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  animation: pulse 1.5s infinite;
+  flex: 1;
+}
+
+.stop-recording-btn:hover {
+  background: #dc2626;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.75;
+  }
 }
 
 .new-chat-pill {

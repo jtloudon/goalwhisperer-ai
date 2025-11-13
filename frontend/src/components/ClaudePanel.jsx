@@ -11,6 +11,13 @@ function ClaudePanel() {
   const [isInitializing, setIsInitializing] = useState(true);
   const messagesEndRef = useRef(null);
 
+  // Voice recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recordingIntervalRef = useRef(null);
+
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -185,6 +192,74 @@ function ClaudePanel() {
     }
   }
 
+  // Voice recording functions
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await transcribeAudio(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingTime(0);
+
+      // Timer for recording duration
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+
+    } catch (error) {
+      console.error('Microphone access denied:', error);
+      setError('Could not access microphone. Please check browser permissions.');
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      clearInterval(recordingIntervalRef.current);
+    }
+  }
+
+  async function transcribeAudio(audioBlob) {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('audio', audioBlob);
+
+      const response = await fetch(`${API_URL}/claude/transcribe`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        // Insert transcribed text into input
+        setInput(result.data.transcript);
+      } else {
+        setError(result.error || 'Transcription failed');
+      }
+    } catch (error) {
+      console.error('Transcription error:', error);
+      setError('Failed to transcribe audio. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <aside className="claude-panel">
       <div className="claude-header">
@@ -271,11 +346,37 @@ function ClaudePanel() {
           }}
           placeholder="Ask me anything about your goals..."
           rows={3}
-          disabled={isLoading}
+          disabled={isLoading || isRecording}
         />
-        <button type="submit" disabled={isLoading || !input.trim()}>
-          Send
-        </button>
+        <div className="form-buttons">
+          {isRecording ? (
+            <button
+              type="button"
+              className="stop-recording-btn"
+              onClick={stopRecording}
+            >
+              ⏹ Stop Recording ({recordingTime}s)
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="microphone-btn"
+                onClick={startRecording}
+                disabled={isLoading}
+                title="Record voice message"
+              >
+                🎤
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+              >
+                Send
+              </button>
+            </>
+          )}
+        </div>
       </form>
     </aside>
   );

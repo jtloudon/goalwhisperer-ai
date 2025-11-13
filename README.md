@@ -86,6 +86,7 @@ npm run dev
 
 ### AI Coach (Optional)
 - **💬 Conversational Interface** - Chat with Claude Sonnet 4.5 about your goals
+- **🎤 Voice-to-Text** - Speak to your AI coach instead of typing (NEW!)
 - **🤖 Smart Updates** - "Mark action 3 complete", "Update KR 1.2 to 75%"
 - **📝 Weekly Check-ins** - Guided reflection and insights
 - **🎯 Goal Creation** - Natural language objective setting
@@ -150,6 +151,20 @@ The app parses these files and creates beautiful visualizations!
    ANTHROPIC_API_KEY=sk-ant-your-key-here
    ```
 3. Restart: `npm run dev`
+
+### Enable Voice-to-Text (Optional)
+
+Want to speak to your AI coach instead of typing? Enable voice input:
+
+1. Get OpenAI API key from https://platform.openai.com/
+2. Add to `backend/.env`:
+   ```bash
+   OPENAI_API_KEY=sk-your-openai-key-here
+   ```
+3. Restart: `npm run dev`
+4. Click the 🎤 microphone button in the chat interface!
+
+**📖 Full setup guide:** See [VOICE_FEATURE.md](VOICE_FEATURE.md) for details, troubleshooting, and cost info.
 
 ### Validate Your Data
 
