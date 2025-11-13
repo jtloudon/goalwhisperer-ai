@@ -6,30 +6,34 @@ GoalWhisperer AI now supports **real-time voice input**! You can speak to your A
 
 ## Features
 
-- **🎤 Real-Time Streaming** (Chrome/Edge): Text appears as you speak using Web Speech API - **FREE!**
-- **🔄 Smart Fallback** (Firefox/Safari): Falls back to OpenAI Whisper API for browsers without Web Speech API
+- **🎤 Real-Time Streaming** (Chrome/Edge/Safari): Text appears as you speak using Web Speech API - **FREE!**
+- **🔄 Smart Fallback** (Firefox only): Falls back to OpenAI Whisper API for browsers without Web Speech API
+- **⚡ Auto-Stop on Silence**: Automatically stops recording when you pause speaking
 - **⚡ Instant Feedback**: See your words appear in real-time (no waiting for transcription)
-- **💚 Live Indicator**: Green dot shows when streaming is active
 - **🌐 Browser-based**: Uses native browser APIs for audio capture (no plugins required)
 - **📱 Works Everywhere**: Automatically detects best method for your browser
 
 ## Setup Instructions
 
-### Quick Start (Chrome/Edge Users - FREE!)
+### Quick Start (Chrome/Edge/Safari - FREE!)
 
-If you're using **Chrome or Edge**, voice input works **immediately with NO setup required**! Just:
+If you're using **Chrome, Edge, or Safari**, voice input works **immediately with NO setup required**! Just:
 
 1. Click the 🎤 microphone button
 2. Allow microphone access
 3. Start speaking - text appears in real-time!
+4. Pause for 2-3 seconds and recording auto-stops
+5. Review and click Send
 
 **Cost:** $0 (completely free)
 
 ---
 
-### Full Setup (For Firefox/Safari or Better Accuracy)
+### Firefox Setup (Untested - OpenAI Whisper Fallback)
 
-If you want voice input to work in **all browsers** or prefer **OpenAI's Whisper** for better accuracy:
+**Note:** The OpenAI Whisper fallback is currently **untested** and only required for Firefox users.
+
+If you want voice input to work in **Firefox**:
 
 #### 1. Get an OpenAI API Key
 
@@ -78,15 +82,17 @@ npm run dev
 
 ## How to Use
 
-### Real-Time Mode (Chrome/Edge)
+### Real-Time Mode (Chrome/Edge/Safari)
 
 1. **Click the Microphone Button** (🎤) in the chat interface
 2. **Allow Microphone Access** when prompted by your browser
 3. **Start Speaking** - text appears in real-time as you talk! 🎉
-4. **Click "Stop Speaking"** when you're done
+4. **Pause for 2-3 seconds** - recording automatically stops when you stop talking
 5. **Review and Send** - edit if needed, then click Send
 
-### Fallback Mode (Firefox/Safari)
+**Note:** You can also manually click "Stop Speaking" if you don't want to wait for auto-stop.
+
+### Fallback Mode (Firefox - Untested)
 
 1. **Click the Microphone Button** (🎤) in the chat interface
 2. **Allow Microphone Access** when prompted by your browser
@@ -104,38 +110,33 @@ npm run dev
 
 ## Browser Compatibility
 
-### Real-Time Streaming (Web Speech API)
+### Real-Time Streaming (Web Speech API) - Tested ✅
 
-- ✅ **Chrome 25+** - Real-time streaming, FREE
-- ✅ **Edge 79+** - Real-time streaming, FREE
-- ❌ Firefox - Falls back to OpenAI Whisper
-- ❌ Safari - Falls back to OpenAI Whisper
-
-### Fallback Mode (OpenAI Whisper API)
-
-- ✅ Chrome 47+
-- ✅ Firefox 25+
-- ✅ Edge 79+
-- ✅ Safari 14.1+
+- ✅ **Chrome 25+** - Real-time streaming, FREE, auto-stop on silence
+- ✅ **Edge 79+** - Real-time streaming, FREE, auto-stop on silence
+- ✅ **Safari 14.1+** - Real-time streaming, FREE, auto-stop on silence
+- ❌ **Firefox** - No Web Speech API support, falls back to OpenAI Whisper (untested)
 
 **All browsers require HTTPS** (or localhost for development)
 
 ## Cost Considerations
 
-### Chrome/Edge Users (Web Speech API)
+### Chrome/Edge/Safari Users (Web Speech API)
 
 - **Cost**: **$0.00 - Completely FREE!** 🎉
 - **No API key needed**
 - **Unlimited usage**
+- **Auto-stop on silence** - natural conversation flow
 
-### Firefox/Safari Users (OpenAI Whisper Fallback)
+### Firefox Users (OpenAI Whisper Fallback - Untested)
 
 - **Cost**: $0.006 per minute of audio
 - **Example**: 15 minutes/day = ~$2.70/month
 - **Billing**: Charged to your OpenAI account
 - **Required**: OpenAI API key in `.env` file
+- **Status**: Currently untested - may require additional setup/debugging
 
-**Recommendation:** Use Chrome or Edge for free, real-time voice input!
+**Recommendation:** Use Chrome, Edge, or Safari for free, tested voice input!
 
 ## Troubleshooting
 

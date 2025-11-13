@@ -221,14 +221,17 @@ function ClaudePanel() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
 
-      recognition.continuous = true;
+      recognition.continuous = false;
       recognition.interimResults = true;
       recognition.lang = 'en-US';
+
+      let finalTranscriptAccumulator = '';
 
       recognition.onstart = () => {
         setIsRecording(true);
         setRecordingTime(0);
         setError(null);
+        finalTranscriptAccumulator = '';
 
         // Timer for recording duration
         recordingIntervalRef.current = setInterval(() => {
@@ -238,28 +241,24 @@ function ClaudePanel() {
 
       recognition.onresult = (event) => {
         let interimTranscript = '';
-        let finalTranscript = '';
+        let newFinalTranscript = '';
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            finalTranscript += transcript + ' ';
+            newFinalTranscript += transcript + ' ';
           } else {
             interimTranscript += transcript;
           }
         }
 
-        // Update input with the transcript (real-time!)
-        if (finalTranscript) {
-          setInput(prev => prev + finalTranscript);
-        } else if (interimTranscript) {
-          // Show interim results (will be replaced by final)
-          setInput(prev => {
-            const lastFinalIndex = prev.lastIndexOf(' ');
-            const baseText = lastFinalIndex > 0 ? prev.substring(0, lastFinalIndex + 1) : prev;
-            return baseText + interimTranscript;
-          });
+        // Accumulate finalized text
+        if (newFinalTranscript) {
+          finalTranscriptAccumulator += newFinalTranscript;
         }
+
+        // Update input: finalized text + current interim text
+        setInput(finalTranscriptAccumulator + interimTranscript);
       };
 
       recognition.onerror = (event) => {
@@ -275,9 +274,10 @@ function ClaudePanel() {
       };
 
       recognition.onend = () => {
-        if (isRecording) {
-          // User didn't manually stop, restart
-          recognition.start();
+        // Auto-stopped due to silence - clean up recording state
+        setIsRecording(false);
+        if (recordingIntervalRef.current) {
+          clearInterval(recordingIntervalRef.current);
         }
       };
 
