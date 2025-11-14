@@ -36,3 +36,7 @@
 
 ## 2025-09-15
 - Completed Italian app Level 1 - all 28 lessons (KR 3.1)
+
+### kr-1.3: Key Result
+- **2025-11-14** ✅ Conduct staff training sessions on espresso techniques and customer service
+

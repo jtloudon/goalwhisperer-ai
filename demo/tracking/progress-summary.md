@@ -19,6 +19,7 @@ Successfully completed 3 out of 4 planned actions (75% completion rate). Strong 
 
 ## Wins This Week 🎉
 
+- Conduct staff training sessions on espresso techniques and customer service [2025-11-14]<!-- source: weekly-action -->
 - Both staff training sessions received excellent feedback from team [2025-11-10]
 - 7-day meditation streak maintained despite busy schedule [2025-11-09]
 - Italian reading comprehension noticeably improved from first book [2025-11-08]
