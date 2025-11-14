@@ -1,6 +1,6 @@
 # GoalWhisperer AI
 
-**Your personal AI-powered goal tracking system.** Track objectives, visualize progress, and get AI coaching—all with local-first privacy and markdown-based data.
+**Talk to an AI coach about your goals—out loud.** Get expert OKR guidance through natural conversation with voice-to-text. Local-first privacy, markdown-based data.
 
 ![GoalWhisperer AI](.github/assets/goalwhisperer-ai.png)
 
@@ -28,50 +28,16 @@ DATA_DIR=./demo npm run dev
 
 You'll see a coffee shop owner's goals—completely fake data to explore features!
 
-#### 🧪 Option A.2: Test New User Experience
-Simulate a brand new user with empty data (for testing or development).
+#### 🚀 Option B: Create Your Goals
+Ready to track your own goals? Just run the app!
 
-```bash
-DATA_DIR=./demo-new-user npm run dev
-# or use the npm script:
-npm run dev:newuser
-```
-
-This runs the app with empty directories to test:
-- New user onboarding flows
-- Automatic file/directory creation
-- Empty state handling
-
-#### 🚀 Option B: Interactive Setup Wizard
-Guided setup that helps you create your first goal.
-
-```bash
-npm run setup
-```
-
-The wizard will:
-- Create your data folder structure
-- Help you write your first objective
-- Set up the AI coach (optional)
-
-Then run:
 ```bash
 npm run dev
 ```
 
-#### 📝 Option C: Manual Setup
-For those who prefer full control.
+**Then open:** http://localhost:5173
 
-```bash
-# 1. Copy demo structure
-cp -r demo personal
-
-# 2. Edit your goals
-nano personal/objectives/annual-2025.md
-
-# 3. Run the app
-npm run dev
-```
+The app will guide you through creating your first objective with an intuitive onboarding flow.
 
 ---
 
@@ -127,6 +93,8 @@ Example objective:
 
 #### KR 1.1: Acquire 100 customers
 - **Status**: in-progress
+- **Direction**: increase
+- **Baseline**: 0
 - **Target**: 100
 - **Current**: 45
 - **Progress**: 45%
@@ -184,19 +152,6 @@ This will show errors like:
 
 ---
 
-## 🎨 Screenshots
-
-### Dashboard View
-Clean overview of objectives, progress, and recent wins.
-
-### AI Coach Panel
-Chat naturally about your goals—"Show my progress" or "Create a new objective".
-
-### Weekly Actions
-See all action items organized by objective with completion tracking.
-
----
-
 ## 💡 Tips & Best Practices
 
 ### Writing Good Objectives
@@ -247,8 +202,7 @@ goalwhisperer-ai/
 │   ├── objectives/
 │   ├── plans/
 │   └── tracking/
-├── scripts/               # Setup & validation tools
-│   ├── setup.js          # Interactive wizard
+├── scripts/               # Validation tools
 │   └── validate-data.js  # Data checker
 └── personal/             # YOUR data (gitignored)
 ```
@@ -264,7 +218,6 @@ npm run dev              # Start both frontend & backend
 npm run dev:frontend     # Frontend only (port 5173)
 npm run dev:backend      # Backend only (port 3001)
 npm run build            # Build for production
-npm run setup            # Interactive setup wizard
 npm run validate         # Check markdown data
 ```
 

@@ -11,7 +11,6 @@
     "dev:newuser": "DATA_DIR=./demo-new-user npm run dev",
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "build": "cd frontend && npm run build",
-    "setup": "node scripts/setup.js",
     "validate": "node scripts/validate-data.js"
   },
   "devDependencies": {

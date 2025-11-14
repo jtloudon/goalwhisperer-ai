@@ -48,7 +48,7 @@ async function validate() {
 
   if (!fs.existsSync(fullPath)) {
     print(`❌ Data directory not found: ${dataDir}`, 'red');
-    print('   Run "npm run setup" to create your data folder.\n', 'yellow');
+    print('   Run "npm run dev" and the app will guide you through creating your first goal.\n', 'yellow');
     process.exit(1);
   }
 
@@ -117,7 +117,7 @@ async function validateObjectives(objDir) {
     const krSections = content.split(/^#### KR \d+\.\d+:/gm).slice(1);
     krSections.forEach((kr, index) => {
       const krNum = index + 1;
-      const requiredFields = ['Status', 'Target', 'Current', 'Progress', 'Target Date'];
+      const requiredFields = ['Status', 'Direction', 'Baseline', 'Target', 'Current', 'Progress', 'Target Date'];
 
       requiredFields.forEach(field => {
         if (!kr.includes(`**${field}**:`)) {
@@ -150,6 +150,25 @@ async function validateObjectives(objDir) {
         const validStatuses = ['in-progress', 'complete', 'blocked'];
         if (!validStatuses.includes(status)) {
           addWarning(file, `KR ${krNum} Status "${status}" should be one of: ${validStatuses.join(', ')}`);
+        }
+      }
+
+      // Check direction values
+      const directionMatch = kr.match(/\*\*Direction\*\*:\s*(.+)/);
+      if (directionMatch) {
+        const direction = directionMatch[1].trim();
+        const validDirections = ['increase', 'decrease'];
+        if (!validDirections.includes(direction)) {
+          addError(file, `KR ${krNum} Direction must be "increase" or "decrease", got: "${direction}"`);
+        }
+      }
+
+      // Check if Baseline is numeric
+      const baselineMatch = kr.match(/\*\*Baseline\*\*:\s*(.+)/);
+      if (baselineMatch) {
+        const baselineValue = baselineMatch[1].trim();
+        if (isNaN(parseFloat(baselineValue))) {
+          addError(file, `KR ${krNum} Baseline must be numeric, got: "${baselineValue}"`);
         }
       }
     });
@@ -210,8 +229,105 @@ async function validateTracking(trackingDir) {
       addWarning('tracking', `Missing ${file}`);
     } else {
       addInfo('tracking', `✓ Found ${file}`);
+
+      // Validate file content
+      const content = fs.readFileSync(filePath, 'utf8');
+
+      if (file === 'completed-items.md') {
+        validateCompletedItems(content, file);
+      } else if (file === 'checkin-history.md') {
+        validateCheckinHistory(content, file);
+      } else if (file === 'progress-summary.md') {
+        validateProgressSummary(content, file);
+      }
     }
   });
+}
+
+function validateCompletedItems(content, file) {
+  // Check for main header
+  if (!content.match(/^# Completed Items/m)) {
+    addWarning(file, 'Missing main header "# Completed Items"');
+  }
+
+  // Check for date sections (## YYYY-MM-DD)
+  const dateSections = content.match(/^## \d{4}-\d{2}-\d{2}/gm);
+  if (!dateSections || dateSections.length === 0) {
+    addWarning(file, 'No date sections found (should be "## YYYY-MM-DD")');
+  } else {
+    addInfo(file, `✓ Found ${dateSections.length} date section(s)`);
+
+    // Validate each date section has items
+    const sections = content.split(/^## \d{4}-\d{2}-\d{2}/gm).slice(1);
+    sections.forEach((section, index) => {
+      const items = section.match(/^- .+/gm);
+      if (!items || items.length === 0) {
+        addWarning(file, `Date section ${index + 1} has no completed items`);
+      }
+    });
+  }
+}
+
+function validateCheckinHistory(content, file) {
+  // Check for main header
+  if (!content.match(/^# Check-in History/m)) {
+    addWarning(file, 'Missing main header "# Check-in History"');
+  }
+
+  // Check for check-in sections
+  const checkins = content.match(/^## Check-in: \d{4}-\d{2}-\d{2} to \d{4}-\d{2}-\d{2}/gm);
+  if (checkins && checkins.length > 0) {
+    addInfo(file, `✓ Found ${checkins.length} check-in(s)`);
+
+    // Validate each check-in has required sections
+    const sections = content.split(/^## Check-in: \d{4}-\d{2}-\d{2} to \d{4}-\d{2}-\d{2}/gm).slice(1);
+    sections.forEach((section, index) => {
+      const checkinNum = index + 1;
+      const requiredSections = ['### What Was Completed', '### Updates Made', '### Next Week Focus', '### Insights'];
+
+      requiredSections.forEach(reqSection => {
+        if (!section.includes(reqSection)) {
+          addWarning(file, `Check-in ${checkinNum} missing section: ${reqSection}`);
+        }
+      });
+
+      // Check for date line
+      if (!section.match(/\*\*Date\*\*: \d{4}-\d{2}-\d{2}/)) {
+        addWarning(file, `Check-in ${checkinNum} missing "**Date**: YYYY-MM-DD" line`);
+      }
+    });
+  }
+}
+
+function validateProgressSummary(content, file) {
+  // Check for main header
+  if (!content.match(/^# Weekly Progress Summary/m)) {
+    addWarning(file, 'Missing main header "# Weekly Progress Summary"');
+  }
+
+  // Check for week sections
+  const weekSections = content.match(/^## Week of \d{4}-\d{2}-\d{2} to \d{4}-\d{2}-\d{2}/gm);
+  if (weekSections && weekSections.length > 0) {
+    addInfo(file, `✓ Found ${weekSections.length} week section(s)`);
+
+    // Validate each week has required sections
+    const sections = content.split(/^## Week of \d{4}-\d{2}-\d{2} to \d{4}-\d{2}-\d{2}/gm).slice(1);
+    sections.forEach((section, index) => {
+      const weekNum = index + 1;
+      const requiredSections = ['### Overview', '### Progress Highlights', '### Statistics'];
+
+      requiredSections.forEach(reqSection => {
+        if (!section.includes(reqSection)) {
+          addWarning(file, `Week ${weekNum} missing section: ${reqSection}`);
+        }
+      });
+
+      // Check for wins section
+      if (!section.includes('## Wins This Week')) {
+        addWarning(file, `Week ${weekNum} missing "## Wins This Week" section`);
+      }
+    });
+  }
 }
 
 function printResults() {
