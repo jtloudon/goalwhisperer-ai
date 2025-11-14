@@ -1,8 +1,22 @@
 # GoalWhisperer AI
 
-**Talk to an AI coach about your goals—out loud.** Get expert OKR guidance through natural conversation with voice-to-text. Local-first privacy, markdown-based data.
+**Talk to an AI coach about your goals - out loud.** Get expert OKR guidance through natural conversation with voice-to-text. Local-first privacy, markdown-based data.
 
 ![GoalWhisperer AI](.github/assets/goalwhisperer-ai.png)
+
+---
+
+## 🎯 The Problem
+
+**Achieving meaningful goals shouldn't require learning complex productivity systems.**
+
+Traditional goal tracking fails because:
+- **Writing is friction** - Updating progress in apps feels like homework, not progress
+- **Systems are rigid** - OKR tools force enterprise workflows for personal goals
+- **Tracking feels mechanical** - Checkboxes and forms don't capture the messy reality of goal work
+- **Reflection gets skipped** - No one wants to type paragraphs about what worked and what didn't
+
+**GoalWhisperer changes this:** Just talk. Out loud. Like you're explaining your week to a coach who actually understands OKRs. The AI listens, asks clarifying questions, updates your progress, and helps you figure out what to focus on next—all through natural conversation.
 
 ---
 
@@ -152,25 +166,31 @@ This will show errors like:
 
 ---
 
-## 💡 Tips & Best Practices
+## 💡 What the AI Coach Does For You
 
-### Writing Good Objectives
-✅ **Good:** "Launch sustainable coffee shop business"
-❌ **Too vague:** "Do business stuff"
+The AI coach actively guides you through the OKR process—no manual expertise required.
 
-### Measurable Key Results
-✅ **Good:** "Acquire 100 customers by Dec 31"
-❌ **Not measurable:** "Get some customers"
+### Refines Vague Goals Into Clear Objectives
+Turns "do business stuff" → "Launch sustainable coffee shop business with measurable milestones"
 
-### Weekly Planning
-- Keep actions to 3-5 per week
-- Map each action to a specific Key Result
-- Mark complete as you finish them
+### Ensures Everything is Measurable
+Catches "get some customers" → Suggests "Acquire 100 customers by Dec 31" with baseline and target
 
-### Using the AI Coach
-- Be specific: "Mark action 2 complete from this week"
-- Ask for help: "What should I focus on this week?"
-- Weekly check-ins: "Let's do my weekly check-in"
+### Keeps You Focused on What Matters
+- Guides weekly planning to 3-5 high-impact actions
+- Maps each action to specific Key Results
+- Prevents overcommitment and scope creep
+
+### Provides Proactive Insights
+- Flags stalled progress and at-risk objectives
+- Celebrates wins and completed Key Results
+- Suggests adjustments based on your check-in history
+- Asks clarifying questions to deepen your strategy
+
+### Example Interactions
+- "Let's do my weekly check-in" → Guided reflection with structured prompts
+- "What should I focus on this week?" → AI analyzes your objectives and suggests priorities
+- "Mark action 2 complete" → Updates progress and asks about blockers or wins
 
 ---
 
@@ -182,6 +202,8 @@ This will show errors like:
 - **Data:** Markdown files (no database!)
 - **Styling:** Vanilla CSS with gradient accents
 
+**📐 System Design:** See [Architecture & Design](docs/architecture.md) for detailed system architecture, design decisions, and data flow diagrams.
+
 ---
 
 ## 📦 Project Structure
@@ -190,21 +212,23 @@ This will show errors like:
 goalwhisperer-ai/
 ├── frontend/              # React application
 │   ├── src/
-│   │   ├── components/    # UI components
-│   │   ├── pages/         # Route pages
+│   │   ├── components/    # UI components (ClaudePanel, WinsTrendline, etc.)
+│   │   ├── pages/         # Route pages (Dashboard, Objectives, Plans)
 │   │   └── App.jsx
 ├── backend/               # API server
 │   ├── src/
+│   │   ├── config/        # Configuration (data paths)
 │   │   ├── routes/        # API endpoints
-│   │   ├── services/      # Parser & AI logic
+│   │   ├── services/      # Parser, AI logic, file writers
 │   │   └── server.js
 ├── demo/                  # Sample data (coffee shop owner)
 │   ├── objectives/
 │   ├── plans/
 │   └── tracking/
+├── demo-new-user/         # Empty state for testing
+├── docs/                  # Documentation (voice feature, markdown guide, API)
 ├── scripts/               # Validation tools
-│   └── validate-data.js  # Data checker
-└── personal/             # YOUR data (gitignored)
+└── personal/              # YOUR data (gitignored)
 ```
 
 ---
@@ -256,25 +280,14 @@ MIT License - Feel free to use this for your own goals!
 ## 👤 Author
 
 **Jesse Loudon**
-- Portfolio project demonstrating full-stack + AI integration
-- [GitHub](https://github.com/jtloudon)
+AI, Analytics & Business Insights
 
----
+This project demonstrates full-stack development with AI integration, applying professional experience in:
+- **Systematic goal management** (OKR methodology used in transformation initiatives)
+- **LLM integration patterns** (conversational interfaces, structured data updates, prompt engineering)
+- **User-centric design** (progressive enhancement, privacy-first architecture)
 
-## 🎯 Why GoalWhisperer?
-
-Traditional goal tracking tools are either:
-- **Too complex** (enterprise OKR software)
-- **Too simple** (todo lists)
-- **Not private** (cloud-only services)
-
-GoalWhisperer gives you:
-✅ **Structure** of OKR methodology
-✅ **Simplicity** of markdown files
-✅ **Intelligence** of AI coaching
-✅ **Privacy** of local-first architecture
-
-**Your goals. Your data. Your machine.**
+[GitHub Profile](https://github.com/jtloudon) | [More Projects](https://github.com/jtloudon?tab=repositories)
 
 ---
 

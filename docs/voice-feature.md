@@ -21,9 +21,10 @@ If you're using **Chrome, Edge, or Safari**, voice input works **immediately wit
 
 1. Click the 🎤 microphone button
 2. Allow microphone access
-3. Start speaking - text appears in real-time!
-4. Pause for 2-3 seconds and recording auto-stops
-5. Review and click Send
+3. Talk naturally - text appears in real-time!
+4. Pause for 2-3 seconds - **message auto-sends to Claude**
+
+**That's it!** No typing, no clicking Send. Just talk like you're explaining your goals to a real coach.
 
 **Cost:** $0 (completely free)
 
@@ -86,11 +87,12 @@ npm run dev
 
 1. **Click the Microphone Button** (🎤) in the chat interface
 2. **Allow Microphone Access** when prompted by your browser
-3. **Start Speaking** - text appears in real-time as you talk! 🎉
-4. **Pause for 2-3 seconds** - recording automatically stops when you stop talking
-5. **Review and Send** - edit if needed, then click Send
+3. **Just talk** - text appears in real-time as you speak! 🎉
+4. **Pause naturally** - after 2-3 seconds of silence, your message **automatically sends** to Claude
 
-**Note:** You can also manually click "Stop Speaking" if you don't want to wait for auto-stop.
+**That's it!** No need to review or click Send. The AI coach handles transcription errors gracefully—just talk like you're explaining to a real person.
+
+**Note:** You can manually click the button again (now showing a wave animation) to stop recording immediately instead of waiting for auto-stop.
 
 ### Fallback Mode (Firefox - Untested)
 
@@ -219,9 +221,9 @@ Web Speech API starts listening
     ↓
 User speaks → Text appears in real-time! ✨
     ↓
-User clicks "Stop Speaking"
+User pauses (2-3 seconds)
     ↓
-User reviews and sends to Claude
+Auto-stop detected → Message auto-sends to Claude! 🚀
 ```
 
 ### Architecture Flow (Fallback Mode)

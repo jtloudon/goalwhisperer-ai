@@ -809,7 +809,7 @@ okr-web-app/
 
 **Tasks:**
 1. Design system documentation
-   - Created comprehensive design-system.md
+   - Created comprehensive ui-design-guide.md
    - Documented colors, typography, shadows, patterns
    - Captured rejected approaches and rationale
 
