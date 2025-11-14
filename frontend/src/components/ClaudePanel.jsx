@@ -20,6 +20,9 @@ function ClaudePanel() {
   const recordingIntervalRef = useRef(null);
   const recognitionRef = useRef(null);
 
+  // Audio notification
+  const audioContextRef = useRef(null);
+
   // Check for Web Speech API support
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -98,6 +101,9 @@ function ClaudePanel() {
   }
 
   async function handleSuggestedAction(actionValue, isFromPersistentPills = false) {
+    // Initialize audio on user interaction (for beep notification)
+    initAudioContext();
+
     // Clear suggested actions only if from initial greeting pills
     if (!isFromPersistentPills) {
       setSuggestedActions([]);
@@ -169,6 +175,9 @@ function ClaudePanel() {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
+    // Initialize audio on user interaction (for beep notification)
+    initAudioContext();
+
     const userMessage = input.trim();
     setInput('');
     setError(null);
@@ -207,10 +216,31 @@ function ClaudePanel() {
     }
   }
 
+  // Initialize AudioContext on first user interaction
+  function initAudioContext() {
+    if (!audioContextRef.current) {
+      try {
+        audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      } catch (error) {
+        console.error('Failed to create AudioContext:', error);
+      }
+    }
+    // Resume if suspended (browser autoplay policy)
+    if (audioContextRef.current?.state === 'suspended') {
+      audioContextRef.current.resume();
+    }
+  }
+
   // Play notification beep when Claude responds
   function playBeep() {
     try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      initAudioContext(); // Ensure AudioContext is ready
+
+      if (!audioContextRef.current) {
+        return;
+      }
+
+      const audioContext = audioContextRef.current;
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 

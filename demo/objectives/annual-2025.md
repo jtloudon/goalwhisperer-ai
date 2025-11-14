@@ -11,6 +11,7 @@
 #### KR 1.1: Secure commercial lease and complete renovations
 - **Status**: complete
 - **Direction**: increase
+- **Baseline**: 0
 - **Target**: 1
 - **Current**: 1
 - **Progress**: 100%
@@ -18,6 +19,8 @@
 
 #### KR 1.2: Build relationships with 5 local suppliers for sustainable sourcing
 - **Status**: in-progress
+- **Direction**: increase
+- **Baseline**: 0
 - **Target**: 5
 - **Current**: 3
 - **Progress**: 60%
@@ -25,6 +28,8 @@
 
 #### KR 1.3: Successfully host grand opening with 200+ attendees
 - **Status**: in-progress
+- **Direction**: increase
+- **Baseline**: 0
 - **Target**: 200
 - **Current**: 0
 - **Progress**: 0%
@@ -50,6 +55,7 @@
 #### KR 2.2: Run a half-marathon by end of year
 - **Status**: in-progress
 - **Direction**: increase
+- **Baseline**: 0
 - **Target**: 1
 - **Current**: 0
 - **Progress**: 75%
@@ -58,6 +64,7 @@
 #### KR 2.3: Meditate 20 minutes daily for 200 days total
 - **Status**: in-progress
 - **Direction**: increase
+- **Baseline**: 0
 - **Target**: 200
 - **Current**: 85
 - **Progress**: 42%
@@ -65,6 +72,8 @@
 
 #### KR 2.4: Complete 50 yoga classes
 - **Status**: in-progress
+- **Direction**: increase
+- **Baseline**: 0
 - **Target**: 50
 - **Current**: 29
 - **Progress**: 58%
@@ -80,6 +89,8 @@
 
 #### KR 3.1: Complete all 6 levels of language learning app
 - **Status**: in-progress
+- **Direction**: increase
+- **Baseline**: 0
 - **Target**: 6
 - **Current**: 2
 - **Progress**: 33%
@@ -87,6 +98,8 @@
 
 #### KR 3.2: Have 30 conversation practice sessions with native speakers
 - **Status**: in-progress
+- **Direction**: increase
+- **Baseline**: 0
 - **Target**: 30
 - **Current**: 8
 - **Progress**: 27%
@@ -94,6 +107,8 @@
 
 #### KR 3.3: Read 3 Italian books for intermediate learners
 - **Status**: in-progress
+- **Direction**: increase
+- **Baseline**: 0
 - **Target**: 3
 - **Current**: 1
 - **Progress**: 33%

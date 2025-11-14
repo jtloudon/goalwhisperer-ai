@@ -79,8 +79,11 @@ function Objectives() {
                   {obj.keyResults.map(kr => (
                     <div key={kr.id} className="key-result">
                       <div className="kr-header">
-                        <span className={`kr-status-indicator status-${kr.status}`}></span>
-                        <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                          <span className={`kr-status-indicator status-${kr.status}`}></span>
+                          <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                        </div>
+                        <span className="kr-target-date">Target: {kr.targetDate}</span>
                       </div>
 
                       {/* Progress bar with baseline/target endpoints and current value */}
@@ -132,22 +135,15 @@ function Objectives() {
                             </div>
                             <span className="progress-endpoint target">{kr.target}</span>
                           </div>
-                          <div className="kr-target-date">Target: {kr.targetDate}</div>
                         </div>
                       ) : (
                         // Fallback for KRs without baseline
-                        <>
-                          <div className="progress-bar">
-                            <div
-                              className="progress-fill"
-                              style={{ width: `${Math.min(kr.progress, 100)}%` }}
-                            />
-                          </div>
-                          <div className="kr-details">
-                            {kr.target > 0 && <span>{kr.current}/{kr.target}</span>}
-                            <span>Target: {kr.targetDate}</span>
-                          </div>
-                        </>
+                        <div className="progress-bar">
+                          <div
+                            className="progress-fill"
+                            style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                          />
+                        </div>
                       )}
                     </div>
                   ))}
@@ -181,8 +177,11 @@ function Objectives() {
                   {obj.keyResults.map(kr => (
                     <div key={kr.id} className="key-result">
                       <div className="kr-header">
-                        <span className={`kr-status-indicator status-${kr.status}`}></span>
-                        <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                          <span className={`kr-status-indicator status-${kr.status}`}></span>
+                          <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                        </div>
+                        <span className="kr-target-date">Target: {kr.targetDate}</span>
                       </div>
 
                       {/* Progress bar with baseline/target endpoints and current value */}
@@ -234,22 +233,15 @@ function Objectives() {
                             </div>
                             <span className="progress-endpoint target">{kr.target}</span>
                           </div>
-                          <div className="kr-target-date">Target: {kr.targetDate}</div>
                         </div>
                       ) : (
                         // Fallback for KRs without baseline
-                        <>
-                          <div className="progress-bar">
-                            <div
-                              className="progress-fill"
-                              style={{ width: `${Math.min(kr.progress, 100)}%` }}
-                            />
-                          </div>
-                          <div className="kr-details">
-                            {kr.target > 0 && <span>{kr.current}/{kr.target}</span>}
-                            <span>Target: {kr.targetDate}</span>
-                          </div>
-                        </>
+                        <div className="progress-bar">
+                          <div
+                            className="progress-fill"
+                            style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                          />
+                        </div>
                       )}
                     </div>
                   ))}
@@ -288,8 +280,11 @@ function Objectives() {
                         {obj.keyResults.map(kr => (
                           <div key={kr.id} className="key-result">
                             <div className="kr-header">
-                              <span className={`kr-status-indicator status-${kr.status}`}></span>
-                              <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                                <span className={`kr-status-indicator status-${kr.status}`}></span>
+                                <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                              </div>
+                              <span className="kr-target-date">Target: {kr.targetDate}</span>
                             </div>
                             <div className="progress-bar">
                               <div
@@ -297,25 +292,16 @@ function Objectives() {
                                 style={{ width: `${Math.min(kr.progress, 100)}%` }}
                               />
                             </div>
-                            <div className="kr-details">
-                              {kr.measurement === 'metric' && kr.target > 0 && (
+                            {kr.target > 0 && (
+                              <div className="kr-details">
                                 <span>
                                   {kr.baseline !== null && kr.baseline !== undefined
                                     ? `${kr.baseline} → ${kr.current} → ${kr.target}`
                                     : `${kr.current}/${kr.target}`
                                   }
                                 </span>
-                              )}
-                              {kr.measurement === 'incremental' && kr.target > 0 && (
-                                <span>
-                                  {kr.baseline !== null && kr.baseline !== undefined
-                                    ? `${kr.baseline} → ${kr.current} → ${kr.target} completed`
-                                    : `${kr.current}/${kr.target} completed`
-                                  }
-                                </span>
-                              )}
-                              <span>Target: {kr.targetDate}</span>
-                            </div>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>

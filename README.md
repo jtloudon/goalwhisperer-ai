@@ -2,7 +2,7 @@
 
 **Your personal AI-powered goal tracking system.** Track objectives, visualize progress, and get AI coaching—all with local-first privacy and markdown-based data.
 
-![GoalWhisperer AI](https://via.placeholder.com/800x400/764ba2/ffffff?text=GoalWhisperer+AI)
+![GoalWhisperer AI](.github/assets/goalwhisperer-ai.png)
 
 ---
 
@@ -86,7 +86,7 @@ npm run dev
 
 ### AI Coach (Optional)
 - **💬 Conversational Interface** - Chat with Claude Sonnet 4.5 about your goals
-- **🎤 Real-Time Voice Input** - Speak and watch text appear instantly (Chrome/Edge - FREE!) ✨
+- **🎤 Real-Time Voice Input** - Speak and watch text appear instantly (Chrome/Edge/Safari - FREE!) ✨
 - **🤖 Smart Updates** - "Mark action 3 complete", "Update KR 1.2 to 75%"
 - **📝 Weekly Check-ins** - Guided reflection and insights
 - **🎯 Goal Creation** - Natural language objective setting
@@ -154,9 +154,9 @@ The app parses these files and creates beautiful visualizations!
 
 ### Enable Voice Input (Optional but Awesome!)
 
-**Chrome/Edge users:** Voice input works **immediately for FREE!** Just click 🎤 and start talking - text appears in real-time! No setup needed. ✨
+**Chrome/Edge/Safari users:** Voice input works **immediately for FREE!** Just click 🎤 and start talking - text appears in real-time! No setup needed. ✨
 
-**Firefox/Safari users:** Want voice input too? Add OpenAI API key:
+**Firefox users only:** Want voice input too? Add OpenAI API key for Whisper fallback:
 
 1. Get OpenAI API key from https://platform.openai.com/
 2. Add to `backend/.env`:
@@ -166,7 +166,7 @@ The app parses these files and creates beautiful visualizations!
 3. Restart: `npm run dev`
 4. Click the 🎤 microphone button in the chat interface!
 
-**📖 Full setup guide:** See [VOICE_FEATURE.md](VOICE_FEATURE.md) for details, troubleshooting, and cost info.
+**📖 Full setup guide:** See [VOICE_FEATURE.md](docs/voice-feature.md) for details, troubleshooting, and cost info.
 
 ### Validate Your Data
 
