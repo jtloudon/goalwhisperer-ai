@@ -80,7 +80,7 @@ section h2 {
 /* Objectives */
 .objective-card {
   background: white;
-  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+  padding: 1rem 1.5rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   margin-bottom: 2rem;
@@ -90,19 +90,55 @@ section h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1rem 0;
+}
+
+/* When objective-header is used as a summary (collapsible) */
+summary.objective-header {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  position: relative;
+  padding-left: 2rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin: 0;
+}
+
+summary.objective-header::-webkit-details-marker {
+  display: none;
+}
+
+/* Caret indicator */
+summary.objective-header::before {
+  content: '▼';
+  position: absolute;
+  left: -1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a855f7;
+  font-size: 1rem;
+  transition: transform 0.2s;
+  z-index: 10;
+}
+
+/* Rotate caret when closed */
+details:not([open]) > summary.objective-header::before {
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+summary.objective-header:hover {
+  background: rgba(168, 85, 247, 0.05);
+  border-radius: 8px;
 }
 
 .objective-header h3 {
   font-size: 1.75rem;
-  margin: 0 0 0.5rem 0;
+  margin: 0;
 }
 
 .objective-label {
-  background: linear-gradient(90deg, #d946ef 0%, #6366f1 60%, #5BA3FF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #a855f7;
 }
 
 .objective-title-text {
@@ -146,7 +182,7 @@ section h2 {
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 1.75rem;
+  font-size: 2.25rem;
   background: linear-gradient(90deg, #d946ef 0%, #6366f1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

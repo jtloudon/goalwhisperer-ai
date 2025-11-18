@@ -1,7 +1,7 @@
 # GoalWhisperer AI - Design System Specification
 
 **Version:** 1.0
-**Last Updated:** November 12, 2025
+**Last Updated:** November 18, 2025
 **Status:** Living Document
 
 > This is the authoritative design system specification for GoalWhisperer AI. All UI components, colors, typography, and patterns should follow these guidelines for consistency.
@@ -56,6 +56,21 @@ filter: blur(12px);
 /* Organic shape attempt abandoned - kept simple symmetric blur at top edge */
 ```
 
+### Background Gradient
+```css
+/* Subtle pastel gradient wash - pink → lavender → blue → cream */
+linear-gradient(135deg,
+  #f8d7ed 0%,
+  #e8dcf5 25%,
+  #dce9f7 50%,
+  #d9f0f5 75%,
+  #fcf4d9 100%
+)
+
+/* Applied to: body element - creates soft, non-competing background */
+/* Design goal: Visible but subtle, doesn't compete with AI Coach for attention */
+```
+
 ### Solid Colors
 
 **Purple (Primary Brand)**
@@ -80,11 +95,9 @@ filter: blur(12px);
 
 ### Objective Titles (Split-Color Pattern)
 ```css
-/* "Objective 1:" - gradient */
+/* "Objective 1:" - solid purple (matches caret) */
 .objective-label {
-  background: linear-gradient(90deg, #d946ef 0%, #6366f1 60%, #5BA3FF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #a855f7;
 }
 
 /* "Establish Director-Level AI Career Identity" - gray */
@@ -101,8 +114,10 @@ filter: blur(12px);
 ### Progress Percentage
 ```css
 .progress-circle {
-  font-size: 1.75rem; /* Matches objective title size */
-  color: gradient; /* Uses brand gradient */
+  font-size: 2.25rem; /* Larger, hero element */
+  background: linear-gradient(90deg, #d946ef 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 ```
 
@@ -330,9 +345,11 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 ### Objectives Page
 **Changed:**
 - Card structure: Triple-nested cards → **Single objective card + individual KR cards**
-- Objective titles: Full gradient → **Split-color** (gradient label + gray text `#858a94`)
+- **Collapsible objectives:** Entire objective header is clickable with purple caret (▼/►) - **default collapsed**
+- **Caret positioning:** Vertically centered to left of objective text
+- Objective titles: **"Objective 1:" in solid purple `#a855f7`** + gray text `#858a94` (removed gradient)
 - Title size: 1.5rem → **1.75rem** (larger, more prominent)
-- Progress %: 2.75rem → **1.75rem** (matches title size)
+- Progress %: 2.75rem → **2.25rem** (larger, more prominent with gradient)
 - Progress bars: 8px → **4px** (thinner, less dominant)
 - Progress gradient: Dusty `#9b7ab8 → #c8b3dc` → **Vibrant `#ec4899 → #a855f7`**
 - Current value bubble: Blue `#5BA3FF` → **Purple `#a855f7`**
@@ -340,6 +357,7 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 - KR titles: 1rem/500 → **0.9rem/400** (hierarchy)
 - Status dots: 10px → **12px with 3px glow rings**
 - Card shadows: `0 2px 8px 0.1` → **`0 1px 3px 0.08`**
+- **Padding optimization:** Reduced card padding for more compact layout
 
 ### Dashboard Page
 **Changed:**
@@ -482,12 +500,13 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 
 ### ✅ Completed Pages:
 1. **Dashboard** - Stats, wins, chart, shadows all updated
-2. **Objectives** - Split-color titles, progress bars, status indicators, shadows
+2. **Objectives** - Split-color titles, collapsible with carets, progress bars, status indicators, shadows
 3. **Weekly Actions** - Headers, titles, badges, borders, all aligned
 4. **Check-in History** - Headers, badges, shadows, borders
 5. **About** - Headings, links, shadows
-6. **Top Navigation** - Shadow, border, link colors
+6. **Top Navigation** - Shadow, border, link colors, new logo
 7. **AI Coach Panel** - Gradient wash, persistent pills, removed duplicates
+8. **Background** - Subtle pastel gradient (pink → lavender → blue → cream)
 
 ### Design System Principles Applied:
 - Split-color pattern for all page headers (gradient label + gray text `#858a94`)

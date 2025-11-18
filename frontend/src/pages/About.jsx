@@ -6,8 +6,7 @@ function About() {
       <section>
         <h2>Overview</h2>
         <p>
-          This is an AI-powered OKR management system that uses conversational
-          interfaces and real-time visualization to help you track and achieve your goals.
+          <strong>Talk to an AI coach about your goals - out loud.</strong> Get expert OKR guidance through natural conversation with voice-to-text. Local-first privacy, markdown-based data.
         </p>
       </section>
 
@@ -27,9 +26,11 @@ function About() {
         <ul>
           <li><strong>Frontend:</strong> React + Vite + React Router</li>
           <li><strong>Backend:</strong> Node.js + Express</li>
-          <li><strong>AI:</strong> Claude API (Anthropic)</li>
+          <li><strong>AI:</strong> Claude Sonnet 4.5 (Anthropic) - requires API key</li>
+          <li><strong>Voice:</strong> Web Speech API (Chrome/Edge/Safari) + OpenAI Whisper (Firefox fallback)</li>
           <li><strong>Data:</strong> Markdown files</li>
         </ul>
+        <p><em>Note: AI Coach features require an Anthropic API key (set in backend/.env). Voice input works without API keys in Chrome/Edge/Safari.</em></p>
       </section>
 
       <section>

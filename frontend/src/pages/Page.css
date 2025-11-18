@@ -299,10 +299,7 @@
 }
 
 .objective-label {
-  background: linear-gradient(90deg, #d946ef 0%, #6366f1 60%, #5BA3FF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #a855f7;
 }
 
 .objective-title-text {

@@ -63,91 +63,93 @@ function Objectives() {
           {activeObjectives.map(obj => {
             return (
               <div key={obj.id} className="objective-card">
-                <div className="objective-header">
-                  <div>
-                    <h3>
-                      <span className="objective-label">Objective {obj.number}:</span>
-                      <span className="objective-title-text"> {obj.title}</span>
-                    </h3>
-                  </div>
-                  <div className="progress-circle">
-                    <span>{obj.progress}%</span>
-                  </div>
-                </div>
+                <details>
+                  <summary className="objective-header">
+                    <div>
+                      <h3>
+                        <span className="objective-label">Objective {obj.number}:</span>
+                        <span className="objective-title-text"> {obj.title}</span>
+                      </h3>
+                    </div>
+                    <div className="progress-circle">
+                      <span>{obj.progress}%</span>
+                    </div>
+                  </summary>
 
-                <div className="key-results">
-                  {obj.keyResults.map(kr => (
-                    <div key={kr.id} className="key-result">
-                      <div className="kr-header">
-                        <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                          <span className={`kr-status-indicator status-${kr.status}`}></span>
-                          <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                  <div className="key-results">
+                    {obj.keyResults.map(kr => (
+                      <div key={kr.id} className="key-result">
+                        <div className="kr-header">
+                          <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                            <span className={`kr-status-indicator status-${kr.status}`}></span>
+                            <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                          </div>
+                          <span className="kr-target-date">Target: {kr.targetDate}</span>
                         </div>
-                        <span className="kr-target-date">Target: {kr.targetDate}</span>
-                      </div>
 
-                      {/* Progress bar with baseline/target endpoints and current value */}
-                      {kr.baseline !== null && kr.baseline !== undefined && kr.target >= 0 ? (
-                        <div className="progress-container">
-                          <div className="progress-bar-with-labels">
-                            <span className="progress-endpoint baseline">{kr.baseline}</span>
-                            <div style={{ position: 'relative', flex: 1 }}>
-                              <div className="progress-bar">
-                                <div
-                                  className="progress-fill"
-                                  style={{ width: `${Math.min(kr.progress, 100)}%` }}
-                                />
-                              </div>
-                              {/* Tooltip box with current value */}
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  left: `${Math.min(kr.progress, 100)}%`,
-                                  bottom: '100%',
-                                  transform: 'translateX(-50%)',
-                                  marginBottom: '8px',
-                                  background: '#a855f7',
-                                  color: 'white',
-                                  padding: '3px 6px',
-                                  borderRadius: '3px',
-                                  fontSize: '0.7rem',
-                                  fontWeight: '600',
-                                  whiteSpace: 'nowrap',
-                                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                }}
-                              >
-                                {kr.current}
-                                {/* Arrow pointing down */}
+                        {/* Progress bar with baseline/target endpoints and current value */}
+                        {kr.baseline !== null && kr.baseline !== undefined && kr.target >= 0 ? (
+                          <div className="progress-container">
+                            <div className="progress-bar-with-labels">
+                              <span className="progress-endpoint baseline">{kr.baseline}</span>
+                              <div style={{ position: 'relative', flex: 1 }}>
+                                <div className="progress-bar">
+                                  <div
+                                    className="progress-fill"
+                                    style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                                  />
+                                </div>
+                                {/* Tooltip box with current value */}
                                 <div
                                   style={{
                                     position: 'absolute',
-                                    left: '50%',
-                                    top: '100%',
+                                    left: `${Math.min(kr.progress, 100)}%`,
+                                    bottom: '100%',
                                     transform: 'translateX(-50%)',
-                                    width: 0,
-                                    height: 0,
-                                    borderLeft: '5px solid transparent',
-                                    borderRight: '5px solid transparent',
-                                    borderTop: '5px solid #a855f7'
+                                    marginBottom: '8px',
+                                    background: '#a855f7',
+                                    color: 'white',
+                                    padding: '3px 6px',
+                                    borderRadius: '3px',
+                                    fontSize: '0.7rem',
+                                    fontWeight: '600',
+                                    whiteSpace: 'nowrap',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                                   }}
-                                />
+                                >
+                                  {kr.current}
+                                  {/* Arrow pointing down */}
+                                  <div
+                                    style={{
+                                      position: 'absolute',
+                                      left: '50%',
+                                      top: '100%',
+                                      transform: 'translateX(-50%)',
+                                      width: 0,
+                                      height: 0,
+                                      borderLeft: '5px solid transparent',
+                                      borderRight: '5px solid transparent',
+                                      borderTop: '5px solid #a855f7'
+                                    }}
+                                  />
+                                </div>
                               </div>
+                              <span className="progress-endpoint target">{kr.target}</span>
                             </div>
-                            <span className="progress-endpoint target">{kr.target}</span>
                           </div>
-                        </div>
-                      ) : (
-                        // Fallback for KRs without baseline
-                        <div className="progress-bar">
-                          <div
-                            className="progress-fill"
-                            style={{ width: `${Math.min(kr.progress, 100)}%` }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                        ) : (
+                          // Fallback for KRs without baseline
+                          <div className="progress-bar">
+                            <div
+                              className="progress-fill"
+                              style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </details>
               </div>
             );
           })}
@@ -161,91 +163,93 @@ function Objectives() {
           {completedThisYear.map(obj => {
             return (
               <div key={obj.id} className="objective-card completed">
-                <div className="objective-header">
-                  <div>
-                    <h3>
-                      <span className="objective-label">Objective {obj.number}:</span>
-                      <span className="objective-title-text"> {obj.title}</span>
-                    </h3>
-                  </div>
-                  <div className="progress-circle">
-                    <span>{obj.progress}%</span>
-                  </div>
-                </div>
+                <details>
+                  <summary className="objective-header">
+                    <div>
+                      <h3>
+                        <span className="objective-label">Objective {obj.number}:</span>
+                        <span className="objective-title-text"> {obj.title}</span>
+                      </h3>
+                    </div>
+                    <div className="progress-circle">
+                      <span>{obj.progress}%</span>
+                    </div>
+                  </summary>
 
-                <div className="key-results">
-                  {obj.keyResults.map(kr => (
-                    <div key={kr.id} className="key-result">
-                      <div className="kr-header">
-                        <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                          <span className={`kr-status-indicator status-${kr.status}`}></span>
-                          <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                  <div className="key-results">
+                    {obj.keyResults.map(kr => (
+                      <div key={kr.id} className="key-result">
+                        <div className="kr-header">
+                          <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                            <span className={`kr-status-indicator status-${kr.status}`}></span>
+                            <span className="kr-title"><strong>KR {kr.number}:</strong> {kr.title}</span>
+                          </div>
+                          <span className="kr-target-date">Target: {kr.targetDate}</span>
                         </div>
-                        <span className="kr-target-date">Target: {kr.targetDate}</span>
-                      </div>
 
-                      {/* Progress bar with baseline/target endpoints and current value */}
-                      {kr.baseline !== null && kr.baseline !== undefined && kr.target >= 0 ? (
-                        <div className="progress-container">
-                          <div className="progress-bar-with-labels">
-                            <span className="progress-endpoint baseline">{kr.baseline}</span>
-                            <div style={{ position: 'relative', flex: 1 }}>
-                              <div className="progress-bar">
-                                <div
-                                  className="progress-fill"
-                                  style={{ width: `${Math.min(kr.progress, 100)}%` }}
-                                />
-                              </div>
-                              {/* Tooltip box with current value */}
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  left: `${Math.min(kr.progress, 100)}%`,
-                                  bottom: '100%',
-                                  transform: 'translateX(-50%)',
-                                  marginBottom: '8px',
-                                  background: '#a855f7',
-                                  color: 'white',
-                                  padding: '3px 6px',
-                                  borderRadius: '3px',
-                                  fontSize: '0.7rem',
-                                  fontWeight: '600',
-                                  whiteSpace: 'nowrap',
-                                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                }}
-                              >
-                                {kr.current}
-                                {/* Arrow pointing down */}
+                        {/* Progress bar with baseline/target endpoints and current value */}
+                        {kr.baseline !== null && kr.baseline !== undefined && kr.target >= 0 ? (
+                          <div className="progress-container">
+                            <div className="progress-bar-with-labels">
+                              <span className="progress-endpoint baseline">{kr.baseline}</span>
+                              <div style={{ position: 'relative', flex: 1 }}>
+                                <div className="progress-bar">
+                                  <div
+                                    className="progress-fill"
+                                    style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                                  />
+                                </div>
+                                {/* Tooltip box with current value */}
                                 <div
                                   style={{
                                     position: 'absolute',
-                                    left: '50%',
-                                    top: '100%',
+                                    left: `${Math.min(kr.progress, 100)}%`,
+                                    bottom: '100%',
                                     transform: 'translateX(-50%)',
-                                    width: 0,
-                                    height: 0,
-                                    borderLeft: '5px solid transparent',
-                                    borderRight: '5px solid transparent',
-                                    borderTop: '5px solid #a855f7'
+                                    marginBottom: '8px',
+                                    background: '#a855f7',
+                                    color: 'white',
+                                    padding: '3px 6px',
+                                    borderRadius: '3px',
+                                    fontSize: '0.7rem',
+                                    fontWeight: '600',
+                                    whiteSpace: 'nowrap',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                                   }}
-                                />
+                                >
+                                  {kr.current}
+                                  {/* Arrow pointing down */}
+                                  <div
+                                    style={{
+                                      position: 'absolute',
+                                      left: '50%',
+                                      top: '100%',
+                                      transform: 'translateX(-50%)',
+                                      width: 0,
+                                      height: 0,
+                                      borderLeft: '5px solid transparent',
+                                      borderRight: '5px solid transparent',
+                                      borderTop: '5px solid #a855f7'
+                                    }}
+                                  />
+                                </div>
                               </div>
+                              <span className="progress-endpoint target">{kr.target}</span>
                             </div>
-                            <span className="progress-endpoint target">{kr.target}</span>
                           </div>
-                        </div>
-                      ) : (
-                        // Fallback for KRs without baseline
-                        <div className="progress-bar">
-                          <div
-                            className="progress-fill"
-                            style={{ width: `${Math.min(kr.progress, 100)}%` }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                        ) : (
+                          // Fallback for KRs without baseline
+                          <div className="progress-bar">
+                            <div
+                              className="progress-fill"
+                              style={{ width: `${Math.min(kr.progress, 100)}%` }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </details>
               </div>
             );
           })}

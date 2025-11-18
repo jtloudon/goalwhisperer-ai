@@ -68,10 +68,11 @@ Double-click **GoalWhisperer.app** in the project folder for a streamlined exper
 
 ### Core Tracking
 - **📊 Dashboard** - Visual overview of all objectives and recent wins
-- **🎯 Objectives** - Annual goals with measurable Key Results
+- **🎯 Objectives** - Annual goals with measurable Key Results (collapsible for easy navigation)
 - **📅 Weekly Actions** - Break goals into weekly action items
 - **📈 Progress Tracking** - Automatic progress calculation and visualization
 - **✅ Check-in History** - Reflect on what's working each week
+- **🎨 Modern UI** - Subtle gradient background, clean design with pink-purple-blue palette
 
 ### AI Coach (Optional)
 - **💬 Conversational Interface** - Chat with Claude Sonnet 4.5 about your goals
