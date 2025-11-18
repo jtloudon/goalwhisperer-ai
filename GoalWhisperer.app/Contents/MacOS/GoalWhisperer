@@ -6,6 +6,19 @@ APP_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
 # Change to the project root
 cd "$APP_DIR"
 
+# Function to claim a port (kill existing process if needed)
+claim_port() {
+    local port=$1
+    local service_name=$2
+
+    if lsof -i :$port > /dev/null 2>&1; then
+        echo "⚠️  Port $port busy. Killing existing process..."
+        lsof -ti :$port | xargs kill -9 2>/dev/null
+        sleep 2
+    fi
+    echo "✓ Port $port claimed for $service_name"
+}
+
 # Function to check if a port is listening
 wait_for_port() {
     local port=$1
@@ -27,6 +40,14 @@ clear
 echo "========================================="
 echo "  GoalWhisperer AI"
 echo "========================================="
+echo ""
+echo "Claiming ports..."
+echo ""
+
+# Claim ports before starting servers
+claim_port 3001 "Backend"
+claim_port 5173 "Frontend"
+
 echo ""
 echo "Starting servers..."
 echo ""

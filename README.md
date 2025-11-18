@@ -53,6 +53,15 @@ npm run dev
 
 The app will guide you through creating your first objective with an intuitive onboarding flow.
 
+#### 💻 Option C: Launch with App Icon (macOS)
+Double-click **GoalWhisperer.app** in the project folder for a streamlined experience:
+- ✨ **Automatic port cleanup** - Checks ports 3001 & 5173, kills conflicting processes
+- Starts both frontend and backend servers
+- Waits for services to be ready
+- Opens Safari automatically
+
+**Recommended for day-to-day use** - no need to worry about stale processes or port conflicts!
+
 ---
 
 ## 🎯 Features
@@ -244,6 +253,30 @@ npm run dev:backend      # Backend only (port 3001)
 npm run build            # Build for production
 npm run validate         # Check markdown data
 ```
+
+### Port Management & Troubleshooting
+
+**Automatic Port Cleanup (GoalWhisperer.app only):**
+When launching via the app icon, ports 3001 and 5173 are automatically checked and cleaned up before starting servers. This prevents "port already in use" errors from stale processes.
+
+**Manual Port Management (for `npm run dev` users):**
+```bash
+# Check if backend port is in use
+lsof -i :3001
+
+# Check if frontend port is in use
+lsof -i :5173
+
+# Kill processes on specific ports
+lsof -ti :3001 | xargs kill -9  # Backend
+lsof -ti :5173 | xargs kill -9  # Frontend
+```
+
+**Troubleshooting Startup Issues:**
+- **"Port 3001 already in use"** → Kill the process: `lsof -ti :3001 | xargs kill -9`
+- **"Port 5173 already in use"** → Kill the process: `lsof -ti :5173 | xargs kill -9`
+- **Previous servers didn't shut down cleanly** → Use app icon method for automatic cleanup
+- **Want hands-free startup** → Use GoalWhisperer.app instead of `npm run dev`
 
 ### Running with Different Data
 

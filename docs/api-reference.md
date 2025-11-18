@@ -838,8 +838,16 @@ When adding Claude conversational check-ins:
 
 **API not responding?**
 1. Check server is running: `curl http://localhost:3001/api/health`
-2. Check port in use: `lsof -i :3001`
-3. Review server logs for errors
+2. Check port conflicts: `lsof -i :3001`
+3. Kill stale processes: `lsof -ti :3001 | xargs kill -9`
+4. Review server logs for errors
+5. **Tip:** Use GoalWhisperer.app for automatic port cleanup
+
+**Port conflicts during startup?**
+1. Check what's using the port: `lsof -i :3001` (backend) or `lsof -i :5173` (frontend)
+2. Kill the conflicting process: `lsof -ti :PORT | xargs kill -9`
+3. Restart servers
+4. **Alternative:** Launch via GoalWhisperer.app - automatically claims ports
 
 **Empty/null data?**
 1. Verify markdown files exist in `personal/` directory

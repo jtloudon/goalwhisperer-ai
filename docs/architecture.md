@@ -60,6 +60,20 @@ Core functionality works offline. AI features require API key but degrade gracef
 6. Backend returns Claude's response
 7. Frontend auto-refreshes → shows updated state
 
+### Startup Flow (GoalWhisperer.app)
+1. **Port cleanup** - Check ports 3001 and 5173 with `lsof`
+2. **Kill conflicts** - Terminate existing processes if ports busy (`kill -9`)
+3. **Start servers** - Launch both frontend and backend via `npm run dev`
+4. **Wait for readiness** - Poll ports until both services respond
+5. **Open browser** - Launch Safari to http://localhost:5173
+6. **Display logs** - Show server output in terminal window
+
+**Benefits:**
+- No manual port management required
+- Handles stale processes from previous sessions
+- Visual feedback during startup process
+- Single-click launch experience
+
 ---
 
 ## Key Architectural Decisions
