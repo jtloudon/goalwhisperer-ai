@@ -12,7 +12,7 @@
 .sidebar-header {
   padding: 1.5rem;
   border-bottom: 1px solid #d0d0e8;
-  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+  background: var(--primary-gradient-solid);
   color: white;
   height: 100px;
   display: flex;

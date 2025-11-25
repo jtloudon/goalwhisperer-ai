@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import './Page.css';
+import AISparkle from '../components/AISparkle';
+import '../components/AISparkle.css';
 import './Dashboard.css';
 
 const API_URL = 'http://localhost:3001/api';
@@ -71,8 +73,9 @@ function Objectives() {
                         <span className="objective-title-text"> {obj.title}</span>
                       </h3>
                     </div>
-                    <div className="progress-circle">
+                    <div className="progress-circle" title="AI-calculated progress">
                       <span>{obj.progress}%</span>
+                      <AISparkle size={32} />
                     </div>
                   </summary>
 
@@ -107,7 +110,7 @@ function Objectives() {
                                     bottom: '100%',
                                     transform: 'translateX(-50%)',
                                     marginBottom: '8px',
-                                    background: '#a855f7',
+                                    background: 'var(--primary)',
                                     color: 'white',
                                     padding: '3px 6px',
                                     borderRadius: '3px',
@@ -129,7 +132,7 @@ function Objectives() {
                                       height: 0,
                                       borderLeft: '5px solid transparent',
                                       borderRight: '5px solid transparent',
-                                      borderTop: '5px solid #a855f7'
+                                      borderTop: '5px solid var(--primary)'
                                     }}
                                   />
                                 </div>
@@ -171,8 +174,9 @@ function Objectives() {
                         <span className="objective-title-text"> {obj.title}</span>
                       </h3>
                     </div>
-                    <div className="progress-circle">
+                    <div className="progress-circle" title="AI-calculated progress">
                       <span>{obj.progress}%</span>
+                      <AISparkle size={32} />
                     </div>
                   </summary>
 
@@ -207,7 +211,7 @@ function Objectives() {
                                     bottom: '100%',
                                     transform: 'translateX(-50%)',
                                     marginBottom: '8px',
-                                    background: '#a855f7',
+                                    background: 'var(--primary)',
                                     color: 'white',
                                     padding: '3px 6px',
                                     borderRadius: '3px',
@@ -229,7 +233,7 @@ function Objectives() {
                                       height: 0,
                                       borderLeft: '5px solid transparent',
                                       borderRight: '5px solid transparent',
-                                      borderTop: '5px solid #a855f7'
+                                      borderTop: '5px solid var(--primary)'
                                     }}
                                   />
                                 </div>
@@ -273,7 +277,7 @@ function Objectives() {
                           <span className="objective-title-text"> {obj.title}</span>
                         </h3>
                       </div>
-                      <div className="progress-circle">
+                      <div className="progress-circle" title="AI-calculated progress">
                         <span>{obj.progress}%</span>
                       </div>
                     </div>

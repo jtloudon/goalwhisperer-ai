@@ -210,9 +210,13 @@ Catches "get some customers" → Suggests "Acquire 100 customers by Dec 31" with
 - **Backend:** Node.js + Express
 - **AI:** Claude Sonnet 4.5 (Anthropic)
 - **Data:** Markdown files (no database!)
-- **Styling:** Vanilla CSS with gradient accents
+- **Styling:** CSS Variable Theme System with purple identity
 
 **📐 System Design:** See [Architecture & Design](docs/architecture.md) for detailed system architecture, design decisions, and data flow diagrams.
+
+**🎨 Theme System:** Centralized CSS variables in `frontend/src/theme.css` control the entire app's color scheme. Change purple to any color by editing one file! See `THEME_SYSTEM_IMPLEMENTATION_SUMMARY.md` for details.
+
+**✨ AI Indicators:** Gradient sparkles (✨) mark AI-generated content throughout the app, creating a clear visual language for what's AI-calculated vs user-entered.
 
 ---
 

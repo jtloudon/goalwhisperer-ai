@@ -1,0 +1,25 @@
+.ai-sparkle {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.15rem;
+  flex-shrink: 0;
+  transform: translateY(-0.1em);
+}
+
+/* Tighter spacing for badges */
+.badge-with-sparkle .ai-sparkle {
+  margin-left: 0.1rem;
+  transform: translateY(-0.15em);
+}
+
+/* Even tighter for percentage circles */
+.progress-circle .ai-sparkle {
+  margin-left: 0.1rem;
+  transform: translateY(-0.2em);
+}
+
+/* Agent name in ClaudePanel */
+.claude-header h3 .ai-sparkle {
+  margin-left: 0.25rem;
+  transform: translateY(-0.05em);
+}

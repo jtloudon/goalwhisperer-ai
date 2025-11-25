@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import './Page.css';
+import AISparkle from '../components/AISparkle';
+import '../components/AISparkle.css';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -128,7 +130,10 @@ function CheckinHistory() {
                     <span className="checkin-label">Check-in:</span>
                     <span className="checkin-date-range"> {formatDate(checkin.weekStart)} - {formatDate(checkin.weekEnd)}</span>
                   </h3>
-                  <span className="recent-badge">Most Recent</span>
+                  <div className="badge-with-sparkle">
+                    <span className="recent-badge">Most Recent</span>
+                    <AISparkle size={22} />
+                  </div>
                 </div>
                 {renderContent()}
               </div>

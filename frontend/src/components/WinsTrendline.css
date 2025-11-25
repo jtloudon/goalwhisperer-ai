@@ -28,6 +28,6 @@
 .tooltip-value {
   margin: 0;
   font-size: 0.95rem;
-  color: #8b5cf6;
+  color: var(--primary);
   font-weight: 600;
 }

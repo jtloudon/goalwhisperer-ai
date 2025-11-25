@@ -1,5 +1,7 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import './WinsTrendline.css';
+import AISparkle from './AISparkle';
+import './AISparkle.css';
 
 function WinsTrendline({ data }) {
   if (!data || data.length === 0) {
@@ -37,13 +39,18 @@ function WinsTrendline({ data }) {
 
   return (
     <div className="wins-trendline">
-      <h3>Wins Trend (Last 6 Weeks)</h3>
+      <h3>
+        Wins Trend (Last 6 Weeks)
+        <AISparkle size={28} />
+      </h3>
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={formattedData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
           <defs>
             <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#ec4899" />
-              <stop offset="100%" stopColor="#a855f7" />
+              <stop offset="33%" stopColor="#d946ef" />
+              <stop offset="66%" stopColor="#8b5cf6" />
+              <stop offset="100%" stopColor="#5BA3FF" />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

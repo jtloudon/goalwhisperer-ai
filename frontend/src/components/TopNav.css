@@ -1,13 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&display=swap');
 
 .top-nav {
-  background: white;
-  color: #333;
+  background: var(--primary-gradient);
+  color: var(--text-primary);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  border-bottom: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid var(--border-light);
+  height: 60px;
 }
 
 .top-nav-content {
@@ -18,10 +19,27 @@
   max-width: 100%;
 }
 
+.top-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .top-nav-brand .logo {
   height: 40px;
   width: auto;
   display: block;
+}
+
+.top-nav-brand h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: var(--font-brand);
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .top-nav-links {
@@ -32,7 +50,6 @@
 
 .nav-link {
   padding: 0.6rem 1.2rem;
-  color: #666;
   text-decoration: none;
   transition: all 0.2s;
   border-radius: 8px;
@@ -43,17 +60,23 @@
   letter-spacing: 0.05em;
 }
 
-.nav-link:hover {
-  background: transparent;
-  color: #a855f7;
+/* Light text variant (for left side of gradient) */
+.nav-link-light {
+  color: white;
 }
 
-.nav-link.active {
-  background: transparent;
-  color: #a855f7;
+.nav-link-light:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
 }
 
-.nav-link.active::after {
+.nav-link-light.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 600;
+}
+
+.nav-link-light.active::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -61,7 +84,35 @@
   transform: translateX(-50%);
   width: 60%;
   height: 3px;
-  background: #a855f7;
+  background: white;
+  border-radius: 2px 2px 0 0;
+}
+
+/* Dark text variant (for right side of gradient) */
+.nav-link-dark {
+  color: var(--primary-dark);
+}
+
+.nav-link-dark:hover {
+  background: var(--primary-alpha-10);
+  color: var(--primary-dark);
+}
+
+.nav-link-dark.active {
+  background: var(--primary-alpha-15);
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+.nav-link-dark.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background: var(--primary-dark);
   border-radius: 2px 2px 0 0;
 }
 

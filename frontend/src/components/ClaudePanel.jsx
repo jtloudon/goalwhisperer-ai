@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import './ClaudePanel.css';
+import AISparkle from './AISparkle';
+import './AISparkle.css';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -433,7 +435,10 @@ function ClaudePanel() {
     <aside className="claude-panel">
       <div className="claude-header">
         <div>
-          <h3>AI Coach</h3>
+          <h3>
+            AI Coach
+            <AISparkle size={24} />
+          </h3>
           <p className="claude-subtitle">powered by claude-sonnet-4-5-20250929</p>
         </div>
       </div>

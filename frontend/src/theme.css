@@ -1,0 +1,54 @@
+/* Theme Variable System */
+/* This file defines the app's visual identity through CSS variables */
+/* To change the entire app's color scheme, modify the primary color values below */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Primary Brand Color (OKR Web App = Purple) */
+  --primary: #a855f7;           /* Main brand color */
+  --primary-dark: #9333ea;      /* Darker shade for hover/active */
+  --primary-light: #c084fc;     /* Lighter shade for subtle highlights */
+  --primary-alpha-10: rgba(168, 85, 247, 0.1);   /* 10% opacity backgrounds */
+  --primary-alpha-15: rgba(168, 85, 247, 0.15);  /* 15% opacity backgrounds */
+  --primary-alpha-20: rgba(168, 85, 247, 0.2);   /* 20% opacity backgrounds */
+
+  /* Gradient Definitions */
+  --primary-gradient: linear-gradient(90deg, #a855f7 0%, #faf5ff 100%);
+  --primary-gradient-solid: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
+
+  /* Background Gradient (Purple tones) */
+  --bg-gradient: radial-gradient(ellipse 120% 100% at 20% 10%,
+    rgba(243, 232, 255, 0.35) 0%,
+    rgba(233, 213, 255, 0.25) 25%,
+    rgba(255, 255, 255, 0) 50%
+  ),
+  radial-gradient(ellipse 120% 100% at 80% 90%,
+    rgba(245, 235, 255, 0.3) 0%,
+    rgba(250, 245, 255, 0.2) 35%,
+    rgba(255, 255, 255, 0) 60%
+  ),
+  #fafafa;
+
+  /* Agent Identity (CONSISTENT ACROSS ALL APPS) */
+  --agent-gradient: linear-gradient(90deg, #d946ef 0%, #6366f1 60%, #5BA3FF 100%);
+  --agent-primary: #a855f7;
+  --agent-light-bg: #f3e8ff;
+
+  /* Neutral Colors (CONSISTENT ACROSS ALL APPS) */
+  --text-primary: #333;
+  --text-secondary: #666;
+  --text-tertiary: #999;
+  --bg-white: #ffffff;
+  --bg-gray-50: #f9fafb;
+  --bg-gray-100: #f3f4f6;
+  --border-light: #e5e7eb;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  /* Typography */
+  --font-brand: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-agent: 'Orbitron', sans-serif;  /* Keep for agent names only */
+}

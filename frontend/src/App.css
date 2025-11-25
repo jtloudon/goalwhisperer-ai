@@ -1,3 +1,6 @@
+/* Import theme system - defines all color variables */
+@import './theme.css';
+
 * {
   margin: 0;
   padding: 0;
@@ -5,20 +8,11 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background:
-    linear-gradient(135deg,
-      #f8d7ed 0%,
-      #e8dcf5 25%,
-      #dce9f7 50%,
-      #d9f0f5 75%,
-      #fcf4d9 100%
-    );
-  color: #333;
+  background: var(--bg-white);
+  color: var(--text-primary);
   min-height: 100vh;
 }
 
@@ -38,12 +32,12 @@ body {
   flex: 1;
   overflow-y: auto;
   background: transparent;
-  color: #333;
+  color: var(--text-primary);
   padding-right: 440px;
 }
 
 p, span, div, li {
-  color: #333;
+  color: var(--text-primary);
 }
 
 @media (max-width: 1200px) {

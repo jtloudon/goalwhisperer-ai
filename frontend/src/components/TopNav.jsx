@@ -16,14 +16,14 @@ function TopNav() {
     <nav className="top-nav">
       <div className="top-nav-content">
         <div className="top-nav-brand">
-          <img src="/logo-goalwhisperer-ai.png" alt="GoalWhisperer AI" className="logo" />
+          <h1>GoalWhisperer AI</h1>
         </div>
         <div className="top-nav-links">
           {navItems.map(item => (
             <Link
               key={item.path}
               to={item.path}
-              className={`nav-link ${location.pathname === item.path ? 'active' : ''}`}
+              className={`nav-link nav-link-dark ${location.pathname === item.path ? 'active' : ''}`}
             >
               {item.label}
             </Link>
