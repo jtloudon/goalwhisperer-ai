@@ -10,6 +10,7 @@
   --primary: #a855f7;           /* Main brand color */
   --primary-dark: #9333ea;      /* Darker shade for hover/active */
   --primary-light: #c084fc;     /* Lighter shade for subtle highlights */
+  --primary-lighter: #e9d5ff;   /* Light purple for text gradients */
   --primary-alpha-10: rgba(168, 85, 247, 0.1);   /* 10% opacity backgrounds */
   --primary-alpha-15: rgba(168, 85, 247, 0.15);  /* 15% opacity backgrounds */
   --primary-alpha-20: rgba(168, 85, 247, 0.2);   /* 20% opacity backgrounds */

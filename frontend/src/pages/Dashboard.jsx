@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import WinsTrendline from '../components/WinsTrendline';
 import EmptyState from '../components/EmptyState';
+import AISparkle from '../components/AISparkle';
 import './Dashboard.css';
 
 const API_URL = 'http://localhost:3001/api';
@@ -106,7 +107,10 @@ function Dashboard() {
 
       {/* Wins */}
       <section className="wins-section">
-        <h2>🎉 Recent Wins</h2>
+        <h2>
+          🎉 Recent Wins
+          <AISparkle size={28} />
+        </h2>
 
         {/* Wins Trendline */}
         {winsTimeline && winsTimeline.length > 0 && (
