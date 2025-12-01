@@ -108,7 +108,7 @@ function Dashboard() {
       {/* Wins */}
       <section className="wins-section">
         <h2>
-          🎉 Recent Wins
+          Recent Wins
           <AISparkle size={28} />
         </h2>
 

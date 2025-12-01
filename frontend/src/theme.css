@@ -33,7 +33,8 @@
   #fafafa;
 
   /* Agent Identity (CONSISTENT ACROSS ALL APPS) */
-  --agent-gradient: linear-gradient(90deg, #d946ef 0%, #6366f1 60%, #5BA3FF 100%);
+  /* Magenta-forward gradient for visibility - 3 stops, no blue for max pop */
+  --agent-gradient: linear-gradient(90deg, #ec4899 0%, #d946ef 40%, #8b5cf6 100%);
   --agent-primary: #a855f7;
   --agent-light-bg: #f3e8ff;
 

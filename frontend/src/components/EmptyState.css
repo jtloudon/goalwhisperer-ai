@@ -37,7 +37,8 @@
 .empty-state-content h1 {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
-  background: linear-gradient(90deg, #d946ef 0%, #6366f1 100%);
+  /* Magenta-forward gradient matching send button (no blue) */
+  background: linear-gradient(90deg, #ec4899 0%, #d946ef 40%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -76,7 +77,8 @@
 .step-number {
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, #d946ef 0%, #6366f1 100%);
+  /* Magenta-forward gradient for visibility */
+  background: linear-gradient(135deg, #ec4899 0%, #d946ef 40%, #8b5cf6 100%);
   color: white;
   border-radius: 50%;
   display: flex;

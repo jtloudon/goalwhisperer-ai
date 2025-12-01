@@ -1,14 +1,45 @@
 # GoalWhisperer AI - Design System Specification
 
-**Version:** 1.0
-**Last Updated:** November 18, 2025
+**Version:** 2.0
+**Last Updated:** December 1, 2025
 **Status:** Living Document
 
 > This is the authoritative design system specification for GoalWhisperer AI. All UI components, colors, typography, and patterns should follow these guidelines for consistency.
 
 ## Overview
 
-Modern AI-inspired design system following Apple's aesthetic principles with a pink-purple-blue color palette. Focus on clarity, subtle depth, and thoughtful use of gradients.
+Modern AI-inspired design system following Apple's aesthetic principles with a **magenta-forward** gradient palette. Focus on clarity, visual hierarchy through color restraint, and strategic use of gradients to highlight AI-generated content.
+
+## Design Evolution (v2.0 - December 2025)
+
+### Key Changes from v1.0
+
+**Problem Identified**: Purple overload caused agent gradient elements (sparkle, trendline) to blend into the interface instead of standing out as AI indicators.
+
+**Solution**: Reduced purple competition by implementing a clear visual hierarchy:
+- **Agent gradient** = AI-generated content (sparkle, trendline, agent name)
+- **Neutral colors** = data and content text (KPIs, lists, body text)
+- **Purple accents** = strategic brand moments (nav, carets, interactive elements)
+
+### Visual Hierarchy Strategy
+
+1. **Agent Gradient (Magenta-Forward)**
+   - Simplified from 4 stops to 3 stops
+   - Removed blue endpoint for stronger magenta presence
+   - Formula: `#ec4899 0%, #d946ef 40%, #8b5cf6 100%`
+   - Usage: Sparkle icons, trendlines, agent name, send button
+
+2. **Neutral Text (Data & Content)**
+   - KPI values: Dark slate `#1e293b` (authoritative data)
+   - Section headings: Dark gray `#333` (structure)
+   - Body text: Medium gray `#555` (readable content)
+   - Wins/lists: Gray `#555` (non-competing)
+
+3. **Purple Accents (Strategic Brand)**
+   - Collapsible carets: Purple `var(--primary)`
+   - KPI card backgrounds: Subtle purple `var(--primary-alpha-10)`
+   - Navigation: Purple gradient
+   - Interactive elements: Purple hover states
 
 ---
 
@@ -29,31 +60,37 @@ Modern AI-inspired design system following Apple's aesthetic principles with a p
 
 ## Color System
 
-### Brand Gradient (Primary)
+### Agent Gradient (Magenta-Forward) ⭐ PRIMARY
 ```css
-/* Pink → Purple → Blue */
-linear-gradient(90deg, #d946ef 0%, #6366f1 60%, #5BA3FF 100%)
+/* Magenta → Purple (3 stops, no blue for maximum visibility) */
+linear-gradient(90deg, #ec4899 0%, #d946ef 40%, #8b5cf6 100%)
 
-/* Used for: Objective labels, AI Coach title, logo gradient text */
+/* v2.0 Change: Removed blue (#5BA3FF) for stronger magenta presence */
+/* Usage: AI Sparkle, trendlines, agent name, send button, progress percentages */
 ```
+
+**Rationale**: By removing the blue endpoint and shifting weight toward pink/magenta (40% vs previous 30/33%), the gradient creates stronger contrast against purple UI elements, making AI-generated content clearly visible.
 
 ### Progress Bar Gradient
 ```css
-/* Rose-pink → Purple (vibrant, replaces dusty old gradient) */
+/* Rose-pink → Purple (vibrant) */
 linear-gradient(90deg, #ec4899 0%, #a855f7 100%)
 
-/* Applied to: All progress bars, chart trend line, current value bubbles */
+/* Applied to: Progress bar fills */
+/* Note: Simpler 2-stop gradient for progress bars, matches agent magenta start */
 ```
 
-### AI Coach Gradient Wash
+### Navigation Title Gradient
 ```css
-/* Pink → Fuchsia → Purple → Blue (top accent) */
-linear-gradient(135deg, #ec4899 0%, #d946ef 33%, #8b5cf6 66%, #3b82f6 100%)
-opacity: 0.5;
-height: 40px;
-filter: blur(12px);
+/* Medium to light purple - always lighter than nav background */
+linear-gradient(90deg,
+  var(--primary-light) 0%,    /* #c084fc */
+  #e9d5ff 60%,
+  #f8f6ff 100%
+)
 
-/* Organic shape attempt abandoned - kept simple symmetric blur at top edge */
+/* Applied to: Website title text */
+/* Rationale: Provides contrast against purple nav gradient background */
 ```
 
 ### Background Gradient
@@ -73,16 +110,21 @@ linear-gradient(135deg,
 
 ### Solid Colors
 
-**Purple (Primary Brand)**
-- `#a855f7` - Main brand purple (solid elements, nav underline, stats)
-- `#764ba2` - Darker purple (buttons, legacy elements)
+**Purple (Primary Brand)** - Use Sparingly
+- `#a855f7` - Main brand purple (carets, interactive accents)
+- `var(--primary-alpha-10)` - 10% opacity purple (subtle backgrounds like KPI cards)
 
-**Gray Scale**
-- `#858a94` - Medium gray (objective title descriptions)
-- `#9b87b5` - Soft purple-gray (wins text, de-emphasized content)
-- `#9ca3af` - Light gray (dates, baseline/target numbers)
-- `#f3f4f6` - Very light gray (assistant message background)
-- `#e5e7eb` - Border gray (replaced purple borders)
+**Neutral Gray Scale** - Primary Text Colors (v2.0)
+- `#1e293b` - Dark slate (KPI values, data that needs authority)
+- `#333` - Dark gray (section headings, objective titles, labels)
+- `#555` - Medium gray (body text, wins, lists)
+- `#666` - Soft gray (checkmarks, secondary elements)
+- `#9ca3af` - Light gray (dates, de-emphasized text)
+- `#e5e7eb` - Border gray
+
+**Agent Message Background** (v2.0)
+- `transparent` - Modern clean look, no background for agent messages
+- Note: User messages keep light purple background `#e0d4f5`
 
 **Status Colors**
 - Green: `#4caf50` (complete)
@@ -93,16 +135,15 @@ linear-gradient(135deg,
 
 ## Typography Hierarchy
 
-### Objective Titles (Split-Color Pattern)
+### Objective Titles (v2.0 - Unified Dark Gray)
 ```css
-/* "Objective 1:" - solid purple (matches caret) */
+/* v2.0: Both label and title use same dark gray */
 .objective-label {
-  color: #a855f7;
+  color: #333;  /* Changed from purple */
 }
 
-/* "Establish Director-Level AI Career Identity" - gray */
 .objective-title-text {
-  color: #858a94;
+  color: #333;  /* Changed from #858a94 */
 }
 
 /* Overall size */
@@ -111,15 +152,20 @@ linear-gradient(135deg,
 }
 ```
 
-### Progress Percentage
+**Rationale**: Purple caret is the only color accent. Unified dark gray text creates clean hierarchy where the caret signals interactivity, not the text color.
+
+### Progress Percentage (v2.0 - Agent Gradient)
 ```css
 .progress-circle {
-  font-size: 2.25rem; /* Larger, hero element */
-  background: linear-gradient(90deg, #d946ef 0%, #6366f1 100%);
+  font-size: 2.25rem;
+  /* Magenta-forward agent gradient */
+  background: linear-gradient(90deg, #ec4899 0%, #d946ef 40%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 ```
+
+**Rationale**: Uses agent gradient to indicate AI-calculated value.
 
 ### Key Result Titles
 ```css
@@ -493,6 +539,107 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 - Action number badges: Neutral gray `#f3f4f6` background
 - Completion badges: No background, just purple text
 - Persistent pills: Solid purple with white text
+
+---
+
+## Component Patterns (v2.0)
+
+### Collapsible Carets - Unified Pattern
+
+All collapsible sections use the same pattern across Objectives, Weekly Actions, and Check-in History:
+
+```css
+summary::before {
+  content: '▶';
+  display: inline-block;
+  margin-right: 0.5rem;  /* or 0.75rem for larger elements */
+  color: var(--primary);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+details[open] summary::before {
+  transform: rotate(90deg);
+}
+```
+
+**Key Features**:
+- Purple caret (only color accent)
+- Positioned inline with text using `display: inline-block`
+- Proper spacing with `margin-right`
+- Rotates 90° when open
+- `flex-shrink: 0` prevents squishing in flex layouts
+
+**Applied to**:
+- Objectives page: `.objective-header` collapsible cards
+- Weekly Actions: `.plan-card.past-week` collapsible plans
+- Check-in History: `.past-checkin` collapsible check-ins
+
+### Modern Chat UI - No Agent Background
+
+Following modern AI chat conventions (ChatGPT, Claude.ai):
+
+```css
+/* User messages: Keep light purple background */
+.message.user .message-content {
+  background: #e0d4f5;
+  color: #333;
+}
+
+/* Agent messages: Clean, no background (v2.0) */
+.message.assistant .message-content {
+  background: transparent;
+  color: #333;
+  padding-left: 0;
+}
+```
+
+**Rationale**:
+- Reduces visual boxes/clutter
+- Agent text feels integrated, not "trapped"
+- Matches modern AI interface patterns
+- Focus goes to content, not containers
+
+### KPI Cards - Subtle Purple Background
+
+```css
+.stat-card {
+  background: var(--primary-alpha-10);  /* 10% opacity purple */
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.stat-value {
+  color: #1e293b;  /* Dark slate for authority */
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+```
+
+**Rationale**:
+- Subtle purple adds brand warmth without competing
+- Dark slate numbers have strong contrast and authority
+- Uses CSS variable for portability
+
+### AI Sparkle Indicator
+
+Small icon next to AI-generated content using agent gradient:
+
+```jsx
+<AISparkle size={24} />
+```
+
+**Gradient definition** (inline SVG):
+```jsx
+<linearGradient id="sparkleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+  <stop offset="0%" stopColor="#ec4899" />
+  <stop offset="40%" stopColor="#d946ef" />
+  <stop offset="100%" stopColor="#8b5cf6" />
+</linearGradient>
+```
+
+**Usage**: Next to agent name, progress percentages, section headings with AI content
 
 ---
 

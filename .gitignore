@@ -40,3 +40,6 @@ logs/
 # Temporary files
 *.tmp
 .temp/
+
+# Old asset files
+.github/assets/old*

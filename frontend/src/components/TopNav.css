@@ -32,7 +32,7 @@
 }
 
 .top-nav-brand h1 {
-  font-size: 1.75rem;
+  font-size: 1.85rem;  /* Increased for better presence */
   font-weight: 900;
   font-family: 'Arial Black', Arial, sans-serif;
   margin: 0;
@@ -40,10 +40,11 @@
   letter-spacing: 0.03em;
   transform: skewX(-12deg);  /* Italic slant effect */
 
-  /* Gradient using theme colors - fully portable */
+  /* Medium to light purple - always lighter than nav background */
   background: linear-gradient(90deg,
     var(--primary-light) 0%,
-    var(--primary-lighter) 100%
+    #e9d5ff 60%,
+    #f8f6ff 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

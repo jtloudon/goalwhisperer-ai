@@ -15,11 +15,11 @@ function AISparkle({ size = 16, className = '' }) {
       aria-label="AI-generated"
     >
       <defs>
+        {/* Magenta-forward gradient matching send button (no blue for max pop) */}
         <linearGradient id="sparkleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#ec4899" />
-          <stop offset="33%" stopColor="#d946ef" />
-          <stop offset="66%" stopColor="#8b5cf6" />
-          <stop offset="100%" stopColor="#5BA3FF" />
+          <stop offset="40%" stopColor="#d946ef" />
+          <stop offset="100%" stopColor="#8b5cf6" />
         </linearGradient>
       </defs>
 

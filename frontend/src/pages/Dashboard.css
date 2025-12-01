@@ -45,7 +45,8 @@
 }
 
 .stat-card {
-  background: white;
+  /* Subtle primary purple tint - matches theme, distinct from agent bg */
+  background: var(--primary-alpha-10);
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -55,7 +56,8 @@
 .stat-value {
   font-size: 2.5rem;
   font-weight: bold;
-  color: var(--primary);
+  /* Changed to neutral slate - data should be readable, not branded */
+  color: #1e293b;
   margin-bottom: 0.5rem;
 }
 
@@ -74,7 +76,9 @@ section {
 section h2 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: var(--primary);
+  /* Changed to dark gray - let the sparkle provide the color pop */
+  color: #333;
+  font-weight: 600;
 }
 
 /* Objectives */
@@ -98,33 +102,38 @@ summary.objective-header {
   cursor: pointer;
   list-style: none;
   user-select: none;
-  position: relative;
-  padding-left: 2rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding: 0.5rem;
   margin: 0;
+  /* Ensure flex layout works with inline caret */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 summary.objective-header::-webkit-details-marker {
   display: none;
 }
 
-/* Caret indicator */
+/* Caret indicator - matches Weekly Actions pattern */
 summary.objective-header::before {
-  content: '▼';
-  position: absolute;
-  left: -1.5rem;
-  top: 50%;
-  transform: translateY(-50%);
+  content: '▶';
+  display: inline-block;
+  margin-right: 0.75rem;
   color: var(--primary);
   font-size: 1rem;
   transition: transform 0.2s;
-  z-index: 10;
+  flex-shrink: 0;
 }
 
-/* Rotate caret when closed */
-details:not([open]) > summary.objective-header::before {
-  transform: translateY(-50%) rotate(-90deg);
+/* Ensure title div takes available space and aligns left */
+summary.objective-header > div:first-of-type {
+  flex: 1;
+  text-align: left;
+}
+
+/* Rotate caret when open */
+details[open] > summary.objective-header::before {
+  transform: rotate(90deg);
 }
 
 summary.objective-header:hover {
@@ -138,11 +147,13 @@ summary.objective-header:hover {
 }
 
 .objective-label {
-  color: var(--primary);
+  /* Dark gray to match Weekly Actions pattern - purple caret is the only color */
+  color: #333;
 }
 
 .objective-title-text {
-  color: #858a94;
+  /* Unified dark gray for entire title */
+  color: #333;
 }
 
 .kr-summary {
@@ -183,14 +194,16 @@ summary.objective-header:hover {
   justify-content: center;
   font-weight: 600;
   font-size: 2.25rem;
-  background: linear-gradient(90deg, #d946ef 0%, #6366f1 100%);
+  /* Magenta-forward gradient matching send button (no blue) */
+  background: linear-gradient(90deg, #ec4899 0%, #d946ef 40%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .progress-circle span {
-  background: linear-gradient(90deg, #d946ef 0%, #6366f1 100%);
+  /* Magenta-forward gradient matching send button (no blue) */
+  background: linear-gradient(90deg, #ec4899 0%, #d946ef 40%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -414,7 +427,8 @@ summary.objective-header:hover {
   padding: 1rem 1.25rem;
   background: transparent;
   border-radius: 8px;
-  color: var(--primary) !important;
+  /* Changed to neutral - reduces purple competition */
+  color: #555 !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -435,12 +449,14 @@ summary.objective-header:hover {
 
 .win-text {
   flex: 1;
-  color: var(--primary) !important;
+  /* Neutral text color - not competing with agent gradient */
+  color: #555 !important;
 }
 
 .win-text::before {
   content: "✓";
-  color: var(--primary);
+  /* Neutral checkmark to match text */
+  color: #666;
   font-weight: 600;
   margin-right: 0.75rem;
   font-size: 1rem;

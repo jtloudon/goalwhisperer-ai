@@ -1,3 +1,4 @@
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import './WinsTrendline.css';
 import AISparkle from './AISparkle';
@@ -42,11 +43,11 @@ function WinsTrendline({ data }) {
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={formattedData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
           <defs>
+            {/* Magenta-forward gradient matching send button (no blue) */}
             <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#ec4899" />
-              <stop offset="33%" stopColor="#d946ef" />
-              <stop offset="66%" stopColor="#8b5cf6" />
-              <stop offset="100%" stopColor="#5BA3FF" />
+              <stop offset="40%" stopColor="#d946ef" />
+              <stop offset="100%" stopColor="#8b5cf6" />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -75,4 +76,18 @@ function WinsTrendline({ data }) {
   );
 }
 
-export default WinsTrendline;
+// Memoize component to prevent re-renders when data hasn't changed
+// Deep comparison of data array to avoid redrawing chart unnecessarily
+export default React.memo(WinsTrendline, (prevProps, nextProps) => {
+  // Compare data arrays for equality
+  if (!prevProps.data && !nextProps.data) return true;
+  if (!prevProps.data || !nextProps.data) return false;
+  if (prevProps.data.length !== nextProps.data.length) return false;
+
+  // Deep compare each data point
+  return prevProps.data.every((item, index) => {
+    const nextItem = nextProps.data[index];
+    return item.weekStart === nextItem.weekStart &&
+           item.count === nextItem.count;
+  });
+});

@@ -299,11 +299,13 @@
 }
 
 .objective-label {
-  color: var(--primary);
+  /* Dark gray to match Weekly Actions pattern - purple caret is the only color */
+  color: #333;
 }
 
 .objective-title-text {
-  color: #858a94;
+  /* Unified dark gray for entire title */
+  color: #333;
 }
 
 .objective-group .actions-list {
@@ -499,7 +501,8 @@
 .stat-value {
   font-size: 2rem;
   font-weight: bold;
-  color: var(--primary);
+  /* Changed to neutral slate - data should be readable, not branded */
+  color: #1e293b;
 }
 
 .wins-section {
@@ -687,14 +690,14 @@
   align-items: center;
 }
 
-/* Check-in label uses primary color (not agent gradient) */
+/* Check-in label uses dark gray - matches Objectives and Weekly Actions pattern */
 .checkin-label {
-  color: var(--primary);
+  color: #333;
   font-weight: 600;
 }
 
 .checkin-date-range {
-  color: #858a94;
+  color: #333;
 }
 
 .checkin-header h3 {
@@ -711,7 +714,8 @@
 
 .recent-badge {
   padding: 0.3rem 0.75rem;
-  background: linear-gradient(135deg, #ec4899 0%, #d946ef 50%, #8b5cf6 100%);
+  /* Magenta-forward gradient matching send button (no blue) */
+  background: linear-gradient(135deg, #ec4899 0%, #d946ef 40%, #8b5cf6 100%);
   color: white;
   border-radius: 12px;
   font-size: 0.8rem;
@@ -754,21 +758,33 @@
 .past-checkin summary {
   cursor: pointer;
   list-style: none;
+  /* Maintain flex layout for proper spacing */
+  display: flex;
+  align-items: center;
 }
 
 .past-checkin summary::-webkit-details-marker {
   display: none;
 }
 
-.past-checkin summary::after {
-  content: '▼';
-  float: right;
-  color: #999;
+/* Purple caret, matching Weekly Actions pattern */
+.past-checkin summary::before {
+  content: '▶';
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: var(--primary);
   transition: transform 0.2s;
+  flex-shrink: 0;
 }
 
-.past-checkin[open] summary::after {
-  transform: rotate(180deg);
+.past-checkin[open] summary::before {
+  transform: rotate(90deg);
+}
+
+/* Ensure h3 takes full width and aligns left */
+.past-checkin summary h3 {
+  flex: 1;
+  text-align: left;
 }
 
 .empty-state {
