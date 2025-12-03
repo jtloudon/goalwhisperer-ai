@@ -209,19 +209,22 @@
 
 .persistent-pill {
   padding: 0.3rem 0.7rem;
-  border: 2px solid var(--primary);
+  border: 2px solid transparent;
+  /* Gradient border technique: white bg + agent gradient border */
+  background-image: linear-gradient(white, white), var(--agent-gradient);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
   border-radius: 50px;
   font-size: 0.7rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  background: white;
-  color: var(--primary);
+  color: var(--agent-primary);
   white-space: nowrap;
 }
 
 .persistent-pill:hover:not(:disabled) {
-  background: var(--primary-alpha-10);
+  background-image: linear-gradient(var(--agent-light-bg), var(--agent-light-bg)), var(--agent-gradient);
   transform: translateY(-1px);
 }
 
@@ -312,10 +315,14 @@
 }
 
 .claude-input-form button:disabled {
-  background: #e8e8e8;
-  color: #999;
-  cursor: not-allowed;
-  opacity: 0.6;
+  /* Keep gradient background always visible (template pattern) */
+  background: linear-gradient(135deg,
+    #ec4899 0%,
+    #d946ef 40%,
+    #8b5cf6 100%);
+  /* Faint text when disabled/empty */
+  color: rgba(255, 255, 255, 0.4);
+  /* Note: opacity 0.5 applied via global button:disabled rule in index.css */
 }
 
 /* Voice icon button inside textarea */

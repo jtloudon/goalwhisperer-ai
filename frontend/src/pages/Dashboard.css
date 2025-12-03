@@ -81,6 +81,17 @@ section h2 {
   font-weight: 600;
 }
 
+/* Recent Wins heading - agent gradient */
+.wins-section h2 {
+  background: var(--agent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 /* Objectives */
 .objective-card {
   background: white;
@@ -114,15 +125,20 @@ summary.objective-header::-webkit-details-marker {
   display: none;
 }
 
-/* Caret indicator - matches Weekly Actions pattern */
+/* CSS Chevron - made with borders */
 summary.objective-header::before {
-  content: '▶';
+  content: '';
   display: inline-block;
+  width: var(--chevron-size-default);
+  height: var(--chevron-size-default);
+  border-right: var(--chevron-border-width) solid var(--chevron-color-primary);
+  border-bottom: var(--chevron-border-width) solid var(--chevron-color-primary);
+  transform: rotate(-45deg);
   margin-right: 0.75rem;
-  color: var(--primary);
-  font-size: 1rem;
   transition: transform 0.2s;
   flex-shrink: 0;
+  align-self: center;
+  margin-top: 0.25rem;  /* Fine-tune vertical alignment */
 }
 
 /* Ensure title div takes available space and aligns left */
@@ -131,9 +147,9 @@ summary.objective-header > div:first-of-type {
   text-align: left;
 }
 
-/* Rotate caret when open */
+/* Rotate chevron when open (points down instead of right) */
 details[open] > summary.objective-header::before {
-  transform: rotate(90deg);
+  transform: rotate(45deg);
 }
 
 summary.objective-header:hover {

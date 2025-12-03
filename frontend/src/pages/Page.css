@@ -151,15 +151,20 @@
 }
 
 .plan-card.past-week summary::before {
-  content: '▶';
+  content: '';
   display: inline-block;
+  width: var(--chevron-size-default);
+  height: var(--chevron-size-default);
+  border-right: var(--chevron-border-width) solid var(--chevron-color-primary);
+  border-bottom: var(--chevron-border-width) solid var(--chevron-color-primary);
+  transform: rotate(-45deg);
   margin-right: 0.5rem;
   transition: transform 0.2s;
-  color: var(--primary);
+  flex-shrink: 0;
 }
 
 .plan-card.past-week[open] summary::before {
-  transform: rotate(90deg);
+  transform: rotate(45deg);
 }
 
 .plan-card.past-week summary:hover {
@@ -767,18 +772,22 @@
   display: none;
 }
 
-/* Purple caret, matching Weekly Actions pattern */
+/* CSS Chevron - matching Weekly Actions pattern */
 .past-checkin summary::before {
-  content: '▶';
+  content: '';
   display: inline-block;
+  width: var(--chevron-size-default);
+  height: var(--chevron-size-default);
+  border-right: var(--chevron-border-width) solid var(--chevron-color-primary);
+  border-bottom: var(--chevron-border-width) solid var(--chevron-color-primary);
+  transform: rotate(-45deg);
   margin-right: 0.5rem;
-  color: var(--primary);
   transition: transform 0.2s;
   flex-shrink: 0;
 }
 
 .past-checkin[open] summary::before {
-  transform: rotate(90deg);
+  transform: rotate(45deg);
 }
 
 /* Ensure h3 takes full width and aligns left */
