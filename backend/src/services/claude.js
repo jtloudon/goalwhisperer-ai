@@ -20,6 +20,12 @@ import {
   addWin,
   saveCheckinSummary,
 } from './writer.js';
+import {
+  parseAnnualObjectives,
+  parseWeeklyPlans,
+  parseCheckinHistory,
+  parseProgressSummary,
+} from './parser.js';
 import PATHS from '../config/paths.js';
 
 // Get current file's directory for loading agent prompts
@@ -307,6 +313,73 @@ const tools = [
       required: ['weekStart', 'weekEnd'],
     },
   },
+  {
+    name: 'read_objectives',
+    description: 'Read all objectives and their key results from the annual objectives file. Use this when you need to verify current KR targets, progress, baselines, or any other objective/KR details. Optionally filter by objective number. CRITICAL: Use this tool whenever you need to check the current state of objectives or KRs before making decisions or answering user questions about specific KRs.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        objectiveNumber: {
+          type: 'string',
+          description: 'Optional: Filter to a specific objective number (e.g., "1", "2", "3"). If omitted, returns all objectives.',
+        },
+      },
+    },
+  },
+  {
+    name: 'read_key_result',
+    description: 'Read a single key result by its ID. More efficient than read_objectives when you only need details for one specific KR. Returns the KR with all its properties: title, status, direction, baseline, target, current, progress, targetDate. Use this when the user asks about a specific KR or you need to verify KR details before updating.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        krId: {
+          type: 'string',
+          description: 'Key result ID (e.g., "kr-1.2" or "1.2")',
+        },
+      },
+      required: ['krId'],
+    },
+  },
+  {
+    name: 'read_weekly_plan',
+    description: 'Read a specific weekly plan by week start date. Returns all actions for that week with their status, mapsTo references, and details. Use this when you need to see what actions are planned for a specific week, verify action status, or check which KRs the actions map to.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        weekStart: {
+          type: 'string',
+          description: 'Week start date (YYYY-MM-DD) of the plan to read',
+        },
+      },
+      required: ['weekStart'],
+    },
+  },
+  {
+    name: 'read_checkin_history',
+    description: 'Read recent check-in summaries. Returns the last N check-ins with completions, updates, next week focus, and insights. Use this to understand recent progress patterns, see what was discussed in previous check-ins, or get context on historical decisions. CRITICAL: This data is NOT included in your initial context, so you must call this tool if you need check-in history.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        limit: {
+          type: 'number',
+          description: 'Optional: Number of recent check-ins to return (default: 5, max: 20)',
+        },
+      },
+    },
+  },
+  {
+    name: 'read_wins',
+    description: 'Read recent wins from the progress summary. Returns the most recent win entries with dates. Use this for better duplicate detection before adding new wins, or when the user asks to see their recent wins. The initial context includes some wins, but this tool gives you the full list and more control.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        limit: {
+          type: 'number',
+          description: 'Optional: Number of recent wins to return (default: 10, max: 50)',
+        },
+      },
+    },
+  },
 ];
 
 // Execute tool calls
@@ -397,6 +470,140 @@ async function executeTool(toolName, toolInput) {
 
       case 'save_checkin_summary':
         return await saveCheckinSummary(PATHS.tracking.checkinHistory, toolInput);
+
+      case 'read_objectives': {
+        const result = await parseAnnualObjectives(PATHS.objectives.annual);
+
+        // Filter by objective number if specified
+        if (toolInput.objectiveNumber) {
+          const objNum = parseInt(toolInput.objectiveNumber);
+          const objective = result.objectives.find(obj => obj.number === objNum);
+
+          if (!objective) {
+            return {
+              error: `Objective ${toolInput.objectiveNumber} not found`,
+            };
+          }
+
+          return {
+            success: true,
+            message: `Retrieved Objective ${objNum}`,
+            data: {
+              objective,
+              year: result.year,
+            },
+          };
+        }
+
+        // Return all objectives
+        return {
+          success: true,
+          message: `Retrieved ${result.objectives.length} objective(s)`,
+          data: {
+            objectives: result.objectives,
+            year: result.year,
+          },
+        };
+      }
+
+      case 'read_key_result': {
+        const result = await parseAnnualObjectives(PATHS.objectives.annual);
+
+        // Normalize KR ID (accept "1.2", "kr-1.2", or "KR 1.2")
+        const krIdNormalized = toolInput.krId.replace(/^kr-/i, '').replace(/^KR\s+/i, '');
+        const krIdWithPrefix = `kr-${krIdNormalized}`;
+
+        // Search for the KR across all objectives
+        let foundKR = null;
+        let foundObjective = null;
+
+        for (const obj of result.objectives) {
+          const kr = obj.keyResults.find(kr => kr.id === krIdWithPrefix || kr.number === krIdNormalized);
+          if (kr) {
+            foundKR = kr;
+            foundObjective = obj;
+            break;
+          }
+        }
+
+        if (!foundKR) {
+          return {
+            error: `Key result ${toolInput.krId} not found`,
+          };
+        }
+
+        return {
+          success: true,
+          message: `Retrieved KR ${foundKR.number}`,
+          data: {
+            keyResult: foundKR,
+            objective: {
+              id: foundObjective.id,
+              number: foundObjective.number,
+              title: foundObjective.title,
+            },
+          },
+        };
+      }
+
+      case 'read_weekly_plan': {
+        const plans = await parseWeeklyPlans(PATHS.plans);
+
+        // Find the plan matching the week start date
+        const plan = plans.find(p => p.dateRange.startsWith(toolInput.weekStart));
+
+        if (!plan) {
+          return {
+            error: `No weekly plan found for week starting ${toolInput.weekStart}`,
+          };
+        }
+
+        return {
+          success: true,
+          message: `Retrieved weekly plan for ${plan.dateRange}`,
+          data: {
+            plan,
+          },
+        };
+      }
+
+      case 'read_checkin_history': {
+        const limit = toolInput.limit || 5;
+        const maxLimit = Math.min(limit, 20); // Cap at 20
+
+        const checkins = await parseCheckinHistory(PATHS.tracking.checkinHistory);
+
+        // Return most recent N check-ins (they're already sorted newest first)
+        const recentCheckins = checkins.slice(0, maxLimit);
+
+        return {
+          success: true,
+          message: `Retrieved ${recentCheckins.length} check-in(s)`,
+          data: {
+            checkins: recentCheckins,
+            total: checkins.length,
+          },
+        };
+      }
+
+      case 'read_wins': {
+        const limit = toolInput.limit || 10;
+        const maxLimit = Math.min(limit, 50); // Cap at 50
+
+        const progressSummary = await parseProgressSummary(PATHS.tracking.progress, PATHS.plans);
+
+        // Return most recent N wins
+        const recentWins = progressSummary.wins.slice(0, maxLimit);
+
+        return {
+          success: true,
+          message: `Retrieved ${recentWins.length} win(s)`,
+          data: {
+            wins: recentWins,
+            total: progressSummary.wins.length,
+          },
+        };
+      }
 
       default:
         throw new Error(`Unknown tool: ${toolName}`);
