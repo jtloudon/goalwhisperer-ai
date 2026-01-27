@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 The Problem
+## The Problem
 
 **Achieving meaningful goals shouldn't require learning complex productivity systems.**
 
@@ -20,7 +20,7 @@ Traditional goal tracking fails because:
 
 ---
 
-## ⚡ Quick Start (5 minutes)
+## Quick Start
 
 ### 1. Clone & Install
 ```bash
@@ -31,7 +31,7 @@ npm run install:all
 
 ### 2. Choose Your Path
 
-#### 🎯 Option A: Try Demo Data (Fastest)
+#### Option A: Try Demo Data (Fastest)
 Perfect for seeing what the app can do before setting up your goals.
 
 ```bash
@@ -40,10 +40,9 @@ DATA_DIR=./demo npm run dev
 
 **Then open:** http://localhost:5173
 
-You'll see a coffee shop owner's goals—completely fake data to explore features!
+You'll see a coffee shop owner's goals — demo data to explore features.
 
-#### 🚀 Option B: Create Your Goals
-Ready to track your own goals? Just run the app!
+#### Option B: Create Your Goals
 
 ```bash
 npm run dev
@@ -53,43 +52,43 @@ npm run dev
 
 The app will guide you through creating your first objective with an intuitive onboarding flow.
 
-#### 💻 Option C: Launch with App Icon (macOS)
+#### Option C: Launch with App Icon (macOS)
 Double-click **GoalWhisperer.app** in the project folder for a streamlined experience:
-- ✨ **Automatic port cleanup** - Checks ports 3001 & 5173, kills conflicting processes
+- **Automatic port cleanup** — checks ports 3001 & 5173, kills conflicting processes
 - Starts both frontend and backend servers
 - Waits for services to be ready
 - Opens Safari automatically
 
-**Recommended for day-to-day use** - no need to worry about stale processes or port conflicts!
+**Recommended for day-to-day use** — no need to worry about stale processes or port conflicts.
 
 ---
 
-## 🎯 Features
+## Features
 
 ### Core Tracking
-- **📊 Dashboard** - Visual overview of all objectives and recent wins
-- **🎯 Objectives** - Annual goals with measurable Key Results (collapsible for easy navigation)
-- **📅 Weekly Actions** - Break goals into weekly action items
-- **📈 Progress Tracking** - Automatic progress calculation and visualization
-- **✅ Check-in History** - Reflect on what's working each week
-- **🎨 Modern UI** - Subtle gradient background, clean design with pink-purple-blue palette
+- **Dashboard** — visual overview of all objectives and recent wins
+- **Objectives** — annual goals with measurable Key Results (collapsible navigation)
+- **Weekly Actions** — break goals into weekly action items
+- **Progress Tracking** — automatic progress calculation and visualization
+- **Check-in History** — reflect on what's working each week
+- **Modern UI** — gradient background, clean design with purple palette
 
 ### AI Coach (Optional)
-- **💬 Conversational Interface** - Chat with Claude Sonnet 4.5 about your goals
-- **🎤 Real-Time Voice Input** - Speak and watch text appear instantly (Chrome/Edge/Safari - FREE!) ✨
-- **🤖 Smart Updates** - "Mark action 3 complete", "Update KR 1.2 to 75%"
-- **📝 Weekly Check-ins** - Guided reflection and insights
-- **🎯 Goal Creation** - Natural language objective setting
+- **Conversational Interface** — chat with Claude Sonnet 4.5 about your goals
+- **Real-Time Voice Input** — speak and watch text appear instantly (Chrome/Edge/Safari, free)
+- **Smart Updates** — "Mark action 3 complete", "Update KR 1.2 to 75%"
+- **Weekly Check-ins** — guided reflection and insights
+- **Goal Creation** — natural language objective setting
 
 ### Privacy & Data
-- **🏠 Local-First** - All data stays on your machine
-- **📁 Markdown Storage** - Human-readable, version control friendly
-- **🔒 No Cloud Required** - Works offline (AI features need API key)
-- **📤 Git-Friendly** - Track goals alongside your code
+- **Local-First** — all data stays on your machine
+- **Markdown Storage** — human-readable, version control friendly
+- **No Cloud Required** — works offline (AI features need API key)
+- **Git-Friendly** — track goals alongside your code
 
 ---
 
-## 📖 How It Works
+## How It Works
 
 GoalWhisperer uses a simple markdown structure:
 
@@ -125,11 +124,11 @@ Example objective:
 - **Target Date**: 2025-12-31
 ```
 
-The app parses these files and creates beautiful visualizations!
+The app parses these files and renders them as interactive visualizations.
 
 ---
 
-## 🛠️ Setup Details
+## Setup Details
 
 ### Prerequisites
 - **Node.js 18+** ([download](https://nodejs.org/))
@@ -144,11 +143,11 @@ The app parses these files and creates beautiful visualizations!
    ```
 3. Restart: `npm run dev`
 
-### Enable Voice Input (Optional but Awesome!)
+### Enable Voice Input (Optional)
 
-**Chrome/Edge/Safari users:** Voice input works **immediately for FREE!** Just click 🎤 and start talking - text appears in real-time! No setup needed. ✨
+**Chrome/Edge/Safari:** Voice input works immediately using the Web Speech API. Click the microphone button and start talking — text appears in real-time. No setup needed.
 
-**Firefox users only:** Want voice input too? Add OpenAI API key for Whisper fallback:
+**Firefox:** Requires an OpenAI API key for Whisper fallback:
 
 1. Get OpenAI API key from https://platform.openai.com/
 2. Add to `backend/.env`:
@@ -156,9 +155,9 @@ The app parses these files and creates beautiful visualizations!
    OPENAI_API_KEY=sk-your-openai-key-here
    ```
 3. Restart: `npm run dev`
-4. Click the 🎤 microphone button in the chat interface!
+4. Click the microphone button in the chat interface.
 
-**📖 Full setup guide:** See [VOICE_FEATURE.md](docs/voice-feature.md) for details, troubleshooting, and cost info.
+**Full setup guide:** See [VOICE_FEATURE.md](docs/voice-feature.md) for details, troubleshooting, and cost info.
 
 ### Validate Your Data
 
@@ -176,15 +175,15 @@ This will show errors like:
 
 ---
 
-## 💡 What the AI Coach Does For You
+## What the AI Coach Does
 
-The AI coach actively guides you through the OKR process—no manual expertise required.
+The AI coach guides you through the OKR process without requiring prior expertise.
 
 ### Refines Vague Goals Into Clear Objectives
-Turns "do business stuff" → "Launch sustainable coffee shop business with measurable milestones"
+Turns "do business stuff" into "Launch sustainable coffee shop business with measurable milestones."
 
 ### Ensures Everything is Measurable
-Catches "get some customers" → Suggests "Acquire 100 customers by Dec 31" with baseline and target
+Catches "get some customers" and suggests "Acquire 100 customers by Dec 31" with baseline and target.
 
 ### Keeps You Focused on What Matters
 - Guides weekly planning to 3-5 high-impact actions
@@ -198,13 +197,13 @@ Catches "get some customers" → Suggests "Acquire 100 customers by Dec 31" with
 - Asks clarifying questions to deepen your strategy
 
 ### Example Interactions
-- "Let's do my weekly check-in" → Guided reflection with structured prompts
-- "What should I focus on this week?" → AI analyzes your objectives and suggests priorities
-- "Mark action 2 complete" → Updates progress and asks about blockers or wins
+- "Let's do my weekly check-in" — guided reflection with structured prompts
+- "What should I focus on this week?" — analyzes objectives and suggests priorities
+- "Mark action 2 complete" — updates progress and asks about blockers or wins
 
 ---
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 - **Frontend:** React 18 + Vite + React Router
 - **Backend:** Node.js + Express
@@ -212,15 +211,15 @@ Catches "get some customers" → Suggests "Acquire 100 customers by Dec 31" with
 - **Data:** Markdown files (no database!)
 - **Styling:** CSS Variable Theme System with purple identity
 
-**📐 System Design:** See [Architecture & Design](docs/architecture.md) for detailed system architecture, design decisions, and data flow diagrams.
+**System Design:** See [Architecture & Design](docs/architecture.md) for detailed system architecture, design decisions, and data flow diagrams.
 
-**🎨 Theme System:** Centralized CSS variables in `frontend/src/theme.css` control the entire app's color scheme. Change purple to any color by editing one file! See `THEME_SYSTEM_IMPLEMENTATION_SUMMARY.md` for details.
+**Theme System:** Centralized CSS variables in `frontend/src/theme.css` control the entire app's color scheme. Change purple to any color by editing one file. See `THEME_SYSTEM_IMPLEMENTATION_SUMMARY.md` for details.
 
-**✨ AI Indicators:** Gradient sparkles (✨) mark AI-generated content throughout the app, creating a clear visual language for what's AI-calculated vs user-entered.
+**AI Indicators:** Gradient sparkle markers distinguish AI-generated content from user-entered data throughout the app.
 
 ---
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 goalwhisperer-ai/
@@ -247,7 +246,7 @@ goalwhisperer-ai/
 
 ---
 
-## 🚀 Development
+## Development
 
 ### Available Scripts
 
@@ -298,24 +297,24 @@ DATA_DIR=/path/to/data npm run dev
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is a personal portfolio project, but I welcome:
-- 🐛 Bug reports
-- 💡 Feature suggestions
-- 📝 Documentation improvements
+- Bug reports
+- Feature suggestions
+- Documentation improvements
 
 Please open an issue to discuss!
 
 ---
 
-## 📄 License
+## License
 
-MIT License - Feel free to use this for your own goals!
+MIT
 
 ---
 
-## 👤 Author
+## Author
 
 **Jesse Loudon**
 AI, Analytics & Business Insights
@@ -329,12 +328,8 @@ This project demonstrates full-stack development with AI integration, applying p
 
 ---
 
-## 📚 Additional Resources
+## Additional Resources
 
 - **Demo Data:** See `demo/` folder for examples
 - **Data Format:** Check `demo/objectives/annual-2025.md` for template
 - **Troubleshooting:** Run `npm run validate` to check data
-
----
-
-*Made with ❤️ and Claude Sonnet 4.5*
